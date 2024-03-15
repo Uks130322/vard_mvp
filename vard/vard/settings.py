@@ -44,6 +44,8 @@ INSTALLED_APPS = [
 
     #пользовтаельские приложения
     'vardapp',
+    'social_django',
+
 ]
 
 SITE_ID = 1
@@ -120,6 +122,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+  'social_core.backends.github.GithubOAuth2',
+
+]
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
