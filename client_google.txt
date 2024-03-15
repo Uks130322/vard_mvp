@@ -1,0 +1,2 @@
+client id 420560745246-ut13alpenv1a81ropeeqmtapg3r8ln13.apps.googleusercontent.com
+client secret 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

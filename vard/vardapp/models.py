@@ -1,15 +1,15 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin, AbstractUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, password=None, **kwargs):
+    def create_user(self, name, email, password=None, **kwargs):
         if not email:
             raise ValueError('User must have an email address')
 
         user = self.model(
-            username=username,
+            name=name,
             email=self.normalize_email(email),
             password=password,
             **kwargs
@@ -19,9 +19,8 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password=None, **kwargs):
+    def create_superuser(self, email, password=None, **kwargs):
         user = self.create_user(
-            username=username,
             email=email,
             password=password,
             **kwargs
@@ -33,7 +32,7 @@ class UserManager(BaseUserManager):
 
 
 class Users(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(unique=True, max_length=255)
+    name = models.CharField(max_length=255)
     email = models.EmailField(unique=True, max_length=255)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_password_change = models.DateTimeField(auto_now=True)
@@ -42,8 +41,8 @@ class Users(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
 
     objects = UserManager()
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
 
     def __str__(self):
         return f'{self.email}'
