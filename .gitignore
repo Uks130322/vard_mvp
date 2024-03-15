@@ -2,3 +2,4 @@
 .idea
 /venv
 .env
+/vard/db.sqlite3
