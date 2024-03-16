@@ -30,6 +30,30 @@ SECRET_KEY = 'django-insecure-8br((+(405z_8=c=&ke(1@j1=t8opdx_e@i1%ip6=brljbpra5
 DEBUG = True
 
 ALLOWED_HOSTS = []
+SITE_ID = 1
+
+CLIENT_ID = os.getenv('SOCIALACCOUNT_PROVIDERS')
+SEKRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
+SOCIALACCOUNT_PROVIDERS = {
+    'github' : {
+        # Для каждого провайдера на основе OAuth либо добавьте
+        #приложение ''SocialApp'' # (''socialaccount''), содержащее необходимое client
+        # учетные данные или перечислите их здесь:
+        # For each OAuth based provider, either add a ''SocialApp''
+        # (''socialaccount'' app) containing the required client
+        # credentials, or list them here:
+        'APP' : {
+            'client_id' : os.getenv('SOCIAL_AUTH_GITHUB_KEY') ,
+            'secret' : os.getenv('SOCIAL_AUTH_GITHUB_SECRET') ,
+            'key' : ''
+         }
+    }
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend' ,
+    'allauth.account.auth_backends.AuthenticationBackend' ,
+]
 
 
 # Application definition
@@ -41,14 +65,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     #пользовтаельские приложения
     'vardapp',
-    'social_django',
-
+    #'social_django',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github' ,
 ]
 
-SITE_ID = 1
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,21 +114,21 @@ WSGI_APPLICATION = 'vard.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'baza_test1',
-        'USER': 'root',
-        'PASSWORD': os.getenv("POSTGRESPWD"),
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'baza_test1',
+    #     'USER': 'root',
+    #     'PASSWORD': os.getenv("POSTGRESPWD"),
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '3306',
+    #     'OPTIONS': {
+    #         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+    #     }
+    # }
 }
 
 AUTH_USER_MODEL = 'vardapp.Users'
@@ -122,12 +151,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
-  'social_core.backends.github.GithubOAuth2',
 
-]
-SOCIAL_AUTH_GITHUB_KEY = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
-SOCIAL_AUTH_GITHUB_SECRET = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -150,3 +174,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
+
+SITE_URL = 'http://127.0.0.1:8000'
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/accounts/logout/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# Тест на основе файла электронной почты.надо когда не хотим отпраавлять нрастоящие письма
+#EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+#EMAIL_FILE_PATH = BASE_DIR / 'emails'
+
