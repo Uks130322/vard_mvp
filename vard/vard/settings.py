@@ -50,8 +50,30 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    # 'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.github',
 ]
+
+CLIENT_ID = os.getenv('SOCIALACCOUNT_PROVIDERS')
+GITHUB_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
+GOOGLE_SECRET_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_SECRET')
+
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+
+        'APP': {
+            'client_id': os.getenv('SOCIAL_AUTH_GITHUB_KEY'),
+            'secret': os.getenv('SOCIAL_AUTH_GITHUB_SECRET'),
+            'key': ''
+         }
+    },
+    'google': {
+        'APP': {
+            'client_id': os.getenv('SOCIAL_AUTH_GOOGLE_KEY'),
+            'secret': os.getenv('SOCIAL_AUTH_GOOGLE_SECRET'),
+            'key': ''
+        }
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
