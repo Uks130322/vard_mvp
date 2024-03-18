@@ -56,26 +56,23 @@ INSTALLED_APPS = [
     'vardapp',
 ]
 
-CLIENT_ID = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
-GITHUB_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
-GOOGLE_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'APP': {
+            'client_id': os.getenv('SOCIAL_AUTH_GITHUB_KEY'),
+            'secret': os.getenv('SOCIAL_AUTH_GITHUB_SECRET'),
+            'key': ''
+         }
+    },
+    'google': {
+        'APP': {
+            'client_id': os.getenv('SOCIAL_AUTH_GOOGLE_KEY'),
+            'secret': os.getenv('SOCIAL_AUTH_GOOGLE_SECRET'),
+            'key': ''
+        },
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'github': {
-#         'APP': {
-#             'client_id': CLIENT_ID,
-#             'secret': GITHUB_SECRET_KEY,
-#             'key': ''
-#          }
-#     },
-#     'google': {
-#         'APP': {
-#             'client_id': os.getenv('SOCIAL_AUTH_GOOGLE_KEY'),
-#             'secret': os.getenv('SOCIAL_AUTH_GOOGLE_SECRET'),
-#             'key': ''
-#         }
-#     }
-# }
+    }
+}
 
 #SOCIALACCOUNT_QUERY_EMAIL = True
 
@@ -202,6 +199,10 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 #ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}
+ACCOUNT_USERNAME_BLACKLIST = ["admin", "administrator", "moderator"]
+#ACCOUNT_USERNAME_MIN_LENGTH = 4
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
+
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
