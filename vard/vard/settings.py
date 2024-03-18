@@ -13,12 +13,12 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-load_dotenv()
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+dotenv_path = os.path.join(BASE_DIR, '.env')
+load_dotenv(dotenv_path)
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -53,13 +53,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
 ]
 
-CLIENT_ID = os.getenv('SOCIALACCOUNT_PROVIDERS')
-GITHUB_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
-GOOGLE_SECRET_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_SECRET')
+CLIENT_ID = 'SOCIALACCOUNT_PROVIDERS'
+# GITHUB_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
+# GOOGLE_SECRET_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_SECRET')
 
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
-
         'APP': {
             'client_id': os.getenv('SOCIAL_AUTH_GITHUB_KEY'),
             'secret': os.getenv('SOCIAL_AUTH_GITHUB_SECRET'),
@@ -130,7 +129,7 @@ DATABASES = {
     #     'ENGINE': 'django.db.backends.mysql',
     #     'NAME': 'baza_test1',
     #     'USER': 'root',
-    #     'PASSWORD': os.getenv("POSTGRESPWD"),
+    #     'PASSWORD': os.getenv("MYSQLPWD"),
     #     'HOST': '127.0.0.1',
     #     'PORT': '3306',
     #     'OPTIONS': {
@@ -197,7 +196,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = False
+ACCOUNT_EMAIL_VERIFICATION = None
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 EMAIL_HOST = 'smtp.yandex.ru'
@@ -211,3 +210,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'
 MANAGERS = [("n1", "stds58@gmail.com")]
 ADMINS = [("n2", "stds58@yandex.ru")]
 SERVER_EMAIL = 'stds58@yandex.ru'
+
+ACCOUNT_USERNAME_BLACKLIST = ["admin", "administrator", "moderator"]
+ACCOUNT_USERNAME_MIN_LENGTH = 4
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
