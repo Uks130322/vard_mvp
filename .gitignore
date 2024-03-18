@@ -1,7 +1,7 @@
 # Default ignored files
 .idea
 /venv
-.env
+vard/.env
 /vard/db.sqlite3
 /vard/vardapp/__pycache__
 /vard/vardapp/migrations/__pycache__

@@ -13,23 +13,24 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+dotenv_path = os.path.join(BASE_DIR, '.env')
+load_dotenv(dotenv_path)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+#SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'django-insecure-8br((+(405z_8=c=&ke(1@j1=t8opdx_e@i1%ip6=brljbpra5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -42,38 +43,41 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # users apps
-    'vardapp',
-
+'django.contrib.sites',
+'django.contrib.flatpages',
     # allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
+
+# users apps
+    'vardapp',
 ]
 
-CLIENT_ID = os.getenv('SOCIALACCOUNT_PROVIDERS')
+CLIENT_ID = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
 GITHUB_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
-GOOGLE_SECRET_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_SECRET')
+GOOGLE_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 
-SOCIALACCOUNT_PROVIDERS = {
-    'github': {
+# SOCIALACCOUNT_PROVIDERS = {
+#     'github': {
+#         'APP': {
+#             'client_id': CLIENT_ID,
+#             'secret': GITHUB_SECRET_KEY,
+#             'key': ''
+#          }
+#     },
+#     'google': {
+#         'APP': {
+#             'client_id': os.getenv('SOCIAL_AUTH_GOOGLE_KEY'),
+#             'secret': os.getenv('SOCIAL_AUTH_GOOGLE_SECRET'),
+#             'key': ''
+#         }
+#     }
+# }
 
-        'APP': {
-            'client_id': os.getenv('SOCIAL_AUTH_GITHUB_KEY'),
-            'secret': os.getenv('SOCIAL_AUTH_GITHUB_SECRET'),
-            'key': ''
-         }
-    },
-    'google': {
-        'APP': {
-            'client_id': os.getenv('SOCIAL_AUTH_GOOGLE_KEY'),
-            'secret': os.getenv('SOCIAL_AUTH_GOOGLE_SECRET'),
-            'key': ''
-        }
-    }
-}
+#SOCIALACCOUNT_QUERY_EMAIL = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -83,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     # 'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -164,11 +169,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -197,8 +199,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+#ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
