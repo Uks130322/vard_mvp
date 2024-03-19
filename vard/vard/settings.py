@@ -24,8 +24,8 @@ load_dotenv(dotenv_path)
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = os.getenv('SECRET_KEY')
-SECRET_KEY = 'django-insecure-8br((+(405z_8=c=&ke(1@j1=t8opdx_e@i1%ip6=brljbpra5'
+SECRET_KEY = os.getenv('SECRET_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-'django.contrib.sites',
-'django.contrib.flatpages',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
     # allauth
     'allauth',
     'allauth.account',
@@ -52,9 +52,14 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
 
-# users apps
+    # users apps
     'vardapp',
 ]
+
+
+CLIENT_ID = 'SOCIALACCOUNT_PROVIDERS'
+# GITHUB_SECRET_KEY = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
+# GOOGLE_SECRET_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_SECRET')
 
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
@@ -84,7 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     # 'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -132,7 +137,7 @@ DATABASES = {
     #     'ENGINE': 'django.db.backends.mysql',
     #     'NAME': 'baza_test1',
     #     'USER': 'root',
-    #     'PASSWORD': os.getenv("POSTGRESPWD"),
+    #     'PASSWORD': os.getenv("MYSQLPWD"),
     #     'HOST': '127.0.0.1',
     #     'PORT': '3306',
     #     'OPTIONS': {
@@ -198,9 +203,9 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-#ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}
+# ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}
 ACCOUNT_USERNAME_BLACKLIST = ["admin", "administrator", "moderator"]
-#ACCOUNT_USERNAME_MIN_LENGTH = 4
+ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
 
 
