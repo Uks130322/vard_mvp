@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     # users apps
     'vardapp',
+    'appquery',
 
     # allauth
     'allauth',
