@@ -15,7 +15,6 @@ engine = get_engine()
 Session = sessionmaker(autoflush=False, bind=engine)
 with Session(autoflush=False, bind=engine) as db:
     df = db.execute(text('SELECT * FROM vardapp_users'))
-#     df = db.query(Data2).all()
     for i in df:
-        print(i.id, i.name)
+        print(i)
 
