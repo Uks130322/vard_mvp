@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'django-insecure-8br((+(405z_8=c=&ke(1@j1=t8opdx_e@i1%ip6=brljbpra5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
+
+    'rest_framework',
 ]
 
 CLIENT_ID = os.getenv('SOCIALACCOUNT_PROVIDERS')
@@ -208,7 +210,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'
+#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'
 MANAGERS = [("n1", "stds58@gmail.com")]
 ADMINS = [("n2", "stds58@yandex.ru")]
 SERVER_EMAIL = 'stds58@yandex.ru'

@@ -16,8 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers, serializers, viewsets
+from appquery import views
+
+
+router = routers.DefaultRouter()
+#router.register(r'apidb', views.DBView, basename='DataBaseQuery')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
+    path('xxx/', include(('appquery.urls', 'appquery'), namespace='appquery')),
+path('api/', include(router.urls)),
+path('drf/', include('rest_framework.urls', namespace='rest_framework')),
+
 ]
