@@ -146,7 +146,7 @@ DATABASES = {
     # }
 }
 
-AUTH_USER_MODEL = 'vardapp.Users'
+AUTH_USER_MODEL = 'vardapp.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
