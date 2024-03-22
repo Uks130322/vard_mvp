@@ -21,7 +21,7 @@ from appquery import views
 
 
 router = routers.DefaultRouter()
-#router.register(r'apidb', views.DBView, basename='DataBaseQuery')
+router.register(r'apinews', views.DBView, basename='user')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
