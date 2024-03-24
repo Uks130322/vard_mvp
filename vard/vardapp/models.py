@@ -59,7 +59,7 @@ class Access(models.Model):
 
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='access id')
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, null=False, verbose_name='user id')
-    file_id = models.ForeignKey('File', on_delete=models.CASCADE, verbose_name='')
+    file_id = models.ForeignKey('File', on_delete=models.CASCADE, verbose_name='file id')
     access_type_id = models.IntegerField(choices=AccessType.choices, null=False, verbose_name='access type id')
     date_access_open = models.DateTimeField(auto_now=True, verbose_name='date access open')
     date_access_close = models.DateTimeField(auto_now=True, verbose_name='date access close')

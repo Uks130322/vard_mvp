@@ -52,8 +52,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
 
+    'rest_framework',
     # users apps
     'vardapp',
+    'APIapp',
 ]
 
 
