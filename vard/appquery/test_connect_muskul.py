@@ -47,6 +47,11 @@ print(data)
 
 
 
+
+
+# r[1]
+# keys_list = list(r.keys())
+
 #     driver1 = 1
 #     DRIVERS = [
 #         (driver1, 'SQLAlchemy'),
@@ -77,3 +82,31 @@ print(data)
 
 # https://metanit.com/python/database/3.1.php
 # pip install SQLAlchemy
+
+# "method": "info","select","create db","drop db"
+# {
+# "method": "select",
+# "user_id": 1,
+# "driver": "mysql",
+# "user_name": "root",
+# "password": "P@r0l",
+# "url": null,
+# "host": "localhost",
+# "port": null,
+# "data_base_name": "baza_test1",
+# "data_base_type": null,
+# "description": null,
+# "str_query": "SELECT * FROM vardapp_users where id=1"
+# }
+#
+# {
+# "method": "create db",
+# "user_id": 1,
+# "driver": "mysql",
+# "user_name": "root",
+# "password": "P@r0l",
+# "url": null,
+# "host": "localhost",
+# "port": null,
+# "data_base_name": "baza_test2"
+# }
