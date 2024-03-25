@@ -17,13 +17,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # @action(detail=False, methods=['post'])
     # def create_user(self, request, pk=None):
-    #     print("PRINTPRINTPRINT", request, self)
     #     user = User.create_user(**request)
     #     return Response({'status': 'user created'})
 
     # @action(detail=False, methods=['post'])
     # def set_password(self, request, pk=None):
-    #     print("PRINTPRINTPRINT", request, self)
     #     user = self.get_object()
     #     user.set_password(request['password'])
     #     user.save()
