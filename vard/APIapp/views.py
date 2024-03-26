@@ -1,7 +1,5 @@
-from rest_framework import viewsets, generics, status
-from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
 
 from vardapp.models import *
 from .serializers import *
@@ -14,18 +12,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('name')
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
-
-    # @action(detail=False, methods=['post'])
-    # def create_user(self, request, pk=None):
-    #     user = User.create_user(**request)
-    #     return Response({'status': 'user created'})
-
-    # @action(detail=False, methods=['post'])
-    # def set_password(self, request, pk=None):
-    #     user = self.get_object()
-    #     user.set_password(request['password'])
-    #     user.save()
-    #     return Response({'status': 'password set'})
 
 
 class AccessViewSet(viewsets.ModelViewSet):
