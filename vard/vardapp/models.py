@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-
+#from appquery.models import ClientDB
 
 class UserManager(BaseUserManager):
     def create_user(self, name, email, password=None, **kwargs):
@@ -45,4 +45,15 @@ class Users(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['name']
 
     def __str__(self):
-        return f'{self.email}'
+        return f'{self.id}'
+
+
+
+
+# class Chart(models.Model):
+#     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='chart id')
+#     user_id = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='user id')
+#     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
+#     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
+#     clientdb_id = models.ForeignKey(ClientDB, on_delete=models.CASCADE, verbose_name='user id')
+#     str_query = models.TextField(blank=True)

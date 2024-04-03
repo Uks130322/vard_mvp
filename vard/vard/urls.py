@@ -22,9 +22,13 @@ from vardapp import views as views2
 
 
 router = routers.DefaultRouter()
-#router.register(r'apinews', views.DBView, basename='user')
-router.register(r'client', views.ClientViewset)
+#router.register(r'dbview', views.DBView, basename='dbview')
+#router.register(r'client', views.ClientViewset)
 router.register(r'users', views2.UserViewset)
+router.register(r'charts', views.ChartViewSet)
+router.register(r'clientdb', views.ClientDBViewSet)
+router.register(r'clientdata', views.ClientDataViewSet)
+
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -35,3 +39,6 @@ urlpatterns = [
 
 
 ]
+
+
+
