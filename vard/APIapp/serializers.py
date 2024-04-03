@@ -1,5 +1,6 @@
-from vardapp.models import *
 from rest_framework import serializers
+from vardapp.models import *
+from APIapp.utils import load_csv, load_json
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -30,18 +31,35 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'date_delete': {'read_only': True},
+            'type_id': {'read_only': True},
         }
 
-    def load_by_url(self):
-        pass  ######### TODO
+    def load_by_url(self, validated_data):
+        try:
+            validated_data = load_json(self, validated_data)
+            return validated_data
+        except BaseException as error:
+            print(error)
+            try:
+                validated_data = load_csv(self, validated_data)
+                return validated_data
+            except BaseException as error:
+                print(error)
+                return validated_data
 
     def create(self, validated_data):
         if validated_data['load_by_url']:
-            return self.load_by_url
+            validated_data = self.load_by_url(validated_data)
 
         validated_data.pop('load_by_url', None)
         file = File(**validated_data)
-        file.name = file.link.name
+        if not file.name:
+            file.name = file.link.name
+        file_type = file.name.split('.')[-1].upper()
+        try:                                                 # TODO make stronger validation,
+            file.type_id = File.FilesType[file_type].value   # TODO move to other place,
+        except BaseException as error:                       # TODO make validator idk, do it before path creating
+            print(error, " Wrong file format")               # TODO make nice exceptions
         file.save()
         return file
 

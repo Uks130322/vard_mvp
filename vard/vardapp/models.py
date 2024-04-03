@@ -1,8 +1,8 @@
-import os.path
-
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
+
+from vardapp.utils import user_directory_path
 
 
 class UserManager(BaseUserManager):
@@ -67,10 +67,6 @@ class Access(models.Model):
     date_access_close = models.DateTimeField(auto_now=True, verbose_name='date access close')
 
 
-def user_directory_path(instance, filename):
-    return os.path.join(f'user_{instance.user_id.id}', filename)
-
-
 class File(models.Model):
 
     class Publish(models.IntegerChoices):
@@ -89,10 +85,13 @@ class File(models.Model):
         # EXCEL = 4
         # ... = 5
 
+        def __str__(self):
+            return self.value
+
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='file id')
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, null=False, verbose_name='user id')
     place_id = models.IntegerField(choices=Place.choices, default=2, null=False, verbose_name='id of place file')
-    type_id = models.IntegerField(choices=FilesType.choices, null=False, verbose_name='id type of file')
+    type_id = models.IntegerField(choices=FilesType.choices, null=False, verbose_name='id type of file', )
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     date_delete = models.DateTimeField(blank=True, null=True, verbose_name='date of delete')
