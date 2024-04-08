@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.0.12', '95.163.185.57']
 
 
 # Application definition
@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
+
+    # for CORS
+    'corsheaders',
 
     'rest_framework',
     # users apps
@@ -86,6 +89,7 @@ SOCIALACCOUNT_PROVIDERS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -96,7 +100,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'vard.urls'
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
 TEMPLATES = [
     {
@@ -222,3 +229,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'
 MANAGERS = [("n1", "stds58@gmail.com")]
 ADMINS = [("n2", "stds58@yandex.ru")]
 SERVER_EMAIL = 'stds58@yandex.ru'
+
+MEDIA_URL = ''  # TO DO clarify details
+MEDIA_ROOT = os.path.join('files')

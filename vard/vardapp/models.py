@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
+from vardapp.utils import user_directory_path
+
 
 class UserManager(BaseUserManager):
     def create_user(self, name, email, password=None, **kwargs):
@@ -79,19 +81,22 @@ class File(models.Model):
     class FilesType(models.IntegerChoices):
         CSV = 1
         JSON = 2
-        EXCEL = 3
-        PDF = 4
+        PDF = 3
+        # EXCEL = 4
         # ... = 5
+
+        def __str__(self):
+            return self.value
 
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='file id')
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, null=False, verbose_name='user id')
     place_id = models.IntegerField(choices=Place.choices, default=2, null=False, verbose_name='id of place file')
-    type_id = models.IntegerField(choices=FilesType.choices, null=False, verbose_name='id type of file')
+    type_id = models.IntegerField(choices=FilesType.choices, null=False, verbose_name='id type of file', )
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
-    date_delete = models.DateTimeField(auto_now=True, verbose_name='date of delete')
-    name = models.CharField(max_length=255, verbose_name='name of file')
-    link = models.CharField(max_length=255, verbose_name='link of file')
+    date_delete = models.DateTimeField(blank=True, null=True, verbose_name='date of delete')
+    name = models.CharField(max_length=255, blank=True, verbose_name='name of file')
+    link = models.FileField(upload_to=user_directory_path, blank=True, verbose_name='link of file')
     publish = models.IntegerField(choices=Publish.choices, default=0)
 
 
@@ -119,9 +124,9 @@ class Chart(models.Model):
 
 class Comment(models.Model):
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name = 'publish id')
-    file_id = models.ForeignKey('File', on_delete=models.CASCADE, null=False, verbose_name='cells id')
-    chart_id = models.ForeignKey('Chart', on_delete=models.CASCADE, null=False, verbose_name='chart id')
-    dashboard_id = models.ForeignKey('Dashboard', on_delete=models.CASCADE, null=False, verbose_name='dashboard id')
+    file_id = models.ForeignKey('File', on_delete=models.CASCADE, null=True, verbose_name='cells id')
+    chart_id = models.ForeignKey('Chart', on_delete=models.CASCADE, null=True, verbose_name='chart id')
+    dashboard_id = models.ForeignKey('Dashboard', on_delete=models.CASCADE, null=True, verbose_name='dashboard id')
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='user id')
     date_send = models.DateTimeField(auto_now_add=True, verbose_name='date of send')
     date_remove = models.DateTimeField(auto_now_add=True, verbose_name='date of remove')
