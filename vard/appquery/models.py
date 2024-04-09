@@ -1,5 +1,5 @@
 from django.db import models
-from vardapp.models import Users
+from vardapp.models import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
@@ -13,7 +13,7 @@ class ClientDB(models.Model):
     DRIVERS = [
         (driver1, 'SQLAlchemy for MySQL'),
     ]
-    user = models.ForeignKey(Users, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     connection_name = models.CharField(max_length=255, null=False, default='')
     user_name = models.CharField(max_length=16, null=False)
     password = models.CharField(max_length=128, null=False)
@@ -22,14 +22,14 @@ class ClientDB(models.Model):
     host = models.CharField(max_length=60, null=True, default='localhost')
     port = models.IntegerField(null=True, default=3306)
     data_base_type = models.CharField(null=True, max_length=255)
-    data_base_name = models.CharField(max_length=63,null=False)
+    data_base_name = models.CharField(max_length=63, null=False)
     description = models.CharField(null=True, max_length=255)
-    str_connection = models.CharField(blank=True, null=True, max_length=255)
+    str_datas_for_connection = models.CharField(blank=True, null=True, max_length=255)
 
-    def get_responces(self, id):
+    def get_responses(self, id):
         try:
-            user = Users.objects.get(id=self.user.id)
-            connect = ClientDB.objects.get(id = id)
+            user = User.objects.get(id=self.user.id)
+            connect = ClientDB.objects.get(id=id)
             user_id = user.id
             url = connect.url
             host = connect.host
@@ -49,8 +49,8 @@ class ClientDB(models.Model):
             result = {'user_id': user_id, 'fieldname': None, 'data': None, 'error': f'{error}'}
             return result
 
-    def update_responce(self, id):
-        result = self.get_responces(id)
+    def update_response(self, id):
+        result = self.get_responses(id)
         return result
 
     def __str__(self):
@@ -58,7 +58,7 @@ class ClientDB(models.Model):
 
 
 class Chart(models.Model):
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, verbose_name='user id')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     clientdb_id = models.ForeignKey(ClientDB, on_delete=models.CASCADE, verbose_name='clientdb id')

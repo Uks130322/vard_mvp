@@ -31,7 +31,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class Users(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True, max_length=255)
     date_creation = models.DateTimeField(auto_now_add=True)
