@@ -1,19 +1,13 @@
-
 from rest_framework import views, viewsets
-from .models import ClientDB, Chart, ClientData
+from vardapp.models import ClientDB, Chart, ClientData
 from rest_framework.response import Response
-from .serializers import ClientDBSerializer, ChartSerializer, ClientDataSerializer
+from .serializers import ClientDBSerializer, ClientDataSerializer
 import re
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, drop_database, database_exists
 from sqlalchemy import exc
-
-
-class ChartViewSet(viewsets.ModelViewSet):
-    queryset = Chart.objects.all()
-    serializer_class = ChartSerializer
 
 
 class ClientDBViewSet(viewsets.ModelViewSet):
@@ -70,13 +64,15 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         datas = serializer.validated_data
-        str_connection = self.get_str_connect_sqlalchemy(datas['user_name'], datas['password'], datas['url'],
+        str_datas_for_connection = self.get_str_connect_sqlalchemy(datas['user_name'], datas['password'], datas['url'],
                                                          datas['host'],datas['port'], datas['data_base_name'])
-        return serializer.save(user=self.request.user, str_connection=str_connection)
+        return serializer.save(user=self.request.user, str_datas_for_connection=str_datas_for_connection)
+
 
     def get_queryset(self):
         queryset = ClientDB.objects.filter(user_id=self.request.user)
         return queryset
+
 
 class ClientDataViewSet(viewsets.ModelViewSet):
     queryset = ClientData.objects.all()
@@ -89,9 +85,9 @@ class ClientDataViewSet(viewsets.ModelViewSet):
         for i, j in zip(client_data, old_response_data.data):
             obj = Chart.objects.get(id=i.chart.id)
             str_query = obj.str_query
-            str_connection = ClientDB.objects.get(id=obj.clientdb_id.id).str_connection
+            str_datas_for_connection = ClientDB.objects.get(id=obj.clientdb_id.id).str_datas_for_connection
             try:
-                engine = create_engine(f"{str_connection}", echo=False)
+                engine = create_engine(f"{str_datas_for_connection}", echo=False)
                 Session = sessionmaker(autoflush=False, bind=engine)
                 with Session(autoflush=False, bind=engine) as db:
                     rows = db.execute(text(str_query)).fetchall()

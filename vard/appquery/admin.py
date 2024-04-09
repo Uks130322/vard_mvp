@@ -1,5 +1,3 @@
 from django.contrib import admin
-from .models import ClientDB
 
-
-admin.site.register(ClientDB)
+# Register your models here.
