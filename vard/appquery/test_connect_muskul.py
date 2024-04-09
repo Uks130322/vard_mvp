@@ -1,4 +1,4 @@
-#from vardapp.models import User
+# from vardapp.models import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
@@ -10,10 +10,11 @@ import re
 #     engine = create_engine(f"mysql://root:{parol}@localhost/baza_test1",echo=False)
 #     return engine
 
-#user_id = User.get().first()
+# user_id = User.get().first()
 user_id = 'ddd'
 
-def create_host(url,host,port):
+
+def create_host(url, host, port):
     if host == 'localhost' or host == '127.0.0.1':
         result = host
     elif port == '' or port is None or not port:
@@ -22,14 +23,16 @@ def create_host(url,host,port):
         result = f'{url}:{port}'
     return result
 
-def get_engine(driver, user_name, password, url,host,port, data_base_name):
+
+def get_engine(driver, user_name, password, url, host, port, data_base_name):
     password_new = password.replace('@', '%40')
     password_new = re.escape(password_new)
-    host_new = create_host(url,host,port)
+    host_new = create_host(url, host, port)
     engine = create_engine(f"{driver}://{user_name}:{password_new}@{host_new}/{data_base_name}", echo=False)
     return engine
 
-engine = get_engine('mysql','root','P@r0l','','localhost','','baza_test1')
+
+engine = get_engine('mysql', 'root', 'P@r0l', '', 'localhost', '', 'baza_test1')
 Session = sessionmaker(autoflush=False, bind=engine)
 # with Session(autoflush=False, bind=engine) as db:
 #     df = db.execute(text('SELECT * FROM vardapp_user'))
@@ -43,10 +46,6 @@ with Session(autoflush=False, bind=engine) as db:
 print(data)
 
 
-
-
-
-
 # r[1]
 # keys_list = list(r.keys())
 
@@ -56,7 +55,7 @@ print(data)
 #     ]
 #     #ENGINES = {'SQLAlchemy';''}
 #
-#     user_id = models.ForeignKey(Users , on_delete=models.CASCADE, null=False) # like '[0-9a-zA-Z_][0-9a-zA-Z_-]%'
+#     user_id = models.ForeignKey(User , on_delete=models.CASCADE, null=False) # like '[0-9a-zA-Z_][0-9a-zA-Z_-]%'
 #     user_name = models.CharField(min_length=1, max_length=16, null=False) #
 #     password = models.CharField(min_length=8, max_length=128, null=False) #
 #     driver = models.CharField(max_length='255', null=False, choices=DRIVER, default=engine) #
@@ -64,9 +63,11 @@ print(data)
 #     host = models.CharFieldField(null=False, default='localhost') #host может быть как именем хоста, так и IP-адресом
 #     port = models.IntegerFieldField(null=False, default=3306) #
 #     data_base_type = models.CharField(max_length=255, null=False) #что это??? OPTIONS???
-#     data_base_name = models.CharField(max_length=63, null=False) # like '%[0-9a-zA-Z_-]%' # Имена mysql, sys, information_schema и performance_schema запрещены
+#     data_base_name = models.CharField(max_length=63, null=False) # like '%[0-9a-zA-Z_-]%'
+# Имена mysql, sys, information_schema и performance_schema запрещены
 #     description = models.CharField(max_length=255, null=False) #
-#     OPTIONS = models.CharField(max_length=255, null=False, default="""'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}""")
+#     OPTIONS = models.CharField(max_length=255, null=False, default="""'OPTIONS':
+#     {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}""")
 #
 #
 # # https://sky.pro/media/podklyuchenie-k-baze-dannyh-mysql-s-pomoshhyu-python/
@@ -94,7 +95,7 @@ print(data)
 # "data_base_name": "baza_test1",
 # "data_base_type": null,
 # "description": null,
-# "str_query": "SELECT * FROM vardapp_users where id=1"
+# "str_query": "SELECT * FROM vardapp_user where id=1"
 # }
 #
 # {

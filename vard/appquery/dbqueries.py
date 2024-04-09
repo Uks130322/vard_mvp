@@ -6,7 +6,7 @@ import json
 
 
 class DataBaseQuery():
-    def __init__(self,driver, user_name, password, url,host,port, data_base_name,
+    def __init__(self, driver, user_name, password, url, host, port, data_base_name,
                  data_base_type, description, str_query):
         self.driver = driver
         self.user_name = user_name
@@ -21,17 +21,12 @@ class DataBaseQuery():
 
     def create_host(self):
         """
-<<<<<<< HEAD
-            сначала подключаемся к локальному хосту. поэтому сначала проверяем на валидность локальный хост, если он невалиден,
-            проверяем порт и подключаемся к удалённому url.
-=======
             сначала подключаемся к локальному хосту. поэтому сначала проверяем на валидность
             локальный хост, если он невалиден, проверяем порт и подключаемся к удалённому url.
->>>>>>> feature-crud-valar
             у mysql по умолчанию порт = 3306. если порт не указан, устанавливаем 3306.
             эта проверка нужна тк в result-е стоит двоеточие : f'{self.url}:{self.port}
             если url неправилен, то бд вернёт ошибку,т.е. дополнительно его проверять не нужно
-            """
+        """
         if self.host == 'localhost' or self.host == '127.0.0.1':
             result = self.host
         elif self.port == '' or self.port is None or not self.port:

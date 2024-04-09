@@ -2,8 +2,11 @@ from django.urls import include, path
 from rest_framework import routers
 
 from APIapp import views
+from appquery import views as DBviews
 
 router = routers.DefaultRouter()
+router.register(r'clientdb', DBviews.ClientDBViewSet)
+router.register(r'clientdata', DBviews.ClientDataViewSet)
 router.register(r'users', views.UserViewSet, )
 router.register(r'access', views.AccessViewSet)
 router.register(r'files', views.FileViewSet)
@@ -16,5 +19,5 @@ router.register(r'read_comment', views.ReadCommentViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    # path('drf/', include('rest_framework.urls', namespace='rest_framework')),
+    path('drf/', include('rest_framework.urls', namespace='rest_framework')),
 ]

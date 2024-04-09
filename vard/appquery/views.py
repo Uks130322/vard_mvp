@@ -1,4 +1,4 @@
-from rest_framework import views, viewsets
+from rest_framework import viewsets
 from vardapp.models import ClientDB, Chart, ClientData
 from rest_framework.response import Response
 from .serializers import ClientDBSerializer, ClientDataSerializer
@@ -56,7 +56,7 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         Session = sessionmaker(autoflush=False, bind=engine)
         with Session(autoflush=False, bind=engine) as db:
             rows = db.execute(text(str_query)).fetchall()
-            user = [{'user_id':user_id}]
+            user = [{'user_id': user_id}]
             result = user + [r._asdict() for r in rows]
         return result
 
@@ -64,10 +64,15 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         datas = serializer.validated_data
-        str_datas_for_connection = self.get_str_connect_sqlalchemy(datas['user_name'], datas['password'], datas['url'],
-                                                         datas['host'],datas['port'], datas['data_base_name'])
+        str_datas_for_connection = self.get_str_connect_sqlalchemy(
+            datas['user_name'],
+            datas['password'],
+            datas['url'],
+            datas['host'],
+            datas['port'],
+            datas['data_base_name']
+        )
         return serializer.save(user=self.request.user, str_datas_for_connection=str_datas_for_connection)
-
 
     def get_queryset(self):
         queryset = ClientDB.objects.filter(user_id=self.request.user)
@@ -96,10 +101,8 @@ class ClientDataViewSet(viewsets.ModelViewSet):
                         ClientData.objects.filter(id=i.chart.id).update(data=result)
             except exc.SQLAlchemyError as e:
                 #error = str(e.__dict__['orig'])
-                print('error',e)
+                print('error', e)
             j['data'] = result
             L.append(j)
         new_response_data = L
         return Response(new_response_data)
-
-
