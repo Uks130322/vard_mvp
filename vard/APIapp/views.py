@@ -47,6 +47,7 @@ class ReadCommentViewSet(viewsets.ModelViewSet):
     queryset = ReadComment.objects.all().order_by('-date_reading')
     serializer_class = ReadCommentSerializer
 
+
 class FileUserViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
 
@@ -55,36 +56,41 @@ class FileUserViewSet(viewsets.ModelViewSet):
         if u1.id is not None:
             queryset = File.objects.filter(user_id=u1).order_by('id')
         else:
-            queryset=[]
+            queryset = []
         return queryset
+
 
 class CommentUserViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+
     def get_queryset(self):
         u1 = self.request.user
         if u1.id is not None:
             queryset = Comment.objects.filter(user_id=u1).order_by('id')
         else:
-            queryset=[]
+            queryset = []
         return queryset
+
 
 class DashboardUserViewSet(viewsets.ModelViewSet):
     serializer_class = DashboardSerializer
+
     def get_queryset(self):
         u1 = self.request.user
         if u1.id is not None:
             queryset = Dashboard.objects.filter(user_id=u1).order_by('id')
         else:
-            queryset=[]
+            queryset = []
         return queryset
 
 
 class ChartUserViewSet(viewsets.ModelViewSet):
     serializer_class = ChartSerializer
+
     def get_queryset(self):
         u1 = self.request.user
         if u1.id is not None:
             queryset = Chart.objects.filter(user_id=u1).order_by('id')
         else:
-            queryset=[]
+            queryset = []
         return queryset
