@@ -1,0 +1,27 @@
+http://95.163.185.57/api/ - Api Root
+http://95.163.185.57/api/users/ - Users
+http://95.163.185.57/api/users/3 - User with id=3
+http://95.163.185.57/api/access/
+http://95.163.185.57/api/files/
+http://95.163.185.57/api/feedback/
+http://95.163.185.57/api/dashboards/
+http://95.163.185.57/api/charts/
+http://95.163.185.57/api/comments/
+http://95.163.185.57/api/read_comment/
+
+http://95.163.185.57/api/clientdb/ - Client's DataBase, all datas for connection.
+http://95.163.185.57/api/clientdata/ - Datas from client's database
+
+http://95.163.185.57/auth/register/ - registration
+http://95.163.185.57/auth/login/
+http://95.163.185.57/auth/logout/
+http://95.163.185.57/auth/user/ - duplicate api/users, later one of them will be removed
+http://95.163.185.57/auth/signup/ - maybe we don't need it
+http://95.163.185.57/auth/signup/ - google_login
+http://95.163.185.57/auth/github/ - github_login
+
+using django-allauth and dj-rest-auth
+
+Реализована аутентификация по токену, по ссылке в разделах "Тестирование" есть информация как
+этим пользоваться, я не особо понимаю, но может вы поймете :)
+https://django.fun/articles/tutorials/autentifikaciya-v-django-rest-frejmvorke/

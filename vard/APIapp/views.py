@@ -52,6 +52,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReadCommentViewSet(viewsets.ModelViewSet):
     queryset = ReadComment.objects.all().order_by('-date_reading')
     serializer_class = ReadCommentSerializer
+    permission_classes = [AllowAny]
 
 
 class FileUserViewSet(viewsets.ModelViewSet):
