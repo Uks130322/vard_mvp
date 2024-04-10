@@ -101,7 +101,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'vard.urls'
-CSRF_COOKIE_SECURE = False
+#CSRF_COOKIE_SECURE = False
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]

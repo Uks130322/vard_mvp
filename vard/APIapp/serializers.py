@@ -92,3 +92,5 @@ class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ReadComment
         fields = '__all__'
+
+
