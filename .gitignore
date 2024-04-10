@@ -7,5 +7,5 @@ vard/.env
 /vard/vardapp/__pycache__
 /vard/vardapp/migrations/__pycache__
 client_google
-urls_readme.txt
+API_urls.txt
 /vard/files
