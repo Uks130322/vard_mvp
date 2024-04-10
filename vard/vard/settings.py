@@ -55,11 +55,15 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
 
     # for CORS
     'corsheaders',
 
     'rest_framework',
+    'rest_framework.authtoken',
+
 ]
 
 
@@ -226,13 +230,19 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
-#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'
 MANAGERS = [("n1", "stds58@gmail.com")]
 ADMINS = [("n2", "stds58@yandex.ru")]
 SERVER_EMAIL = 'stds58@yandex.ru'
 
 MEDIA_URL = ''  # TO DO clarify details
 MEDIA_ROOT = os.path.join('files')
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ]
+}
 
 # REST_FRAMEWORK = {
 #    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
