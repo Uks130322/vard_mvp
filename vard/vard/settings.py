@@ -32,7 +32,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '192.168.0.12', '95.163.185.57']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -105,7 +104,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'vard.urls'
-#CSRF_COOKIE_SECURE = False
+# CSRF_COOKIE_SECURE = False
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
