@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
@@ -96,7 +97,8 @@ class File(models.Model):
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     date_delete = models.DateTimeField(blank=True, null=True, verbose_name='date of delete')
     name = models.CharField(max_length=255, blank=True, verbose_name='name of file')
-    link = models.FileField(upload_to=user_directory_path, blank=True, verbose_name='link of file')
+    link = models.FileField(upload_to=user_directory_path, blank=True, verbose_name='link of file',
+                            validators=[FileExtensionValidator(allowed_extensions=['pdf', 'csv', 'json'])])
     publish = models.IntegerField(choices=Publish.choices, default=0)
 
 
