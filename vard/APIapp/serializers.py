@@ -54,14 +54,10 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
 
         validated_data.pop('load_by_url', None)
         file = File(**validated_data)
-        file_type = file.link.name.split('.')[-1].upper()
-        print("I M HERE", file_type)
-        try:                                                 # TODO make stronger validation,
-            file.type_id = File.FilesType[file_type].value   # TODO move to other place,
-        except BaseException as error:                       # TODO make validator idk, do it before path creating
-            return error, " Wrong file format"              # TODO make nice exceptions
         if not file.name:
             file.name = file.link.name
+        file_type = file.link.name.split('.')[-1].upper()
+        file.type_id = File.FilesType[file_type].value
         file.save()
         return file
 
@@ -94,5 +90,3 @@ class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ReadComment
         fields = '__all__'
-
-
