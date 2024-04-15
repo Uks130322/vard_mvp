@@ -7,7 +7,7 @@ from appquery import views as DBviews
 router = routers.DefaultRouter()
 router.register(r'clientdb', DBviews.ClientDBViewSet)
 router.register(r'clientdata', DBviews.ClientDataViewSet)
-router.register(r'users', views.UserViewSet, )
+router.register(r'users', views.UserViewSet)
 router.register(r'access', views.AccessViewSet)
 router.register(r'files', views.FileViewSet)
 router.register(r'filesuser', views.FileUserViewSet, basename='filesuser')

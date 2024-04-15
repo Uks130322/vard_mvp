@@ -257,3 +257,7 @@ REST_FRAMEWORK = {
 #     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 #     'PAGE_SIZE': 2
 # }
+
+# REST_AUTH = {
+#     'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer',
+# }

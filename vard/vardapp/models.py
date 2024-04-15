@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
@@ -14,17 +15,18 @@ class UserManager(BaseUserManager):
         user = self.model(
             name=name,
             email=self.normalize_email(email),
-            password=password,
+            password=make_password(password),
             **kwargs
         )
 
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **kwargs):
+    def create_superuser(self, name, email, password=None, **kwargs):
         user = self.create_user(
-            email=email,
-            password=password,
+            name=name,
+            email=self.normalize_email(email),
+            password=make_password(password),
             **kwargs
         )
         user.is_superuser = True

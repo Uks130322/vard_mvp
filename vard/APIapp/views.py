@@ -4,9 +4,9 @@ from vardapp.models import *
 from .serializers import *
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows users to be viewed.
     """
     queryset = User.objects.all().order_by('name')
     serializer_class = UserSerializer

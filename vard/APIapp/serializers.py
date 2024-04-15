@@ -13,10 +13,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'is_superuser': {'read_only': True},
         }
 
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
-
 
 class AccessSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
