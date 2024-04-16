@@ -9,6 +9,11 @@ http://95.163.185.57/api/charts/
 http://95.163.185.57/api/comments/
 http://95.163.185.57/api/read_comment/
 
+http://95.163.185.57/api/files/?user_id__id=2 - for filter files by user with id=2
+http://95.163.185.57/api/dashboards/?user_id__id=<id> for filter by user
+http://95.163.185.57/api/charts/?user_id__id=<id> for filter by user
+http://95.163.185.57/api/comments/?user_id__id=<id> for filter by user
+
 http://95.163.185.57/api/clientdb/ - Client's DataBase, all datas for connection.
 http://95.163.185.57/api/clientdata/ - Datas from client's database
 
