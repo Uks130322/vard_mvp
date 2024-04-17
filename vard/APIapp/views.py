@@ -25,12 +25,14 @@ class AccessViewSet(viewsets.ModelViewSet):
 
 class CustomPerm(BasePermission):
     def has_permission(self, request, view):
-        obj_user = User.objects.filter(access__access_type_id = 4).filter(email=request.user)
+        obj_user1 = User.objects.filter(access__access_type_id=1).filter(email=request.user)
+        obj_user2 = User.objects.filter(access__access_type_id=2).filter(email=request.user)
+        obj_user4 = User.objects.filter(access__access_type_id = 4).filter(email=request.user)
         print('obj_user',request.user)
-        if request.method in SAFE_METHODS:
+        if request.method in SAFE_METHODS and (obj_user2 or obj_user4):
             return True
 
-        return bool(obj_user)
+        return bool(obj_user4)
 
 class FileViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all().order_by('name')
