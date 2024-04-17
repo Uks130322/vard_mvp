@@ -1,32 +1,29 @@
-http://95.163.185.57/api/ - Api Root
-http://95.163.185.57/api/users/ - Users
-http://95.163.185.57/api/users/3 - User with id=3
-http://95.163.185.57/api/access/
-http://95.163.185.57/api/files/
-http://95.163.185.57/api/feedback/
-http://95.163.185.57/api/dashboards/
-http://95.163.185.57/api/charts/
-http://95.163.185.57/api/comments/
-http://95.163.185.57/api/read_comment/
+https://natalietkachuk.pythonanywhere.com/api/ - Api Root
+https://natalietkachuk.pythonanywhere.com/api/users/ - Users
+https://natalietkachuk.pythonanywhere.com/api/users/3 - User with id=3
+https://natalietkachuk.pythonanywhere.com/api/access/
+https://natalietkachuk.pythonanywhere.com/api/files/
+https://natalietkachuk.pythonanywhere.com/api/feedback/
+https://natalietkachuk.pythonanywhere.com/api/dashboards/
+https://natalietkachuk.pythonanywhere.com/api/charts/
+https://natalietkachuk.pythonanywhere.com/api/comments/
+https://natalietkachuk.pythonanywhere.com/api/read_comment/
 
-http://95.163.185.57/api/files/?user_id__id=2 - for filter files by user with id=2
-http://95.163.185.57/api/dashboards/?user_id__id=<id> for filter by user
-http://95.163.185.57/api/charts/?user_id__id=<id> for filter by user
-http://95.163.185.57/api/comments/?user_id__id=<id> for filter by user
+https://natalietkachuk.pythonanywhere.com/api/files/?user_id__id=2 - for filter files by user with id=2
+https://natalietkachuk.pythonanywhere.com/api/dashboards/?user_id__id=<id> for filter by user
+https://natalietkachuk.pythonanywhere.com/api/charts/?user_id__id=<id> for filter by user
+https://natalietkachuk.pythonanywhere.com/api/comments/?user_id__id=<id> for filter by user
 
-http://95.163.185.57/api/clientdb/ - Client's DataBase, all datas for connection.
-http://95.163.185.57/api/clientdata/ - Datas from client's database
+https://natalietkachuk.pythonanywhere.com/api/clientdb/ - Client's DataBase, all datas for connection.
+https://natalietkachuk.pythonanywhere.com/api/clientdata/ - Datas from client's database
 
-http://95.163.185.57/auth/register/ - registration
-http://95.163.185.57/auth/login/
-http://95.163.185.57/auth/logout/
-http://95.163.185.57/auth/user/ - duplicate api/users, later one of them will be removed
-http://95.163.185.57/auth/signup/ - maybe we don't need it
-http://95.163.185.57/auth/signup/ - google_login
-http://95.163.185.57/auth/github/ - github_login
+https://natalietkachuk.pythonanywhere.com/auth/register/ - registration
+https://natalietkachuk.pythonanywhere.com/auth/login/
+https://natalietkachuk.pythonanywhere.com/auth/logout/
+https://natalietkachuk.pythonanywhere.com/auth/user/ - duplicate api/users, later one of them will be removed
+https://natalietkachuk.pythonanywhere.com/auth/signup/ - maybe we don't need it
+https://natalietkachuk.pythonanywhere.com/auth/signup/ - google_login
+https://natalietkachuk.pythonanywhere.com/auth/github/ - github_login
 
 using django-allauth and dj-rest-auth
-
-Реализована аутентификация по токену, по ссылке в разделах "Тестирование" есть информация как
-этим пользоваться, я не особо понимаю, но может вы поймете :)
 https://django.fun/articles/tutorials/autentifikaciya-v-django-rest-frejmvorke/
