@@ -3,6 +3,10 @@ from rest_framework.permissions import AllowAny
 from vardapp.models import *
 from .serializers import *
 
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -19,10 +23,20 @@ class AccessViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
+class CustomPerm(BasePermission):
+    def has_permission(self, request, view):
+        obj_user = User.objects.filter(access__access_type_id = 4).filter(email=request.user)
+        print('obj_user',request.user)
+        if request.method in SAFE_METHODS:
+            return True
+
+        return bool(obj_user)
+
 class FileViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all().order_by('name')
     serializer_class = FileSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [CustomPerm]
+
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):
