@@ -35,7 +35,8 @@ ALLOWED_HOSTS = [
     '192.168.0.12',
     '95.163.185.57',
     'google.com',
-    'github.com'
+    'github.com',
+    'natalietkachuk.pythonanywhere.com',
 ]
 
 # Application definition

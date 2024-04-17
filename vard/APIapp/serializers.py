@@ -7,7 +7,13 @@ from APIapp.utils import load_csv, load_json
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'is_superuser', 'password']
+        fields = [
+            'id',
+            'name',
+            'email',
+            'is_superuser',
+            'password'
+        ]
         extra_kwargs = {
             'password': {'write_only': True},
             'is_superuser': {'read_only': True},
