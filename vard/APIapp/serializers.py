@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from vardapp.models import *
 from APIapp.utils import load_csv, load_json
 
@@ -6,15 +7,17 @@ from APIapp.utils import load_csv, load_json
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'is_superuser', 'password']
+        fields = [
+            'id',
+            'name',
+            'email',
+            'is_superuser',
+            'password'
+        ]
         extra_kwargs = {
             'password': {'write_only': True},
             'is_superuser': {'read_only': True},
         }
-
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
 
 
 class AccessSerializer(serializers.HyperlinkedModelSerializer):
@@ -53,13 +56,10 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
 
         validated_data.pop('load_by_url', None)
         file = File(**validated_data)
-        file_type = file.type_id or file.link.name.split('.')[-1].upper()
-        try:                                                 # TODO make stronger validation,
-            file.type_id = File.FilesType[file_type].value   # TODO move to other place,
-        except BaseException as error:                       # TODO make validator idk, do it before path creating
-            print(error, " Wrong file format")               # TODO make nice exceptions
         if not file.name:
             file.name = file.link.name
+        file_type = file.link.name.split('.')[-1].upper()
+        file.type_id = File.FilesType[file_type].value
         file.save()
         return file
 
@@ -92,5 +92,3 @@ class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ReadComment
         fields = '__all__'
-
-

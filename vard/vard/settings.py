@@ -30,8 +30,14 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '192.168.0.12', '95.163.185.57']
-
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    '192.168.0.12',
+    '95.163.185.57',
+    'google.com',
+    'github.com',
+    'natalietkachuk.pythonanywhere.com',
+]
 
 # Application definition
 
@@ -63,6 +69,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
 
 ]
 
@@ -94,7 +101,7 @@ SOCIALACCOUNT_PROVIDERS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -105,10 +112,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'vard.urls'
-#CSRF_COOKIE_SECURE = False
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-]
+CSRF_COOKIE_SECURE = False
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = ["*"]
+CORS_ALLOW_HEADERS = ["*"]
 
 TEMPLATES = [
     {
@@ -235,13 +244,15 @@ MANAGERS = [("n1", "stds58@gmail.com")]
 ADMINS = [("n2", "stds58@yandex.ru")]
 SERVER_EMAIL = 'stds58@yandex.ru'
 
-MEDIA_URL = ''  # TO DO clarify details
+MEDIA_URL = ''  # TODO clarify details
 MEDIA_ROOT = os.path.join('files')
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         "rest_framework.authentication.TokenAuthentication",
-    ]
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 # REST_FRAMEWORK = {
@@ -257,4 +268,8 @@ REST_FRAMEWORK = {
 # REST_FRAMEWORK = {
 #     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 #     'PAGE_SIZE': 2
+# }
+
+# REST_AUTH = {
+#     'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer',
 # }

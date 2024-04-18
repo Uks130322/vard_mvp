@@ -60,8 +60,8 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             result = user + [r._asdict() for r in rows]
         return result
 
-    def perform_create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    def perform_create(self, serializer):
+        # serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         datas = serializer.validated_data
         str_datas_for_connection = self.get_str_connect_sqlalchemy(
@@ -72,7 +72,10 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             datas['port'],
             datas['data_base_name']
         )
-        return serializer.save(user=self.request.user, str_datas_for_connection=str_datas_for_connection)
+        return serializer.save(
+            user=self.request.user,
+            str_datas_for_connection=str_datas_for_connection
+        )
 
     def get_queryset(self):
         queryset = ClientDB.objects.filter(user_id=self.request.user)

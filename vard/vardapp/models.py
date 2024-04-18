@@ -1,3 +1,5 @@
+from django.contrib.auth.hashers import make_password
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
@@ -13,17 +15,18 @@ class UserManager(BaseUserManager):
         user = self.model(
             name=name,
             email=self.normalize_email(email),
-            password=password,
+            password=make_password(password),
             **kwargs
         )
 
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **kwargs):
+    def create_superuser(self, name, email, password=None, **kwargs):
         user = self.create_user(
-            email=email,
-            password=password,
+            name=name,
+            email=self.normalize_email(email),
+            password=make_password(password),
             **kwargs
         )
         user.is_superuser = True
@@ -96,7 +99,8 @@ class File(models.Model):
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     date_delete = models.DateTimeField(blank=True, null=True, verbose_name='date of delete')
     name = models.CharField(max_length=255, blank=True, verbose_name='name of file')
-    link = models.FileField(upload_to=user_directory_path, blank=True, verbose_name='link of file')
+    link = models.FileField(upload_to=user_directory_path, blank=True, verbose_name='link of file',
+                            validators=[FileExtensionValidator(allowed_extensions=['pdf', 'csv', 'json'])])
     publish = models.IntegerField(choices=Publish.choices, default=0)
 
 
