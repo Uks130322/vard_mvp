@@ -101,6 +101,9 @@ class File(models.Model):
                             validators=[FileExtensionValidator(allowed_extensions=['pdf', 'csv', 'json'])])
     publish = models.IntegerField(choices=Publish.choices, default=0)
 
+    def __str__(self):
+        return f'{self.name}, id={self.id}'
+
 
 class Feedback(models.Model):
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='feedback id')

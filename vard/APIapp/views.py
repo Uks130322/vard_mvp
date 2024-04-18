@@ -1,11 +1,8 @@
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from vardapp.models import *
+from .permissions import FileAccessPermission
 from .serializers import *
-
-from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -18,102 +15,70 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class AccessViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows Access to be viewed or edited. Only Owner can change access level.
+    """
     queryset = Access.objects.all()
     serializer_class = AccessSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
-
-class CustomPerm(BasePermission):
-    def has_permission(self, request, view):
-        obj_user1 = User.objects.filter(access__access_type_id=1).filter(email=request.user)
-        obj_user2 = User.objects.filter(access__access_type_id=2).filter(email=request.user)
-        obj_user4 = User.objects.filter(access__access_type_id = 4).filter(email=request.user)
-        print('obj_user',request.user)
-        if request.method in SAFE_METHODS and (obj_user2 or obj_user4):
-            return True
-
-        return bool(obj_user4)
 
 class FileViewSet(viewsets.ModelViewSet):
-    queryset = File.objects.all().order_by('name')
+    """
+    User should see the list of all his files. If he got permission, he can see others users'
+    files by detail, not the list
+    """
+    queryset = File.objects.all()
     serializer_class = FileSerializer
-    permission_classes = [CustomPerm]
 
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, FileAccessPermission]
+        return [permission() for permission in permission_classes]
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows feedback messages to be viewed or edited.
+    """
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class DashboardViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows dashboards to be viewed or edited.
+    """
     queryset = Dashboard.objects.all()
     serializer_class = DashboardSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class ChartViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows charts to be viewed or edited.
+    """
     queryset = Chart.objects.all()
     serializer_class = ChartSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows comments to be viewed or edited.
+    """
     queryset = Comment.objects.all().order_by('-date_send')
     serializer_class = CommentSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class ReadCommentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows comment reading to be viewed or edited.
+    """
     queryset = ReadComment.objects.all().order_by('-date_reading')
     serializer_class = ReadCommentSerializer
-    permission_classes = [AllowAny]
-
-
-class FileUserViewSet(viewsets.ModelViewSet):
-    serializer_class = FileSerializer
-
-    def get_queryset(self):
-        u1 = self.request.user
-        if u1.id is not None:
-            queryset = File.objects.filter(user_id=u1).order_by('id')
-        else:
-            queryset = []
-        return queryset
-
-
-class CommentUserViewSet(viewsets.ModelViewSet):
-    serializer_class = CommentSerializer
-
-    def get_queryset(self):
-        u1 = self.request.user
-        if u1.id is not None:
-            queryset = Comment.objects.filter(user_id=u1).order_by('id')
-        else:
-            queryset = []
-        return queryset
-
-
-class DashboardUserViewSet(viewsets.ModelViewSet):
-    serializer_class = DashboardSerializer
-
-    def get_queryset(self):
-        u1 = self.request.user
-        if u1.id is not None:
-            queryset = Dashboard.objects.filter(user_id=u1).order_by('id')
-        else:
-            queryset = []
-        return queryset
-
-
-class ChartUserViewSet(viewsets.ModelViewSet):
-    serializer_class = ChartSerializer
-
-    def get_queryset(self):
-        u1 = self.request.user
-        if u1.id is not None:
-            queryset = Chart.objects.filter(user_id=u1).order_by('id')
-        else:
-            queryset = []
-        return queryset
+    permission_classes = [IsAuthenticated]

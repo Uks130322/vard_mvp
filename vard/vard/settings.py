@@ -234,13 +234,12 @@ MANAGERS = [("n1", "stds58@gmail.com")]
 ADMINS = [("n2", "stds58@yandex.ru")]
 SERVER_EMAIL = 'stds58@yandex.ru'
 
-MEDIA_URL = ''  # TO DO clarify details
+MEDIA_URL = ''  # TODO clarify details
 MEDIA_ROOT = os.path.join('files')
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        #"rest_framework.authentication.TokenAuthentication",
-        'rest_framework.authentication.BasicAuthentication',
+        "rest_framework.authentication.TokenAuthentication",
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
