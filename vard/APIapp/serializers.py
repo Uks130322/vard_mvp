@@ -61,6 +61,10 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
         file_type = file.link.name.split('.')[-1].upper()
         file.type_id = File.FilesType[file_type].value
         file.save()
+
+        # automatically add access = owner for user
+        access = Access(user_id=file.user_id, file_id=file, access_type_id=2)
+        access.save()
         return file
 
 
