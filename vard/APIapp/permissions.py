@@ -19,7 +19,7 @@ class FileAccessPermission(BasePermission):
         is_reader = Access.objects.filter(user_id=request.user.id, access_type_id=1,
                                           file_id=obj.pk).exists()
         is_owner = Access.objects.filter(user_id=request.user.id, access_type_id=2,
-                                         file_id=obj.pk).exists()
+                                        file_id=obj.pk).exists()
         is_commentator = Access.objects.filter(user_id=request.user.id, access_type_id=3,
                                                file_id=obj.pk).exists()
         is_editor = Access.objects.filter(user_id=request.user.id, access_type_id=4,
@@ -36,3 +36,13 @@ class FileAccessPermission(BasePermission):
         else:
             # owner and editor can edit
             return is_owner or is_editor
+
+
+class GiveAccessPermission(BasePermission):
+    """Only the Owner can add or change the permission"""
+
+    def has_object_permission(self, request, view, obj):
+        if request.method not in SAFE_METHODS:
+            return obj.file_id.user_id == request.user
+
+        return True

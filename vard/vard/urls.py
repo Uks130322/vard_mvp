@@ -1,9 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
-from dj_rest_auth.registration.views import RegisterView
 from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
 from allauth.socialaccount.views import signup
-from vardapp.views import GoogleLogin, GitHubLogin
+from vardapp.views import GoogleLogin, GitHubLogin, RegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),

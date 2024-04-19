@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from vardapp.models import *
-from .permissions import FileAccessPermission
+from .permissions import FileAccessPermission, GiveAccessPermission
 from .serializers import *
 
 
@@ -20,7 +20,13 @@ class AccessViewSet(viewsets.ModelViewSet):
     """
     queryset = Access.objects.all()
     serializer_class = AccessSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, GiveAccessPermission]
+        return [permission() for permission in permission_classes]
 
 
 class FileViewSet(viewsets.ModelViewSet):
