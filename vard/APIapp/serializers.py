@@ -1,5 +1,6 @@
 from rest_framework import serializers
-
+import datetime
+from django.utils import timezone, dateformat
 from vardapp.models import *
 from appchat.models import Chat
 from APIapp.utils import load_csv, load_json
@@ -96,5 +97,10 @@ class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
 class ChatSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Chat
-        fields = ['id','user_id_owner','user_id_sender','date_send','date_remove','message']
+        fields = ['id','user_id_owner','user_id_sender','date_send','date_remove','is_remove','message']
+
+
+
+
+
 
