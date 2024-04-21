@@ -8,6 +8,7 @@ http://95.163.185.57/api/dashboards/
 http://95.163.185.57/api/charts/
 http://95.163.185.57/api/comments/
 http://95.163.185.57/api/read_comment/
+http://95.163.185.57/api/chat/
 
 http://95.163.185.57/api/clientdb/ - Client's DataBase, all datas for connection.
 http://95.163.185.57/api/clientdata/ - Datas from client's database

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from vardapp.models import *
+from appchat.models import Chat
 from APIapp.utils import load_csv, load_json
 
 
@@ -90,3 +91,10 @@ class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ReadComment
         fields = '__all__'
+
+
+class ChatSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Chat
+        fields = ['id','user_id_owner','user_id_sender','date_send','date_remove','message']
+

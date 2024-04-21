@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from vardapp.models import *
+from appchat.models import Chat
 from .serializers import *
 
 
@@ -101,3 +102,10 @@ class ChartUserViewSet(viewsets.ModelViewSet):
         else:
             queryset = []
         return queryset
+
+
+class ChatViewSet(viewsets.ModelViewSet):
+    queryset = Chat.objects.all().order_by('-date_send')
+    serializer_class = ChatSerializer
+    permission_classes = [AllowAny]
+

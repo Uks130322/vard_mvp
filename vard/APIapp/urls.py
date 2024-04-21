@@ -19,6 +19,7 @@ router.register(r'dashboards', views.DashboardViewSet)
 router.register(r'charts', views.ChartViewSet)
 router.register(r'comments', views.CommentViewSet)
 router.register(r'read_comment', views.ReadCommentViewSet)
+router.register(r'chat', views.ChatViewSet, basename='chat')
 
 
 urlpatterns = [
