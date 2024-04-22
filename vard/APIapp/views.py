@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from vardapp.models import *
-from .permissions import DataAccessPermission  # , GiveAccessPermission
+from .permissions import DataAccessPermission, CommentAccessPermission
 from .serializers import *
 
 
@@ -26,12 +26,7 @@ class AccessViewSet(viewsets.ModelViewSet):
         datas = serializer.validated_data
         return serializer.save(owner_id=self.request.user, **datas)
 
-    def get_permissions(self):
-        if self.action == 'list':
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAuthenticated]  # , GiveAccessPermission]
-        return [permission() for permission in permission_classes]
+    permission_classes = [IsAuthenticated]
 
 
 class FileViewSet(viewsets.ModelViewSet):
@@ -77,12 +72,18 @@ class DashboardViewSet(viewsets.ModelViewSet):
     queryset = Dashboard.objects.all()
     serializer_class = DashboardSerializer
     filterset_fields = ['user_id__id']
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, DataAccessPermission]
+        return [permission() for permission in permission_classes]
 
 
 class ChartViewSet(viewsets.ModelViewSet):
@@ -92,12 +93,18 @@ class ChartViewSet(viewsets.ModelViewSet):
     queryset = Chart.objects.all()
     serializer_class = ChartSerializer
     filterset_fields = ['user_id__id']
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, DataAccessPermission]
+        return [permission() for permission in permission_classes]
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -107,12 +114,20 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-date_send')
     serializer_class = CommentSerializer
     filterset_fields = ['user_id__id']
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        elif self.action == 'create':
+            permission_classes = [IsAuthenticated, DataAccessPermission]
+        else:
+            permission_classes = [IsAuthenticated, CommentAccessPermission]
+        return [permission() for permission in permission_classes]
 
 
 class ReadCommentViewSet(viewsets.ModelViewSet):
