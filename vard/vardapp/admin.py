@@ -1,7 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User, ClientDB
+from .models import (
+    User,
+    ClientDB,
+    Access,
+    File,
+    Feedback,
+    Dashboard,
+    Comment,
+    ReadComment,
+    Chart
+)
 
 
 class UserAdmin(BaseUserAdmin):
@@ -22,7 +32,12 @@ class UserAdmin(BaseUserAdmin):
             None,
             {
                 "classes": ["wide"],
-                "fields": ["name", "email", "password1", "password2"],
+                "fields": [
+                    "name",
+                    "email",
+                    "password1",
+                    "password2"
+                ],
             },
         ),
     ]
@@ -32,4 +47,11 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Access)
+admin.site.register(File)
+admin.site.register(Feedback)
+admin.site.register(Dashboard)
+admin.site.register(Comment)
+admin.site.register(ReadComment)
+admin.site.register(Chart)
 admin.site.register(ClientDB)

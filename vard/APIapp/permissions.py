@@ -3,7 +3,7 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 from vardapp.models import User, Access
 
 
-class FileAccessPermission(BasePermission):
+class DataAccessPermission(BasePermission):
     """
     READER = 1 - read only
     OWNER = 2 - can do anything
@@ -17,13 +17,13 @@ class FileAccessPermission(BasePermission):
             return True
 
         is_reader = Access.objects.filter(user_id=request.user.id, access_type_id=1,
-                                          file_id=obj.pk).exists()
+                                          owner_id=obj.user_id).exists()
         is_owner = Access.objects.filter(user_id=request.user.id, access_type_id=2,
-                                        file_id=obj.pk).exists()
+                                         owner_id=obj.user_id).exists()
         is_commentator = Access.objects.filter(user_id=request.user.id, access_type_id=3,
-                                               file_id=obj.pk).exists()
+                                               owner_id=obj.user_id).exists()
         is_editor = Access.objects.filter(user_id=request.user.id, access_type_id=4,
-                                          file_id=obj.pk).exists()
+                                          owner_id=obj.user_id).exists()
 
         if request.method in SAFE_METHODS and any([is_reader, is_owner, is_commentator, is_editor]):
             # all users with any access can see the file
@@ -38,11 +38,11 @@ class FileAccessPermission(BasePermission):
             return is_owner or is_editor
 
 
-class GiveAccessPermission(BasePermission):
-    """Only the Owner can add or change the permission"""
-
-    def has_object_permission(self, request, view, obj):
-        if request.method not in SAFE_METHODS:
-            return obj.file_id.user_id == request.user
-
-        return True
+# class GiveAccessPermission(BasePermission):
+#     """Only the Owner can add or change the permission"""
+#
+#     def has_object_permission(self, request, view, obj):
+#         if request.method not in SAFE_METHODS:
+#             return obj.file_id.user_id == request.user
+#
+#         return True
