@@ -131,7 +131,7 @@ class Dashboard(models.Model):
 
 class Comment(models.Model):
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name = 'publish id')
-    file_id = models.ForeignKey('File', on_delete=models.CASCADE, null=True, verbose_name='cells id')
+    file_id = models.ForeignKey('File', on_delete=models.CASCADE, null=True, verbose_name='file id')
     chart_id = models.ForeignKey('Chart', on_delete=models.CASCADE, null=True, verbose_name='chart id')
     dashboard_id = models.ForeignKey('Dashboard', on_delete=models.CASCADE, null=True, verbose_name='dashboard id')
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='user id')
