@@ -24,6 +24,9 @@ class AccessSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Access
         fields = '__all__'
+        extra_kwargs = {
+            'owner_id': {'read_only': True},
+        }
 
 
 class FileSerializer(serializers.HyperlinkedModelSerializer):
@@ -34,6 +37,7 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'date_delete': {'read_only': True},
+            'user_id': {'read_only': True},
             'type_id': {'read_only': True},
         }
 
@@ -61,10 +65,6 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
         file_type = file.link.name.split('.')[-1].upper()
         file.type_id = File.FilesType[file_type].value
         file.save()
-
-        # automatically add access = owner for user
-        access = Access(user_id=file.user_id, file_id=file, access_type_id=2)
-        access.save()
         return file
 
 
@@ -72,27 +72,42 @@ class FeedbackSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Feedback
         fields = '__all__'
+        extra_kwargs = {
+            'user_id': {'read_only': True},
+        }
 
 
 class DashboardSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Dashboard
         fields = '__all__'
+        extra_kwargs = {
+            'user_id': {'read_only': True},
+        }
 
 
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Chart
         fields = '__all__'
+        extra_kwargs = {
+            'user_id': {'read_only': True},
+        }
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
+        extra_kwargs = {
+            'user_id': {'read_only': True},
+        }
 
 
 class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ReadComment
         fields = '__all__'
+        extra_kwargs = {
+            'user_id': {'read_only': True},
+        }
