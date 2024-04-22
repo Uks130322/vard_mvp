@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'vardapp',
     'appquery',
     'APIapp',
+    'appchat',
 
     # allauth
     'allauth',

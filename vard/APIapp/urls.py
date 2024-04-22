@@ -16,6 +16,7 @@ router.register(r'dashboards', views.DashboardViewSet)  # api/dashboards/?user_i
 router.register(r'charts', views.ChartViewSet)  # api/charts/?user_id__id=<id> for filter by user
 router.register(r'comments', views.CommentViewSet)  # api/comments/?user_id__id=<id> for filter by user
 router.register(r'read_comment', views.ReadCommentViewSet)
+router.register(r'chat', views.ChatViewSet, basename='chat')
 
 urlpatterns = [
     path('', include(router.urls)),
