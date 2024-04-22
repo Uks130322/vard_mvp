@@ -6,6 +6,7 @@ from appchat.models import Chat
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
+import django_filters
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -78,6 +79,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
+        print('self.request.user',self.request.user)
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
 
@@ -160,9 +162,10 @@ class ChartUserViewSet(viewsets.ModelViewSet):
 
 
 class ChatViewSet(viewsets.ModelViewSet):
-    queryset = Chat.objects.all().order_by('-date_send')
+    queryset = Chat.objects.filter(is_remove=False).order_by('-date_send')
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
+    filterset_fields = ['id','user_id_owner','user_id_sender','date_send','date_remove','is_remove','message']
 
     def destroy(self, request, *args, **kwargs):
         chat = self.get_object()
@@ -184,7 +187,7 @@ class ChatViewSet(viewsets.ModelViewSet):
                 'message': f"отклонено. причина: {chat.get_status_display()}"
             })
 
-    def perform_create(self, serializer):
-        """The creator is automatically assigned as user_id_sender"""
-        datas = serializer.validated_data
-        return serializer.save(user_id_sender=self.request.user, **datas)
+    # def perform_create(self, serializer):
+    #     """The creator is automatically assigned as user_id_sender"""
+    #     datas = serializer.validated_data
+    #     return serializer.save(user_id_sender=self.request.user, **datas)

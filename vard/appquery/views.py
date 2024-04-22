@@ -78,7 +78,10 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        queryset = ClientDB.objects.filter(user_id=self.request.user)
+        if self.request.user.id is not None:
+            queryset = ClientDB.objects.filter(user_id=self.request.user)
+        else:
+            queryset = []
         return queryset
 
 
