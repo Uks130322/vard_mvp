@@ -5,6 +5,7 @@ from vardapp.models import User, Access
 
 class DataAccessPermission(BasePermission):
     """
+    For files, charts and dashboards.
     READER = 1 - read only
     OWNER = 2 - can do anything
     COMMENTATOR = 3 - can read and comment (comment access in CommentAccessPermission)
