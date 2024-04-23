@@ -126,7 +126,7 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
             'message'
         ]
 
-    extra_kwargs = {
-        'id': {'read_only': True},
-        'user_id_sender': {'read_only': True},
-    }
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'user_id_sender': {'read_only': True},
+        }

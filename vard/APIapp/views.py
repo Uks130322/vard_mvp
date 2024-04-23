@@ -147,18 +147,6 @@ class ReadCommentViewSet(viewsets.ModelViewSet):
         return serializer.save(user_id=self.request.user, **datas)
 
 
-class ChartUserViewSet(viewsets.ModelViewSet):
-    serializer_class = ChartSerializer
-
-    def get_queryset(self):
-        u1 = self.request.user
-        if u1.id is not None:
-            queryset = Chart.objects.filter(user_id=u1).order_by('id')
-        else:
-            queryset = []
-        return queryset
-
-
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all().order_by('-date_send')
     serializer_class = ChatSerializer
