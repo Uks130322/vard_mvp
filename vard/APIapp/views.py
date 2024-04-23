@@ -165,7 +165,7 @@ class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.filter(is_remove=False).order_by('-date_send')
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
-    filterset_fields = ['id','user_id_owner','user_id_sender','date_send','date_remove','is_remove','message']
+    filterset_fields = ['user_id_owner', 'user_id_sender']
 
     def destroy(self, request, *args, **kwargs):
         chat = self.get_object()
@@ -187,7 +187,7 @@ class ChatViewSet(viewsets.ModelViewSet):
                 'message': f"отклонено. причина: {chat.get_status_display()}"
             })
 
-    # def perform_create(self, serializer):
-    #     """The creator is automatically assigned as user_id_sender"""
-    #     datas = serializer.validated_data
-    #     return serializer.save(user_id_sender=self.request.user, **datas)
+    def perform_create(self, serializer):
+        """The creator is automatically assigned as user_id_sender"""
+        datas = serializer.validated_data
+        return serializer.save(user_id_sender=self.request.user, **datas)
