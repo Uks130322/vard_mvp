@@ -188,3 +188,24 @@ class ChatViewSet(viewsets.ModelViewSet):
         """The creator is automatically assigned as user_id_sender"""
         datas = serializer.validated_data
         return serializer.save(user_id_sender=self.request.user, **datas)
+
+
+class ChartDashboardViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows dashboards to be viewed or edited.
+    """
+    queryset = ChartDashboard.objects.all()
+    serializer_class = ChartDashboardSerializer
+    filterset_fields = ['user_id__id']
+
+    def perform_create(self, serializer):
+        """The creator is automatically assigned as user_id"""
+        datas = serializer.validated_data
+        return serializer.save(user_id=self.request.user, **datas)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, DataAccessPermission]
+        return [permission() for permission in permission_classes]

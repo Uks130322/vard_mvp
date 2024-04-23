@@ -130,3 +130,8 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
         'id': {'read_only': True},
         'user_id_sender': {'read_only': True},
     }
+
+class ChartDashboardSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ChartDashboard
+        fields = '__all__'
