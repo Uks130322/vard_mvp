@@ -163,6 +163,7 @@ class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all().order_by('-date_send')
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
+    filterset_fields = ['user_id_owner__id', 'user_id_sender__id', 'date_send', 'message']
 
     def destroy(self, request, *args, **kwargs):
         chat = self.get_object()
@@ -187,7 +188,8 @@ class ChatViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id_sender"""
         datas = serializer.validated_data
-        return serializer.save(user_id_sender=self.request.user, **datas)
+        print('self.request.user',self.request.user)
+        return serializer.save(**datas)
 
 
 class ChartDashboardViewSet(viewsets.ModelViewSet):

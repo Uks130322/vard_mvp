@@ -17,17 +17,19 @@ class DataAccessPermission(BasePermission):
             # all authorized users can add files
             return True
 
-        is_reader = Access.objects.filter(user_id=request.user.id, access_type_id=1,
-                                          owner_id=obj.user_id).exists()
+        is_reader = Access.objects.filter(user_id=request.user.id, access_type_id=1,owner_id=obj.user_id).exists()
+        #is_owner = Access.objects.filter(user_id=request.user.id, access_type_id=2, owner_id=obj.user_id).exists()
         is_owner = request.user == obj.user_id
-        is_commentator = Access.objects.filter(user_id=request.user.id, access_type_id=3,
-                                               owner_id=obj.user_id).exists()
-        is_editor = Access.objects.filter(user_id=request.user.id, access_type_id=4,
-                                          owner_id=obj.user_id).exists()
+        is_commentator = Access.objects.filter(user_id=request.user.id, access_type_id=3,owner_id=obj.user_id).exists()
+        is_editor = Access.objects.filter(user_id=request.user.id, access_type_id=4,owner_id=obj.user_id).exists()
 
         if request.method in SAFE_METHODS and any([is_reader, is_owner, is_commentator, is_editor]):
             # all users with any access can see the file
             return True
+
+        # elif request.method == "GET" or request.method == "PUT" or request.method == "PATCH":
+        #     # only owner can delete the file
+        #     return is_owner or is_editor
 
         elif request.method == "DELETE":
             # only owner can delete the file

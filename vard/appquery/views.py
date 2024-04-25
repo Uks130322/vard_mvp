@@ -8,11 +8,21 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, drop_database, database_exists
 from sqlalchemy import exc
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from APIapp.permissions import DataAccessPermission, CommentAccessPermission
+from vardapp.models import *
 
 
 class ClientDBViewSet(viewsets.ModelViewSet):
     queryset = ClientDB.objects.all()
     serializer_class = ClientDBSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, DataAccessPermission]
+        return [permission() for permission in permission_classes]
 
     def get_host(self, url, host, port):
         if host == 'localhost' or host == '127.0.0.1':
@@ -73,21 +83,24 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             datas['data_base_name']
         )
         return serializer.save(
-            user=self.request.user,
+            user_id=self.request.user,
             str_datas_for_connection=str_datas_for_connection
         )
 
-    def get_queryset(self):
-        queryset = ClientDB.objects.filter(user_id=self.request.user)
-        return queryset
+    # def get_queryset(self):
+    #     queryset = ClientDB.objects.filter(user_id=self.request.user)
+    #     return queryset
 
 
 class ClientDataViewSet(viewsets.ModelViewSet):
     queryset = ClientData.objects.all()
     serializer_class = ClientDataSerializer
+    permission_classes = [IsAuthenticated, DataAccessPermission]
 
     def list(self, request, *args, **kwargs):
         L = []
+        result = []
+        error = ''
         old_response_data = super(ClientDataViewSet, self).list(request, *args, **kwargs)
         client_data = ClientData.objects.all()
         for i, j in zip(client_data, old_response_data.data):
@@ -103,9 +116,39 @@ class ClientDataViewSet(viewsets.ModelViewSet):
                     if not ClientData.objects.filter(id=i.chart.id):
                         ClientData.objects.filter(id=i.chart.id).update(data=result)
             except exc.SQLAlchemyError as e:
-                #error = str(e.__dict__['orig'])
-                print('error', e)
-            j['data'] = result
+                error = str(e.__dict__['orig'])
+            if not error:
+                j['data'] = result
+            else:
+                j['error'] = error
+            L.append(j)
+        new_response_data = L
+        return Response(new_response_data)
+
+    def retrieve(self, request, pk, *args, **kwargs):
+        L = []
+        result = []
+        error = ''
+        old_response_data = super(ClientDataViewSet, self).list(request, *args, **kwargs)
+        client_data = ClientData.objects.filter(pk=pk)
+        for i, j in zip(client_data, old_response_data.data):
+            obj = Chart.objects.get(id=i.chart.id)
+            str_query = obj.str_query
+            str_datas_for_connection = ClientDB.objects.get(id=obj.clientdb_id.id).str_datas_for_connection
+            try:
+                engine = create_engine(f"{str_datas_for_connection}", echo=False)
+                Session = sessionmaker(autoflush=False, bind=engine)
+                with Session(autoflush=False, bind=engine) as db:
+                    rows = db.execute(text(str_query)).fetchall()
+                    result = [r._asdict() for r in rows]
+                    if not ClientData.objects.filter(id=i.chart.id):
+                        ClientData.objects.filter(id=i.chart.id).update(data=result)
+            except exc.SQLAlchemyError as e:
+                error = str(e.__dict__['orig'])
+            if not error:
+                j['data'] = result
+            else:
+                j['error'] = error
             L.append(j)
         new_response_data = L
         return Response(new_response_data)

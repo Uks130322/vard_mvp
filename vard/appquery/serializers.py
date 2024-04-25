@@ -7,17 +7,20 @@ class ClientDataSerializer(serializers.HyperlinkedModelSerializer):
         model = ClientData
         fields = [
             'id',
-            'chart',
             'data'
         ]
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'data': {'read_only': True},
+        }
 
 
-class ClientDBSerializer(serializers.ModelSerializer):
+class ClientDBSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ClientDB
         fields = [
             'id',
-            'user',
+            'user_id',
             'connection_name',
             'user_name',
             'password',
@@ -32,15 +35,15 @@ class ClientDBSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             # 'user': {'write_only': True},
-            'connection_name': {'write_only': True},
-            'user_name': {'write_only': True},
-            'password': {'write_only': True},
-            'driver': {'write_only': True},
-            'url': {'write_only': True},
-            'host': {'write_only': True},
-            'port': {'write_only': True},
-            'data_base_type': {'write_only': True},
-            'data_base_name': {'write_only': True},
+            'connection_name': {'write_only': False},
+            'user_name': {'write_only': False},
+            'password': {'write_only': False},
+            'driver': {'write_only': False},
+            'url': {'write_only': False},
+            'host': {'write_only': False},
+            'port': {'write_only': False},
+            'data_base_type': {'write_only': False},
+            'data_base_name': {'write_only': False},
 
             'str_datas_for_connection': {'read_only': True},
         }

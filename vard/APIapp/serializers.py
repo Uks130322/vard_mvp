@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from vardapp.models import *
 from appchat.models import Chat
+from appquery.serializers import ClientDataSerializer
 from APIapp.utils import load_csv, load_json
+from drf_writable_nested import WritableNestedModelSerializer
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -89,10 +91,25 @@ class DashboardSerializer(serializers.HyperlinkedModelSerializer):
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Chart
-        fields = '__all__'
+        fields = ['id','user_id','date_creation','date_change','clientdb_id','str_query','clientdata']
         extra_kwargs = {
             'user_id': {'read_only': True},
+            'clientdata': {'read_only': True},
         }
+
+    # def update(self, instance, validated_data):
+    #     clientdata = validated_data.pop('clientdata')
+    #     clientdata = ClientData.objects.update(**clientdata)
+    #     return super().update(instance, validated_data)
+
+    def create(self, validated_data, **kwargs):
+        #print('validated_data',validated_data)
+        clientdata = ClientData.objects.create(user_id=validated_data['user_id'],data='')
+        chart = Chart.objects.create(**validated_data, clientdata = clientdata)
+        #print('chart',clientdata.chart.id)
+        return chart
+
+#select * from vardapp_users
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -126,10 +143,12 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
             'message'
         ]
 
-    extra_kwargs = {
-        'id': {'read_only': True},
-        'user_id_sender': {'read_only': True},
-    }
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'user_id_owner': {'read_only': True},
+            'user_id_sender': {'read_only': True},
+        }
+
 
 class ChartDashboardSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

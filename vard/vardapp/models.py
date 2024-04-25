@@ -155,7 +155,7 @@ class ClientDB(models.Model):
         (driver1, 'SQLAlchemy for MySQL'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     connection_name = models.CharField(max_length=255, null=False, default='')
     user_name = models.CharField(max_length=16, null=False)
     password = models.CharField(max_length=128, null=False)
@@ -205,13 +205,14 @@ class Chart(models.Model):
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     clientdb_id = models.ForeignKey(ClientDB, on_delete=models.CASCADE, verbose_name='clientdb id')
     str_query = models.TextField(blank=True)
+    clientdata = models.OneToOneField('ClientData', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.user_id}'
 
 
 class ClientData(models.Model):
-    chart = models.OneToOneField(Chart, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
     data = models.TextField(blank=True, null=True)
 
 
