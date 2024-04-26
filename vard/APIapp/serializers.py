@@ -139,7 +139,6 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
             'user_id_sender',
             'date_send',
             'date_remove',
-            'is_remove',
             'message'
         ]
 

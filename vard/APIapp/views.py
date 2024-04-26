@@ -160,7 +160,7 @@ class ChartUserViewSet(viewsets.ModelViewSet):
 
 
 class ChatViewSet(viewsets.ModelViewSet):
-    queryset = Chat.objects.all().order_by('-date_send')
+    queryset = Chat.objects.filter(is_remove=False).order_by('-date_send')
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
     filterset_fields = ['user_id_owner__id', 'user_id_sender__id', 'date_send', 'message']
@@ -198,16 +198,16 @@ class ChartDashboardViewSet(viewsets.ModelViewSet):
     """
     queryset = ChartDashboard.objects.all()
     serializer_class = ChartDashboardSerializer
-    filterset_fields = ['user_id__id']
+    #filterset_fields = ['user_id__id']
 
-    def perform_create(self, serializer):
-        """The creator is automatically assigned as user_id"""
-        datas = serializer.validated_data
-        return serializer.save(user_id=self.request.user, **datas)
+    # def perform_create(self, serializer):
+    #     """The creator is automatically assigned as user_id"""
+    #     datas = serializer.validated_data
+    #     return serializer.save(user_id=self.request.user, **datas)
 
-    def get_permissions(self):
-        if self.action == 'list':
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAuthenticated, DataAccessPermission]
-        return [permission() for permission in permission_classes]
+    # def get_permissions(self):
+    #     if self.action == 'list':
+    #         permission_classes = [IsAuthenticated]
+    #     else:
+    #         permission_classes = [IsAuthenticated, DataAccessPermission]
+    #     return [permission() for permission in permission_classes]
