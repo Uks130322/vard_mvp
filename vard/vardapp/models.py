@@ -127,7 +127,7 @@ class Dashboard(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='user id')
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
-    chart = models.ManyToManyField('Chart', through='ChartDashboard')
+    chart = models.ManyToManyField('Chart', blank=True, through='ChartDashboard')
 
 
 class Comment(models.Model):
@@ -208,7 +208,7 @@ class Chart(models.Model):
     clientdata = models.OneToOneField('ClientData', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.user_id}'
+        return f'{self.id} {self.user_id}'
 
 
 class ClientData(models.Model):

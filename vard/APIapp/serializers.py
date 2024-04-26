@@ -79,13 +79,16 @@ class FeedbackSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 
-class DashboardSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Dashboard
-        fields = '__all__'
-        extra_kwargs = {
-            'user_id': {'read_only': True},
-        }
+# class DashboardSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = Dashboard
+#         fields = '__all__'
+#         extra_kwargs = {
+#             'user_id': {'read_only': True},
+#         }
+
+
+
 
 
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
@@ -152,4 +155,16 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
 class ChartDashboardSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ChartDashboard
-        fields = '__all__'
+        fields = ['id','chart','dashboard']
+
+
+class DashboardSerializer(WritableNestedModelSerializer):
+    chart = serializers.PrimaryKeyRelatedField(queryset=Chart.objects.all(), many=True)
+    class Meta:
+        model = Dashboard
+        fields = ['id','user_id','date_creation','date_change','chart']
+
+        extra_kwargs = {
+            'user_id': {'read_only': True},
+        }
+
