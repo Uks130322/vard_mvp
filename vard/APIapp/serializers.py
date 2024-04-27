@@ -31,6 +31,14 @@ class AccessSerializer(serializers.HyperlinkedModelSerializer):
             'owner_id': {'read_only': True},
         }
 
+    def create(self, validated_data, **kwargs):
+        qs = Access.objects.filter(owner_id=validated_data['owner_id']).filter(user_id=validated_data['user_id'])
+        if not qs.exists():
+            access = Access.objects.create(**validated_data)
+        else:
+            access = Access.objects.get(**validated_data)
+        return access
+
 
 class FileSerializer(serializers.HyperlinkedModelSerializer):
     user_url = serializers.URLField(source='load_by_url', write_only=True, allow_blank=True)
