@@ -79,18 +79,6 @@ class FeedbackSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 
-# class DashboardSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = Dashboard
-#         fields = '__all__'
-#         extra_kwargs = {
-#             'user_id': {'read_only': True},
-#         }
-
-
-
-
-
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Chart
@@ -167,4 +155,6 @@ class DashboardSerializer(WritableNestedModelSerializer):
         extra_kwargs = {
             'user_id': {'read_only': True},
         }
+
+
 

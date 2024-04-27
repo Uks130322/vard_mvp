@@ -6,6 +6,7 @@ from appchat.models import Chat
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -15,6 +16,10 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all().order_by('name')
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        query = User.objects.filter(email = self.request.user)
+        return query
 
 
 class AccessViewSet(viewsets.ModelViewSet):
@@ -30,6 +35,11 @@ class AccessViewSet(viewsets.ModelViewSet):
         return serializer.save(owner_id=self.request.user, **datas)
 
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_ = User.objects.get(email = self.request.user)
+        query = Access.objects.filter(owner_id=user_)
+        return query
 
 
 class FileViewSet(viewsets.ModelViewSet):
@@ -52,6 +62,17 @@ class FileViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [IsAuthenticated, DataAccessPermission]
         return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        user_ = User.objects.get(email = self.request.user)
+        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+        users = User.objects.filter(id=access_owners[0]['owner_id'])
+        for access_owner in access_owners:
+            users = users.union(User.objects.filter(id=access_owner['owner_id']))
+        query = File.objects.filter(user_id=users[0].id)
+        for user in users:
+            query = query.union( File.objects.filter(Q(user_id=user.id) | Q(user_id=user_)) )
+        return query
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):
@@ -88,6 +109,17 @@ class DashboardViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated, DataAccessPermission]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        user_ = User.objects.get(email = self.request.user)
+        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+        users = User.objects.filter(id=access_owners[0]['owner_id'])
+        for access_owner in access_owners:
+            users = users.union(User.objects.filter(id=access_owner['owner_id']))
+        query = Dashboard.objects.filter(user_id=users[0].id)
+        for user in users:
+            query = query.union( Dashboard.objects.filter(Q(user_id=user.id) | Q(user_id=user_)) )
+        return query
+
 
 class ChartViewSet(viewsets.ModelViewSet):
     """
@@ -108,6 +140,17 @@ class ChartViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [IsAuthenticated, DataAccessPermission]
         return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        user_ = User.objects.get(email = self.request.user)
+        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+        users = User.objects.filter(id=access_owners[0]['owner_id'])
+        for access_owner in access_owners:
+            users = users.union(User.objects.filter(id=access_owner['owner_id']))
+        query = Chart.objects.filter(user_id=users[0].id)
+        for user in users:
+            query = query.union( Chart.objects.filter(Q(user_id=user.id) | Q(user_id=user_)) )
+        return query
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -198,16 +241,3 @@ class ChartDashboardViewSet(viewsets.ModelViewSet):
     """
     queryset = ChartDashboard.objects.all()
     serializer_class = ChartDashboardSerializer
-    #filterset_fields = ['user_id__id']
-
-    # def perform_create(self, serializer):
-    #     """The creator is automatically assigned as user_id"""
-    #     datas = serializer.validated_data
-    #     return serializer.save(user_id=self.request.user, **datas)
-
-    # def get_permissions(self):
-    #     if self.action == 'list':
-    #         permission_classes = [IsAuthenticated]
-    #     else:
-    #         permission_classes = [IsAuthenticated, DataAccessPermission]
-    #     return [permission() for permission in permission_classes]
