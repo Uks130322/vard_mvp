@@ -5,6 +5,8 @@ from appquery.serializers import ClientDataSerializer
 from APIapp.utils import load_csv, load_json
 from drf_writable_nested import WritableNestedModelSerializer
 from django.db.models import Q
+from .hash_md import get_hash_md5
+from django.conf import settings
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -76,6 +78,18 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
         file_type = file.link.name.split('.')[-1].upper()
         file.type_id = File.FilesType[file_type].value
         file.save()
+
+        path_instance = f'{settings.BASE_DIR}{settings.MEDIA_URL}files/{file.link}'.replace('\\', '/')
+        hash_instance = get_hash_md5(path_instance)
+        files = File.objects.filter(user_id=validated_data['user_id']).exclude(id=file.id)
+
+        for file_ in files:
+            path_file = f'{settings.BASE_DIR}{settings.MEDIA_URL}files/{file_.link}'.replace('\\', '/')
+            hash_file = get_hash_md5(path_file)
+            if hash_instance == hash_file:
+                file.link.delete()
+                file.delete()
+                file = file_
         return file
 
 
