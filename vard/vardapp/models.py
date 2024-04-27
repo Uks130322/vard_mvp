@@ -111,7 +111,7 @@ class File(models.Model):
     publish = models.IntegerField(choices=Publish.choices, default=0)
 
     def __str__(self):
-        return f'{self.name}, id={self.id}'
+        return f'{self.name}, id={self.user_id}'
 
 
 class Feedback(models.Model):
@@ -128,6 +128,9 @@ class Dashboard(models.Model):
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     chart = models.ManyToManyField('Chart', blank=True, through='ChartDashboard')
+
+    def __str__(self):
+        return f'{self.id} {self.user_id}'
 
 
 class Comment(models.Model):

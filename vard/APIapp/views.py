@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from vardapp.models import *
-from .permissions import DataAccessPermission, CommentAccessPermission
+from .permissions import DataAccessPermission, DataAccessPermissionSafe, CommentAccessPermission, get_custom_queryset
 from appchat.models import Chat
 from .serializers import *
 from rest_framework.response import Response
@@ -64,19 +64,7 @@ class FileViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        user_ = User.objects.get(email = self.request.user)
-        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        if access_owners.exists():
-            users = User.objects.filter(id=access_owners[0]['owner_id'])
-            print('users',users)
-            for access_owner in access_owners:
-                users = users.union(User.objects.filter(id=access_owner['owner_id']))
-            query = File.objects.filter(user_id=users[0].id)
-            for user in users:
-                query = query.union(File.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
-        else:
-            query = File.objects.filter(user_id=user_)
-        return query
+        return get_custom_queryset(File, self.request.user, self.kwargs)
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):
@@ -85,7 +73,13 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     """
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, DataAccessPermissionSafe]
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
@@ -114,18 +108,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        user_ = User.objects.get(email = self.request.user)
-        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        if access_owners.exists():
-            users = User.objects.filter(id=access_owners[0]['owner_id'])
-            for access_owner in access_owners:
-                users = users.union(User.objects.filter(id=access_owner['owner_id']))
-            query = Dashboard.objects.filter(user_id=users[0].id)
-            for user in users:
-                query = query.union(Dashboard.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
-        else:
-            query = Dashboard.objects.filter(user_id=user_)
-        return query
+        return get_custom_queryset(Dashboard, self.request.user, self.kwargs)
 
 
 class ChartViewSet(viewsets.ModelViewSet):
@@ -149,18 +132,7 @@ class ChartViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        user_ = User.objects.get(email = self.request.user)
-        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        if access_owners.exists():
-            users = User.objects.filter(id=access_owners[0]['owner_id'])
-            for access_owner in access_owners:
-                users = users.union(User.objects.filter(id=access_owner['owner_id']))
-            query = Chart.objects.filter(user_id=users[0].id)
-            for user in users:
-                query = query.union(Chart.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
-        else:
-            query = Chart.objects.filter(user_id=user_)
-        return query
+        return get_custom_queryset(Chart, self.request.user, self.kwargs)
 
 
 class CommentViewSet(viewsets.ModelViewSet):

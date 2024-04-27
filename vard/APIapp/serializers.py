@@ -151,17 +151,26 @@ class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         request = self.context.get("request")
         user_ = User.objects.get(email = request.user)
-        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        if access_owners.exists():
-            users = User.objects.filter(id=access_owners[0]['owner_id'])
-            for access_owner in access_owners:
-                users = users.union(User.objects.filter(id=access_owner['owner_id']))
-            query = Chart.objects.filter(user_id=users[0].id)
-            for user in users:
-                query = query.union(Chart.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
-        else:
-            query = Chart.objects.filter(user_id=user_)
+        query = Chart.objects.filter(user_id=user_)
+        #query = Chart.objects.filter(user_id=user_)
         return query
+
+    # в список чартов в дашборде возвращает объекты пользовтаеля и объекты того, кто дал право на чтение либо коментирование либо редактирование
+    # def get_queryset(self):
+    #     request = self.context.get("request")
+    #     user_ = User.objects.get(email = request.user)
+    #     access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+    #     if access_owners.exists():
+    #         users = User.objects.filter(id=access_owners[0]['owner_id'])
+    #         for access_owner in access_owners:
+    #             users = users.union(User.objects.filter(id=access_owner['owner_id']))
+    #         query = Chart.objects.filter(user_id=users[0].id)
+    #         for user in users:
+    #             query = query.union(Chart.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
+    #     else:
+    #         query = Chart.objects.filter(user_id=user_)
+    #     #query = Chart.objects.filter(user_id=user_)
+    #     return query
 
 class DashboardSerializer(WritableNestedModelSerializer):
     chart = UserFilteredPrimaryKeyRelatedField(many=True)
