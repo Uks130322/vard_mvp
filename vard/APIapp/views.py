@@ -66,12 +66,16 @@ class FileViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user_ = User.objects.get(email = self.request.user)
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        users = User.objects.filter(id=access_owners[0]['owner_id'])
-        for access_owner in access_owners:
-            users = users.union(User.objects.filter(id=access_owner['owner_id']))
-        query = File.objects.filter(user_id=users[0].id)
-        for user in users:
-            query = query.union( File.objects.filter(Q(user_id=user.id) | Q(user_id=user_)) )
+        if access_owners.exists():
+            users = User.objects.filter(id=access_owners[0]['owner_id'])
+            print('users',users)
+            for access_owner in access_owners:
+                users = users.union(User.objects.filter(id=access_owner['owner_id']))
+            query = File.objects.filter(user_id=users[0].id)
+            for user in users:
+                query = query.union(File.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
+        else:
+            query = File.objects.filter(user_id=user_)
         return query
 
 
@@ -112,12 +116,15 @@ class DashboardViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user_ = User.objects.get(email = self.request.user)
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        users = User.objects.filter(id=access_owners[0]['owner_id'])
-        for access_owner in access_owners:
-            users = users.union(User.objects.filter(id=access_owner['owner_id']))
-        query = Dashboard.objects.filter(user_id=users[0].id)
-        for user in users:
-            query = query.union( Dashboard.objects.filter(Q(user_id=user.id) | Q(user_id=user_)) )
+        if access_owners.exists():
+            users = User.objects.filter(id=access_owners[0]['owner_id'])
+            for access_owner in access_owners:
+                users = users.union(User.objects.filter(id=access_owner['owner_id']))
+            query = Dashboard.objects.filter(user_id=users[0].id)
+            for user in users:
+                query = query.union(Dashboard.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
+        else:
+            query = Dashboard.objects.filter(user_id=user_)
         return query
 
 
@@ -144,12 +151,15 @@ class ChartViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user_ = User.objects.get(email = self.request.user)
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        users = User.objects.filter(id=access_owners[0]['owner_id'])
-        for access_owner in access_owners:
-            users = users.union(User.objects.filter(id=access_owner['owner_id']))
-        query = Chart.objects.filter(user_id=users[0].id)
-        for user in users:
-            query = query.union( Chart.objects.filter(Q(user_id=user.id) | Q(user_id=user_)) )
+        if access_owners.exists():
+            users = User.objects.filter(id=access_owners[0]['owner_id'])
+            for access_owner in access_owners:
+                users = users.union(User.objects.filter(id=access_owner['owner_id']))
+            query = Chart.objects.filter(user_id=users[0].id)
+            for user in users:
+                query = query.union(Chart.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
+        else:
+            query = Chart.objects.filter(user_id=user_)
         return query
 
 
@@ -190,19 +200,10 @@ class ReadCommentViewSet(viewsets.ModelViewSet):
         return serializer.save(user_id=self.request.user, **datas)
 
 
-class ChartUserViewSet(viewsets.ModelViewSet):
-    serializer_class = ChartSerializer
-
-    def get_queryset(self):
-        u1 = self.request.user
-        if u1.id is not None:
-            queryset = Chart.objects.filter(user_id=u1).order_by('id')
-        else:
-            queryset = []
-        return queryset
-
-
 class ChatViewSet(viewsets.ModelViewSet):
+    """
+        ???
+    """
     queryset = Chat.objects.filter(is_remove=False).order_by('-date_send')
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
