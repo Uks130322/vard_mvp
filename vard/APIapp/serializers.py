@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from vardapp.models import *
+from vardapp.models import (User, Access, File, Chart, ClientData, Dashboard,
+                            Feedback, ChartDashboard, Comment, ReadComment)
 from appchat.models import Chat
 from appquery.serializers import ClientDataSerializer
 from APIapp.utils import load_csv, load_json
@@ -59,13 +60,11 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
             validated_data = load_json(self, validated_data)
             return validated_data
         except BaseException as error:
-            print(error)
             try:
                 validated_data = load_csv(self, validated_data)
                 return validated_data
             except BaseException as error:
-                print(error)
-                return validated_data
+                return self.error_messages(error)
 
     def create(self, validated_data):
         if validated_data['load_by_url']:
@@ -105,25 +104,24 @@ class FeedbackSerializer(serializers.HyperlinkedModelSerializer):
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Chart
-        fields = ['id','user_id','date_creation','date_change','clientdb_id','str_query','clientdata']
+        fields = [
+            'id',
+            'user_id',
+            'date_creation',
+            'date_change',
+            'clientdb_id',
+            'str_query',
+            'clientdata'
+        ]
         extra_kwargs = {
             'user_id': {'read_only': True},
             'clientdata': {'read_only': True},
         }
 
-    # def update(self, instance, validated_data):
-    #     clientdata = validated_data.pop('clientdata')
-    #     clientdata = ClientData.objects.update(**clientdata)
-    #     return super().update(instance, validated_data)
-
     def create(self, validated_data, **kwargs):
-        #print('validated_data',validated_data)
-        clientdata = ClientData.objects.create(user_id=validated_data['user_id'],data='')
-        chart = Chart.objects.create(**validated_data, clientdata = clientdata)
-        #print('chart',clientdata.chart.id)
+        clientdata = ClientData.objects.create(user_id=validated_data['user_id'], data='')
+        chart = Chart.objects.create(**validated_data, clientdata=clientdata)
         return chart
-
-#select * from vardapp_users
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -166,47 +164,31 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
 class ChartDashboardSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ChartDashboard
-        fields = ['id','chart','dashboard']
+        fields = ['id', 'chart', 'dashboard']
+
 
 class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
+    """Class for get only user's charts to add it to the dashboard"""
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = User.objects.get(email = request.user)
+        user_ = User.objects.get(email=request.user)
         query = Chart.objects.filter(user_id=user_)
-        #query = Chart.objects.filter(user_id=user_)
         return query
 
-    # в список чартов в дашборде возвращает объекты пользовтаеля и объекты того, кто дал право на чтение либо коментирование либо редактирование
-    # def get_queryset(self):
-    #     request = self.context.get("request")
-    #     user_ = User.objects.get(email = request.user)
-    #     access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-    #     if access_owners.exists():
-    #         users = User.objects.filter(id=access_owners[0]['owner_id'])
-    #         for access_owner in access_owners:
-    #             users = users.union(User.objects.filter(id=access_owner['owner_id']))
-    #         query = Chart.objects.filter(user_id=users[0].id)
-    #         for user in users:
-    #             query = query.union(Chart.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
-    #     else:
-    #         query = Chart.objects.filter(user_id=user_)
-    #     #query = Chart.objects.filter(user_id=user_)
-    #     return query
 
 class DashboardSerializer(WritableNestedModelSerializer):
     chart = UserFilteredPrimaryKeyRelatedField(many=True)
+
     class Meta:
         model = Dashboard
-        fields = ['id','user_id','date_creation','date_change','chart']
+        fields = [
+            'id',
+            'user_id',
+            'date_creation',
+            'date_change',
+            'chart'
+        ]
 
         extra_kwargs = {
             'user_id': {'read_only': True},
         }
-
-
-
-
-
-
-

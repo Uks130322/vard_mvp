@@ -9,9 +9,9 @@ from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, drop_database, database_exists
 from sqlalchemy import exc
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from APIapp.permissions import DataAccessPermission, CommentAccessPermission
+from APIapp.permissions import DataAccessPermission, CommentAccessPermission, DataAccessPermissionSafe
 from vardapp.models import *
-from APIapp.permissions import DataAccessPermission, CommentAccessPermission, DataAccessPermissionSafe, get_custom_queryset
+from APIapp.permissions import DataAccessPermission, CommentAccessPermission, get_custom_queryset
 
 
 class ClientDBViewSet(viewsets.ModelViewSet):
@@ -27,7 +27,7 @@ class ClientDBViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_ = User.objects.get(email=self.request.user)
-        query = ClientDB.objects.filter(user_id = user_)
+        query = ClientDB.objects.filter(user_id=user_)
         return query
 
     def get_host(self, url, host, port):
@@ -163,7 +163,6 @@ class ClientDataViewSet(viewsets.ModelViewSet):
                 j['error'] = error
             L.append(j)
         if not L:
-            L=[{'error':'access denied'}]
+            L = [{'error': 'access denied'}]
         new_response_data = L
         return Response(new_response_data)
-

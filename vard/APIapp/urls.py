@@ -13,7 +13,7 @@ router.register(r'access', views.AccessViewSet)
 router.register(r'files', views.FileViewSet)  # api/files/?user_id__id=2 for filter by user with id=2
 router.register(r'feedback', views.FeedbackViewSet)
 router.register(r'dashboards', views.DashboardViewSet)  # api/dashboards/?user_id__id=<id> for filter by user
-#router.register(r'chartdashboard', views.ChartDashboardViewSet, basename='chartdashboard')
+# router.register(r'chartdashboard', views.ChartDashboardViewSet, basename='chartdashboard')
 router.register(r'charts', views.ChartViewSet)  # api/charts/?user_id__id=<id> for filter by user
 router.register(r'comments', views.CommentViewSet)  # api/comments/?user_id__id=<id> for filter by user
 router.register(r'read_comment', views.ReadCommentViewSet)

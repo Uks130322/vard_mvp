@@ -26,7 +26,8 @@ class UserManager(BaseUserManager):
         user = self.create_user(
             name=name,
             email=self.normalize_email(email),
-            password=make_password(password),
+            password=password,
+            # password=make_password(password),
             **kwargs
         )
         user.is_superuser = True
@@ -58,7 +59,7 @@ class Access(models.Model):
 
     class AccessType(models.IntegerChoices):
         READER = 1
-        OWNER = 2
+        # OWNER = 2    # not used
         COMMENTATOR = 3
         EDITOR = 4
 
@@ -187,7 +188,8 @@ class ClientDB(models.Model):
             if not str_query or str_query is None or str_query == '':
                 result = {'user_id': user_id, 'fieldname': None, 'data': None, 'error': None}
             else:
-                result = self.get_query(user_id, url, host, port, password, driver, user_name, data_base_name, str_query)
+                result = self.get_query(user_id, url, host, port, password, driver, user_name,
+                                        data_base_name, str_query)
             return result
         except exc.SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
@@ -206,9 +208,9 @@ class Chart(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
-    clientdb_id = models.ForeignKey(ClientDB, on_delete=models.CASCADE, verbose_name='clientdb id')
+    clientdb_id = models.ForeignKey(ClientDB, on_delete=models.PROTECT, verbose_name='clientdb id')
     str_query = models.TextField(blank=True)
-    clientdata = models.OneToOneField('ClientData', on_delete=models.CASCADE)
+    clientdata = models.OneToOneField('ClientData', on_delete=models.PROTECT)
 
     def __str__(self):
         return f'{self.id} {self.user_id}'
