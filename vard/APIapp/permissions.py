@@ -72,7 +72,7 @@ class CommentAccessPermission(BasePermission):
 
 class DataAccessPermissionSafe(BasePermission):
     """
-    For files, charts and dashboards.
+    For files, charts and dashboards with no editing, just create and SAFE_METHODS.
     READER = 1 - read only
     OWNER = 2 - can do anything
     COMMENTATOR = 3 - can read and comment (comment access in CommentAccessPermission)
@@ -124,6 +124,7 @@ def get_custom_queryset(model, request_user, kwargs):
 
 
 def can_comment(request, data):
+    """Check if user can comment"""
     post = data['file_id'] or data['chart_id'] or data['dashboard_id']
     is_reader = Access.objects.filter(user_id=request.user, access_type_id=1,
                                       owner_id=post.user_id).exists()

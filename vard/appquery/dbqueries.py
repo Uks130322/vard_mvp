@@ -1,11 +1,11 @@
+import re
+import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
-import re
-import json
 
 
-class DataBaseQuery():
+class DataBaseQuery:
     def __init__(self, driver, user_name, password, url, host, port, data_base_name,
                  data_base_type, description, str_query):
         self.driver = driver

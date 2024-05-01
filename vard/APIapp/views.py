@@ -1,17 +1,16 @@
-from rest_framework import viewsets
+from django.db.models import Q
+from rest_framework import viewsets, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
-from vardapp.models import *
-from .permissions import DataAccessPermission, CommentAccessPermission, get_custom_queryset, DataAccessPermissionSafe, \
-    can_comment
+from vardapp.models import (User, Access, File, Dashboard, Chart, Comment, Feedback, ChartDashboard, ReadComment)
 from appchat.models import Chat
+from .permissions import (DataAccessPermission, CommentAccessPermission, get_custom_queryset,
+                          DataAccessPermissionSafe, can_comment)
 from .serializers import (UserSerializer, AccessSerializer, FileSerializer, DashboardSerializer,
                           ChartSerializer, CommentSerializer, FeedbackSerializer, ChartDashboardSerializer,
                           ReadCommentSerializer, ChatSerializer)
-from rest_framework.response import Response
-from rest_framework import status
-from django.db.models import Q
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -46,21 +45,20 @@ class AccessViewSet(viewsets.ModelViewSet):
 
     permission_classes = [IsAuthenticated]
 
-# if we want to show only access objects of authorized user:
     def get_queryset(self):
+        """Superuser can see all access, others can see only theirs own"""
         if self.request.user.is_superuser:
             queryset = Access.objects.all()
         else:
-            # user_ = User.objects.get(email=self.request.user)
-            # query = Access.objects.filter(owner_id=user_)
             queryset = Access.objects.filter(owner_id=self.request.user)
         return queryset
 
 
 class FileViewSet(viewsets.ModelViewSet):
     """
-    User should see the list of all his files. If he got permission, he can see others users'
-    files by detail, not the list
+    API endpoint that allows files to be viewed or edited.
+    By URL can be uploaded CSV and JSON files,
+    by local can be uploaded CSV, JSON and PDF files
     """
     queryset = File.objects.all()
     serializer_class = FileSerializer
@@ -72,6 +70,7 @@ class FileViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # type error by URL upload do not work :(
         except ValidationError as error:
             return Response({
                         'status': status.HTTP_400_BAD_REQUEST,
@@ -91,6 +90,7 @@ class FileViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
+        """Superuser can see all files, others can see theirs own and all with access"""
         if self.request.user.is_superuser:
             queryset = File.objects.all()
         else:
@@ -100,13 +100,14 @@ class FileViewSet(viewsets.ModelViewSet):
 
 class FeedbackViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows feedback messages to be viewed or edited.
+    API endpoint that allows feedback messages to be viewed.
     """
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
     filterset_fields = ['user_id__id']
 
     def get_permissions(self):
+        """Edit is forbidden"""
         if self.action == 'list':
             permission_classes = [IsAuthenticated]
         else:
@@ -119,6 +120,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         return serializer.save(user_id=self.request.user, **datas)
 
     def get_queryset(self):
+        """Superuser can see all feedback, others can see theirs own"""
         if self.request.user.is_superuser:
             queryset = Feedback.objects.all()
         else:
@@ -147,6 +149,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
+        """Superuser can see all dashboards, others can see theirs own and all with access"""
         if self.request.user.is_superuser:
             queryset = Dashboard.objects.all()
         else:
@@ -175,6 +178,7 @@ class ChartViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
+        """Superuser can see all charts, others can see theirs own and all with access"""
         if self.request.user.is_superuser:
             queryset = Chart.objects.all()
         else:
@@ -213,6 +217,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReadCommentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows comment reading to be viewed or edited.
+    Probably does not fully work for now.
     """
     queryset = ReadComment.objects.all().order_by('-date_reading')
     serializer_class = ReadCommentSerializer
@@ -226,7 +231,7 @@ class ReadCommentViewSet(viewsets.ModelViewSet):
 
 class ChatViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows chats to be viewed or edited.
+    API endpoint that allows chat messages to be viewed or edited.
     """
     queryset = Chat.objects.filter(is_remove=False).order_by('-date_send')
     serializer_class = ChatSerializer
@@ -238,7 +243,6 @@ class ChatViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         chat = self.get_object()
-        # if self.action == 'destroy':
         chat.is_remove = True
         serializer = ChatSerializer(chat, data=request.data, partial=True)
         if serializer.is_valid():
@@ -250,11 +254,6 @@ class ChatViewSet(viewsets.ModelViewSet):
                 'status': status.HTTP_400_BAD_REQUEST,
                 'message': serializer.errors
             })
-        # else:
-        #     return Response({
-        #         'state': '0',
-        #         'message': f"отклонено. причина: {chat.get_status_display()}"
-        #     })
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id_sender"""

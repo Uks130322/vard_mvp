@@ -1,17 +1,16 @@
-from rest_framework import viewsets
-from vardapp.models import ClientDB, Chart, ClientData
-from rest_framework.response import Response
-from .serializers import ClientDBSerializer, ClientDataSerializer
 import re
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, drop_database, database_exists
-from sqlalchemy import exc
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from APIapp.permissions import DataAccessPermission, CommentAccessPermission, DataAccessPermissionSafe
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import viewsets
+
+from APIapp.permissions import DataAccessPermission, DataAccessPermissionSafe, get_custom_queryset
 from vardapp.models import *
-from APIapp.permissions import DataAccessPermission, CommentAccessPermission, get_custom_queryset
+from .serializers import ClientDBSerializer, ClientDataSerializer
 
 
 class ClientDBViewSet(viewsets.ModelViewSet):

@@ -1,5 +1,6 @@
-from vardapp.models import ClientDB, ClientData
 from rest_framework import serializers
+
+from vardapp.models import ClientDB, ClientData
 
 
 class ClientDataSerializer(serializers.HyperlinkedModelSerializer):

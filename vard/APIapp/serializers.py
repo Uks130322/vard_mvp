@@ -1,15 +1,16 @@
+from django.conf import settings
+from django.db.models import Q
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from drf_writable_nested import WritableNestedModelSerializer
 
 from vardapp.models import (User, Access, File, Chart, ClientData, Dashboard,
                             Feedback, ChartDashboard, Comment, ReadComment)
 from appchat.models import Chat
 from appquery.serializers import ClientDataSerializer
 from APIapp.utils import load_csv, load_json
-from drf_writable_nested import WritableNestedModelSerializer
-from django.db.models import Q
 from .hash_md import get_hash_md5
-from django.conf import settings
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

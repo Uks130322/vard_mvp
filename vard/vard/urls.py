@@ -2,11 +2,11 @@ from django.contrib import admin
 from django.urls import path, include
 from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
 from allauth.socialaccount.views import signup
+
 from vardapp.views import GoogleLogin, GitHubLogin, RegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('pages/', include('django.contrib.flatpages.urls')),
     path('accounts/', include('allauth.urls')),
     path('api/', include('APIapp.urls')),
 

@@ -1,7 +1,7 @@
 import csv
 import json
-
 import requests
+
 from vardapp.utils import get_upload_filename, get_upload_file_path
 
 

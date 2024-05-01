@@ -1,10 +1,11 @@
-from django.contrib.auth.hashers import make_password
-from django.core.validators import FileExtensionValidator
+from sqlalchemy import exc
+
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.hashers import make_password
+from django.core.validators import FileExtensionValidator
 
 from vardapp.utils import user_directory_path
-from sqlalchemy import exc
 
 
 class UserManager(BaseUserManager):
@@ -27,7 +28,6 @@ class UserManager(BaseUserManager):
             name=name,
             email=self.normalize_email(email),
             password=password,
-            # password=make_password(password),
             **kwargs
         )
         user.is_superuser = True
@@ -90,6 +90,7 @@ class File(models.Model):
         BestPractices = 3
 
     class FilesType(models.IntegerChoices):
+        """By URL can be uploaded CSV and JSON files, by local can be uploaded CSV, JSON and PDF files"""
         CSV = 1
         JSON = 2
         PDF = 3

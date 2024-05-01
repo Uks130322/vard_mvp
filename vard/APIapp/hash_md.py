@@ -3,7 +3,7 @@ import hashlib
 
 def get_hash_md5(filename):
     """
-        работает только с файлами,записанными на диске
+    Works only with files from local disk
     """
     try:
         with open(filename, 'rb') as f:
