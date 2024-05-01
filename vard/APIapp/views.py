@@ -1,7 +1,10 @@
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
 from vardapp.models import *
-from .permissions import DataAccessPermission, CommentAccessPermission, get_custom_queryset, DataAccessPermissionSafe
+from .permissions import DataAccessPermission, CommentAccessPermission, get_custom_queryset, DataAccessPermissionSafe, \
+    can_comment
 from appchat.models import Chat
 from .serializers import (UserSerializer, AccessSerializer, FileSerializer, DashboardSerializer,
                           ChartSerializer, CommentSerializer, FeedbackSerializer, ChartDashboardSerializer,
@@ -45,9 +48,13 @@ class AccessViewSet(viewsets.ModelViewSet):
 
 # if we want to show only access objects of authorized user:
     def get_queryset(self):
-        user_ = User.objects.get(email=self.request.user)
-        query = Access.objects.filter(owner_id=user_)
-        return query
+        if self.request.user.is_superuser:
+            queryset = Access.objects.all()
+        else:
+            # user_ = User.objects.get(email=self.request.user)
+            # query = Access.objects.filter(owner_id=user_)
+            queryset = Access.objects.filter(owner_id=self.request.user)
+        return queryset
 
 
 class FileViewSet(viewsets.ModelViewSet):
@@ -61,14 +68,14 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
-            serializer = FileSerializer(data=request.data)
-            serializer.is_valid()
-            serializer.save()
+            serializer = FileSerializer(data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except TypeError as error:
+        except ValidationError as error:
             return Response({
                         'status': status.HTTP_400_BAD_REQUEST,
-                        'message': 'Wrong file type, it should be json or csv'
+                        'message': error.detail['link'],
                     })
 
     def perform_create(self, serializer):
@@ -84,7 +91,11 @@ class FileViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        return get_custom_queryset(File, self.request.user, self.kwargs)
+        if self.request.user.is_superuser:
+            queryset = File.objects.all()
+        else:
+            queryset = get_custom_queryset(File, self.request.user, self.kwargs)
+        return queryset
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):
@@ -93,6 +104,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     """
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
+    filterset_fields = ['user_id__id']
 
     def get_permissions(self):
         if self.action == 'list':
@@ -105,6 +117,13 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            queryset = Feedback.objects.all()
+        else:
+            queryset = Feedback.objects.filter(user_id=self.request.user)
+        return queryset
 
 
 class DashboardViewSet(viewsets.ModelViewSet):
@@ -128,7 +147,11 @@ class DashboardViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        return get_custom_queryset(Dashboard, self.request.user, self.kwargs)
+        if self.request.user.is_superuser:
+            queryset = Dashboard.objects.all()
+        else:
+            queryset = get_custom_queryset(Dashboard, self.request.user, self.kwargs)
+        return queryset
 
 
 class ChartViewSet(viewsets.ModelViewSet):
@@ -152,7 +175,11 @@ class ChartViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        return get_custom_queryset(Chart, self.request.user, self.kwargs)
+        if self.request.user.is_superuser:
+            queryset = Chart.objects.all()
+        else:
+            queryset = get_custom_queryset(Chart, self.request.user, self.kwargs)
+        return queryset
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -162,20 +189,25 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-date_send')
     serializer_class = CommentSerializer
     filterset_fields = ['user_id__id']
+    permission_classes = [IsAuthenticated, CommentAccessPermission]
+
+    def create(self, request, *args, **kwargs):
+        serializer = CommentSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        if can_comment(request, serializer.validated_data):
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'status': status.HTTP_406_NOT_ACCEPTABLE,
+                'message': "You have no access to comment",
+            })
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
+        print(self.permission_classes)
         return serializer.save(user_id=self.request.user, **datas)
-
-    def get_permissions(self):
-        if self.action == 'list':
-            permission_classes = [IsAuthenticated]
-        elif self.action == 'create':
-            permission_classes = [IsAuthenticated, DataAccessPermission]
-        else:
-            permission_classes = [IsAuthenticated, CommentAccessPermission]
-        return [permission() for permission in permission_classes]
 
 
 class ReadCommentViewSet(viewsets.ModelViewSet):
@@ -198,7 +230,10 @@ class ChatViewSet(viewsets.ModelViewSet):
     """
     queryset = Chat.objects.filter(is_remove=False).order_by('-date_send')
     serializer_class = ChatSerializer
+
+    # should be added some special permissions
     permission_classes = [IsAuthenticated]
+
     filterset_fields = ['user_id_owner__id', 'user_id_sender__id', 'date_send']
 
     def destroy(self, request, *args, **kwargs):
@@ -212,7 +247,7 @@ class ChatViewSet(viewsets.ModelViewSet):
             return Response(ChatSerializer(chat, context=serializer_context).data, status=status.HTTP_200_OK)
         else:
             return Response({
-                'state': '0',
+                'status': status.HTTP_400_BAD_REQUEST,
                 'message': serializer.errors
             })
         # else:
@@ -224,8 +259,7 @@ class ChatViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id_sender"""
         datas = serializer.validated_data
-        print('self.request.user', self.request.user)  ### WTF
-        return serializer.save(**datas)
+        return serializer.save(user_id_sender=self.request.user, **datas)
 
 
 class ChartDashboardViewSet(viewsets.ModelViewSet):

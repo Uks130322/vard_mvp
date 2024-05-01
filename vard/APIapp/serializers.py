@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from vardapp.models import (User, Access, File, Chart, ClientData, Dashboard,
                             Feedback, ChartDashboard, Comment, ReadComment)
 from appchat.models import Chat
@@ -64,7 +66,7 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
                 validated_data = load_csv(self, validated_data)
                 return validated_data
             except BaseException as error:
-                return self.error_messages(error)
+                raise ValidationError(error)
 
     def create(self, validated_data):
         if validated_data['load_by_url']:
@@ -150,13 +152,11 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
             'user_id_owner',
             'user_id_sender',
             'date_send',
-            'date_remove',
             'message'
         ]
 
         extra_kwargs = {
             'id': {'read_only': True},
-            'user_id_owner': {'read_only': True},
             'user_id_sender': {'read_only': True},
         }
 

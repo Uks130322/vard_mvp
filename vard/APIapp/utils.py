@@ -14,7 +14,8 @@ def load_json(self, validated_data):
     json.dump(datas, outfile)
     outfile.close()
     validated_data['link'] = link
-    validated_data['name'] = filename
+    if not validated_data['name']:
+        validated_data['name'] = filename
     return validated_data
 
 
@@ -28,5 +29,6 @@ def load_csv(self, validated_data):
     writer.writerow(datas)
     outfile.close()
     validated_data['link'] = link
-    validated_data['name'] = filename
+    if not validated_data['name']:
+        validated_data['name'] = filename
     return validated_data

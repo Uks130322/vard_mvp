@@ -13,7 +13,9 @@ class DataAccessPermission(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.method == "CREATE":
+        if request.user.is_superuser:
+            return True
+        if request.method == "POST":
             # all authorized users can add files
             return True
 
@@ -45,24 +47,27 @@ class CommentAccessPermission(BasePermission):
     COMMENTATOR = 3 - can add comment
     EDITOR = 4 - can add comment
     """
+
     def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
         post = obj.file_id or obj.chart_id or obj.dashboard_id
-        is_reader = Access.objects.filter(user_id=request.user.id, access_type_id=1,
+        is_reader = Access.objects.filter(user_id=request.user, access_type_id=1,
                                           owner_id=post.user_id).exists()
         is_owner = request.user == post.user_id
-        is_commentator = Access.objects.filter(user_id=request.user.id, access_type_id=3,
+        is_commentator = Access.objects.filter(user_id=request.user, access_type_id=3,
                                                owner_id=post.user_id).exists()
-        is_editor = Access.objects.filter(user_id=request.user.id, access_type_id=4,
+        is_editor = Access.objects.filter(user_id=request.user, access_type_id=4,
                                           owner_id=post.user_id).exists()
 
-        if request.method == "CREATE":
-            # owner or commentator or editor can add comments
-            return is_owner or is_commentator or is_editor
+        if request.method == "POST":
+            # processing in View by using function can_comment
+            pass
         if request.method in SAFE_METHODS and any([is_reader, is_owner, is_commentator, is_editor]):
             # all users with any access can see the comment
             return True
         else:
-            return is_owner
+            return is_owner or request.user == obj.user_id
 
 
 class DataAccessPermissionSafe(BasePermission):
@@ -75,38 +80,34 @@ class DataAccessPermissionSafe(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.method == "CREATE":
-            # all authorized users can add files
+        if request.user.is_superuser:
+            return True
+        if request.method == "POST":
+            # shouldn't be accessed, but it doesn't work here, should be in has_permission
             return False
 
-        is_reader = Access.objects.filter(user_id=request.user.id, access_type_id=1,owner_id=obj.user_id).exists()
-        #is_owner = Access.objects.filter(user_id=request.user.id, access_type_id=2, owner_id=obj.user_id).exists()
+        is_reader = Access.objects.filter(user_id=request.user.id, access_type_id=1,
+                                          owner_id=obj.user_id).exists()
         is_owner = request.user == obj.user_id
-        is_commentator = Access.objects.filter(user_id=request.user.id, access_type_id=3,owner_id=obj.user_id).exists()
-        is_editor = Access.objects.filter(user_id=request.user.id, access_type_id=4,owner_id=obj.user_id).exists()
+        is_commentator = Access.objects.filter(user_id=request.user.id, access_type_id=3,
+                                               owner_id=obj.user_id).exists()
+        is_editor = Access.objects.filter(user_id=request.user.id, access_type_id=4,
+                                          owner_id=obj.user_id).exists()
 
         if request.method in SAFE_METHODS and any([is_reader, is_owner, is_commentator, is_editor]):
             # all users with any access can see the file
             return True
 
-        # elif request.method == "GET" or request.method == "PUT" or request.method == "PATCH":
-        #     # only owner can delete the file
-        #     return is_owner or is_editor
-
-        elif request.method == "DELETE":
-            # only owner can delete the file
-            return False
-
         else:
-            # owner and editor can edit
+            # edit or delete are forbidden
             return False
 
 
 def get_custom_queryset(model, request_user, kwargs):
     """Get custom queryset for files, charts and dashboards. Superuser have access to all files"""
     user_ = User.objects.get(email=request_user)
-    # if user_.is_superuser:
-    #     return model.objects.all()
+    if user_.is_superuser:
+        return model.objects.all()
     access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
     if access_owners.exists() and 'pk' not in kwargs:
         users = User.objects.filter(id=access_owners[0]['owner_id'])
@@ -121,3 +122,14 @@ def get_custom_queryset(model, request_user, kwargs):
         query = model.objects.filter(id=kwargs['pk'])
     return query
 
+
+def can_comment(request, data):
+    post = data['file_id'] or data['chart_id'] or data['dashboard_id']
+    is_reader = Access.objects.filter(user_id=request.user, access_type_id=1,
+                                      owner_id=post.user_id).exists()
+    is_owner = request.user == post.user_id
+    is_commentator = Access.objects.filter(user_id=request.user, access_type_id=3,
+                                           owner_id=post.user_id).exists()
+    is_editor = Access.objects.filter(user_id=request.user, access_type_id=4,
+                                      owner_id=post.user_id).exists()
+    return any([is_owner, is_commentator, is_editor])
