@@ -36,6 +36,7 @@ class ClientDBSerializer(serializers.HyperlinkedModelSerializer):
         ]
         extra_kwargs = {
             # 'user': {'write_only': True},
+            'user_id': {'read_only': True},
             'connection_name': {'write_only': False},
             'user_name': {'write_only': False},
             'password': {'write_only': False},

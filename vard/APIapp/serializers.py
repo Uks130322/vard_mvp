@@ -1,12 +1,12 @@
 from django.conf import settings
-from django.db.models import Q
+from django.db import transaction
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from drf_writable_nested import WritableNestedModelSerializer
 
 from vardapp.models import (User, Access, File, Chart, ClientData, Dashboard,
-                            Feedback, ChartDashboard, Comment, ReadComment)
+                            Feedback, ChartDashboard, Comment, ReadComment, ClientDB)
 from appchat.models import Chat
 from appquery.serializers import ClientDataSerializer
 from APIapp.utils import load_csv, load_json
@@ -104,7 +104,24 @@ class FeedbackSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 
+class ChartClientdbFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """Class for get only user's clientdb to add it to the chart"""
+    def get_queryset(self):
+        request = self.context.get("request")
+        user_ = User.objects.get(email=request.user)
+        query = ClientDB.objects.filter(user_id=user_)
+        return query
+
+class ChartUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """Class for get only user to add it to the chart"""
+    def get_queryset(self):
+        request = self.context.get("request")
+        query = User.objects.filter(email=request.user)
+        return query
+
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
+    clientdb_id = ChartClientdbFilteredPrimaryKeyRelatedField(many=False)
+    user_id = ChartUserFilteredPrimaryKeyRelatedField(many=False)
     class Meta:
         model = Chart
         fields = [
@@ -117,12 +134,17 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
             'clientdata'
         ]
         extra_kwargs = {
-            'user_id': {'read_only': True},
             'clientdata': {'read_only': True},
         }
 
+    @transaction.atomic
     def create(self, validated_data, **kwargs):
+        #print('**validated_data',validated_data['clientdb_id'])
         clientdata = ClientData.objects.create(user_id=validated_data['user_id'], data='')
+        # for i in validated_data['clientdb_id']:
+        #     clientdb_ids = ClientDB.objects.get(id=validated_data['clientdb_id'])
+        # print('clientdb_id',clientdb_ids)
+        #chart = Chart.objects.create(user_id=validated_data['user_id'], clientdata=clientdata, clientdb_id=validated_data['clientdb_id'], str_query=validated_data['str_query'])
         chart = Chart.objects.create(**validated_data, clientdata=clientdata)
         return chart
 
@@ -143,6 +165,7 @@ class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'user_id': {'read_only': True},
         }
+
 
 
 class ChatSerializer(serializers.HyperlinkedModelSerializer):
@@ -168,17 +191,26 @@ class ChartDashboardSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'chart', 'dashboard']
 
 
-class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+class ChartDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     """Class for get only user's charts to add it to the dashboard"""
     def get_queryset(self):
         request = self.context.get("request")
         user_ = User.objects.get(email=request.user)
-        query = Chart.objects.filter(user_id=user_)
+
+        if request.parser_context['kwargs'].get('pk',False):
+            id_obj = request.parser_context['kwargs']['pk']
+            obj = Dashboard.objects.get(id = id_obj)
+            if obj.user_id == user_:
+                query = Chart.objects.filter(user_id=user_)
+            else:
+                query = Chart.objects.filter(user_id=obj.user_id)
+        else:
+            query = None
         return query
 
 
 class DashboardSerializer(WritableNestedModelSerializer):
-    chart = UserFilteredPrimaryKeyRelatedField(many=True)
+    chart = ChartDashboardFilteredPrimaryKeyRelatedField(many=True)
 
     class Meta:
         model = Dashboard

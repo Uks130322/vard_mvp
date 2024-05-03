@@ -134,3 +134,8 @@ def can_comment(request, data):
     is_editor = Access.objects.filter(user_id=request.user, access_type_id=4,
                                       owner_id=post.user_id).exists()
     return any([is_owner, is_commentator, is_editor])
+
+
+
+
+

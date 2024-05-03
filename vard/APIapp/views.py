@@ -168,7 +168,8 @@ class ChartViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
-        return serializer.save(user_id=self.request.user, **datas)
+        #print('**datas',**datas)
+        return serializer.save(**datas)
 
     def get_permissions(self):
         if self.action == 'list':
