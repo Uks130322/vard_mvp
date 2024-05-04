@@ -195,6 +195,19 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
             'user_id': {'read_only': True},
         }
 
+    def validate(self, data):
+        if self.instance is not None:
+            instance_user = self.instance.user
+            data_user = data.get('user')
+            validating_user_fields = [
+                instance_user.fam != data_user['file_id'],
+                instance_user.otc != data_user['chart_id'],
+                instance_user.phone != data_user['dashboard_id'],
+            ]
+            if data_user is not None and any(validating_user_fields):
+                raise serializers.ValidationError({'отклонено':'нельзя изменить комментируемый объект'})
+        return data
+
 
 class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

@@ -204,7 +204,6 @@ class ChartViewSet(viewsets.ModelViewSet):
             })
 
 
-
 class CommentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows comments to be viewed or edited.
