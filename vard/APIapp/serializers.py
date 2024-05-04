@@ -113,16 +113,9 @@ class ChartClientdbFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedF
         query = ClientDB.objects.filter(user_id=user_)
         return query
 
-class ChartUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-    """Class for get only user to add it to the chart"""
-    def get_queryset(self):
-        request = self.context.get("request")
-        query = User.objects.filter(email=request.user)
-        return query
-
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
     clientdb_id = ChartClientdbFilteredPrimaryKeyRelatedField(many=False)
-    user_id = ChartUserFilteredPrimaryKeyRelatedField(many=False)
+
     class Meta:
         model = Chart
         fields = [
@@ -135,6 +128,7 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
             'clientdata'
         ]
         extra_kwargs = {
+            'user_id': {'read_only': True},
             'clientdata': {'read_only': True},
         }
 
