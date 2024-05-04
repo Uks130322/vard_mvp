@@ -107,11 +107,13 @@ class FeedbackSerializer(serializers.HyperlinkedModelSerializer):
 
 class ChartClientdbFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     """Class for get only user's clientdb to add it to the chart"""
+
     def get_queryset(self):
         request = self.context.get("request")
         user_ = User.objects.get(email=request.user)
         query = ClientDB.objects.filter(user_id=user_)
         return query
+
 
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
     clientdb_id = ChartClientdbFilteredPrimaryKeyRelatedField(many=False)
@@ -139,10 +141,56 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
         return chart
 
 
+class CommentChartFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+
+    def get_queryset(self):
+        request = self.context.get("request")
+        user_ = User.objects.get(email=request.user)
+        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+        list_access_owner = []
+        for access_owner in access_owners:
+            list_access_owner.append(access_owner['owner_id'])
+        list_access_owner.append(user_.id)
+        users = User.objects.filter(id__in=list_access_owner)
+        query = Chart.objects.filter(user_id__in=users)
+        return query
+
+
+class CommentFileFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+
+    def get_queryset(self):
+        request = self.context.get("request")
+        user_ = User.objects.get(email=request.user)
+        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+        list_access_owner = []
+        for access_owner in access_owners:
+            list_access_owner.append(access_owner['owner_id'])
+        users = User.objects.filter(id__in=list_access_owner)
+        query = File.objects.filter(user_id__in=users)
+        return query
+
+
+class CommentDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+
+    def get_queryset(self):
+        request = self.context.get("request")
+        user_ = User.objects.get(email=request.user)
+        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+        list_access_owner = []
+        for access_owner in access_owners:
+            list_access_owner.append(access_owner['owner_id'])
+        users = User.objects.filter(id__in=list_access_owner)
+        query = Dashboard.objects.filter(user_id__in=users)
+        return query
+
+
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
+    file_id = CommentFileFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
+    chart_id = CommentChartFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
+    dashboard_id = CommentDashboardFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id','file_id','chart_id','dashboard_id','user_id','date_send','date_remove','date_delivery','comment']
         extra_kwargs = {
             'user_id': {'read_only': True},
         }

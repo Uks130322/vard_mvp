@@ -217,9 +217,20 @@ class CommentViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = CommentSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        if can_comment(request, serializer.validated_data):
+        """проверка внешних ключей. если комментарий делается более чем для одной таблицы, возвращается отшибка"""
+        valid_file_id = 1 if request.data['file_id'] else 0
+        valid_chart_id = 1 if request.data['chart_id'] else 0
+        valid_dashboard_id = 1 if request.data['dashboard_id'] else 0
+        valid_foreign_keys = valid_file_id+valid_chart_id+valid_dashboard_id
+
+        if can_comment(request, serializer.validated_data) and valid_foreign_keys == 1:
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif can_comment(request, serializer.validated_data) and valid_foreign_keys != 1:
+            return Response({
+                'status': status.HTTP_409_CONFLICT,
+                'message': "указано более одной комменитруемой таблицы. выберите одну из file, chart, dashboard",
+            })
         else:
             return Response({
                 'status': status.HTTP_406_NOT_ACCEPTABLE,
@@ -230,6 +241,28 @@ class CommentViewSet(viewsets.ModelViewSet):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
+
+    def get_queryset(self):
+        """админ может читать и изменять все коментарии, владелец изменять все коменты у себя в экосистеме, остальные тлько читать,а изменятьтлько свои"""
+        if 'pk' in self.kwargs:
+            pk = {'pk': self.kwargs['pk']}
+            pk.pop('pk', None)
+        else:
+            pk = self.kwargs
+
+        if self.request.user.is_superuser:
+            queryset = Comment.objects.all()
+        else:
+            file = get_custom_queryset(File, self.request.user, pk)
+            file_items = Comment.objects.filter(file_id__in=file)
+            chart = get_custom_queryset(Chart, self.request.user, pk)
+            chart_items = Comment.objects.filter(chart_id__in=chart)
+            dashboard = get_custom_queryset(Dashboard, self.request.user, pk)
+            dashboard_items = Comment.objects.filter(dashboard_id__in=dashboard)
+            queryset = Comment.objects.filter( Q(id__in=file_items) | Q(id__in=chart_items) | Q(id__in=dashboard_items) ).order_by('-date_send')
+        if 'pk' in self.kwargs:
+            queryset = Comment.objects.filter(Q(id__in=file_items) | Q(id__in=chart_items) | Q(id__in=dashboard_items)).filter(id=self.kwargs['pk'])
+        return queryset
 
 
 class ReadCommentViewSet(viewsets.ModelViewSet):
