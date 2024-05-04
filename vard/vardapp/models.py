@@ -211,7 +211,7 @@ class Chart(models.Model):
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     clientdb_id = models.ForeignKey(ClientDB, on_delete=models.PROTECT, verbose_name='clientdb id')
     str_query = models.TextField(blank=True)
-    clientdata = models.OneToOneField('ClientData', on_delete=models.PROTECT)
+    clientdata = models.OneToOneField('ClientData', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.id} {self.user_id}'

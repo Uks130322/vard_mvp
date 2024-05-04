@@ -205,7 +205,7 @@ class ChartDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelated
             else:
                 query = Chart.objects.filter(user_id=obj.user_id)
         else:
-            query = None
+            query = Chart.objects.filter(user_id=user_)
         return query
 
 

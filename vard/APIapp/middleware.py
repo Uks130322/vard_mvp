@@ -10,5 +10,5 @@ class Process500:
     def process_exception(self, request, exception):
         return JsonResponse({
             "success": False,
-            "error": str(exception)
+            "error": str(exception),
         })

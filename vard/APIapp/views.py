@@ -3,14 +3,15 @@ from rest_framework import viewsets, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
+from django.db import transaction
 from vardapp.models import (User, Access, File, Dashboard, Chart, Comment, Feedback, ChartDashboard, ReadComment)
 from appchat.models import Chat
+from vardapp.models import ClientData
 from .permissions import (DataAccessPermission, CommentAccessPermission, get_custom_queryset,
                           DataAccessPermissionSafe, can_comment)
 from .serializers import (UserSerializer, AccessSerializer, FileSerializer, DashboardSerializer,
                           ChartSerializer, CommentSerializer, FeedbackSerializer, ChartDashboardSerializer,
-                          ReadCommentSerializer, ChatSerializer)
+                          ReadCommentSerializer, ChatSerializer, ClientDataSerializer)
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -186,6 +187,24 @@ class ChartViewSet(viewsets.ModelViewSet):
             queryset = get_custom_queryset(Chart, self.request.user, self.kwargs)
         return queryset
 
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        chart = self.get_object()
+        clientdata = ClientData.objects.get(id=chart.clientdata.id)
+        chartserializer = ChartSerializer(chart, data=request.data, partial=True)
+        clientdataserializer = ClientDataSerializer(clientdata, data=request.data, partial=True)
+        if chartserializer.is_valid() and clientdataserializer.is_valid():
+            clientdata.delete()
+            chart.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message_chart': chartserializer.errors,
+                'message_clientdata': clientdataserializer.errors
+            })
+
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
@@ -211,7 +230,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
-        print(self.permission_classes)
         return serializer.save(user_id=self.request.user, **datas)
 
 

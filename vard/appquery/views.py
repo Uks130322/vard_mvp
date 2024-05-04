@@ -125,6 +125,7 @@ class ClientDataViewSet(viewsets.ModelViewSet):
                     result = [r._asdict() for r in rows]
                     if not ClientData.objects.filter(id=i.chart.id):
                         ClientData.objects.filter(id=i.chart.id).update(data=result)
+                print('i.chart.id', i.chart.id)
             except exc.SQLAlchemyError as e:
                 error = str(e.__dict__['orig'])
             if not error:

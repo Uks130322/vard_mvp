@@ -109,13 +109,13 @@ def get_custom_queryset(model, request_user, kwargs):
     if user_.is_superuser:
         return model.objects.all()
     access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+    #print('access_owners',access_owners)
     if access_owners.exists() and 'pk' not in kwargs:
-        users = User.objects.filter(id=access_owners[0]['owner_id'])
+        list_access_owner=[]
         for access_owner in access_owners:
-            users = users.union(User.objects.filter(id=access_owner['owner_id']))
-        query = model.objects.filter(user_id=users[0].id)
-        for user in users:
-            query = query.union(model.objects.filter(Q(user_id=user.id) | Q(user_id=user_)))
+            list_access_owner.append(access_owner['owner_id'])
+        users = User.objects.filter(id__in=list_access_owner)
+        query = model.objects.filter(user_id__in=users)
     else:
         query = model.objects.filter(user_id=user_)
     if 'pk' in kwargs:
