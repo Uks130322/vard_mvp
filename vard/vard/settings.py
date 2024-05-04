@@ -111,7 +111,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     # 'allauth.account.middleware.AccountMiddleware', # not for this django version
-    #'APIapp.middleware.Process500',
+    'APIapp.middleware.Process500',
 ]
 
 ROOT_URLCONF = 'vard.urls'
