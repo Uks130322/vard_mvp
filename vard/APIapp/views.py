@@ -8,7 +8,7 @@ from vardapp.models import (User, Access, File, Dashboard, Chart, Comment, Feedb
 from appchat.models import Chat
 from vardapp.models import ClientData
 from .permissions import (DataAccessPermission, CommentAccessPermission, get_custom_queryset,
-                          DataAccessPermissionSafe, can_comment)
+                          DataAccessPermissionSafe, can_comment, ChatAccessPermission)
 from .serializers import (UserSerializer, AccessSerializer, FileSerializer, DashboardSerializer,
                           ChartSerializer, CommentSerializer, FeedbackSerializer, ChartDashboardSerializer,
                           ReadCommentSerializer, ChatSerializer, ClientDataSerializer)
@@ -169,7 +169,6 @@ class ChartViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
-        #print('**datas',**datas)
         return serializer.save(**datas)
 
     def get_permissions(self):
@@ -256,9 +255,9 @@ class ChatViewSet(viewsets.ModelViewSet):
     serializer_class = ChatSerializer
 
     # should be added some special permissions
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ChatAccessPermission]
 
-    filterset_fields = ['user_id_owner__id', 'user_id_sender__id', 'date_send']
+    filterset_fields = ['owner_id__id', 'user_id__id', 'date_send']
 
     def destroy(self, request, *args, **kwargs):
         chat = self.get_object()
@@ -278,6 +277,19 @@ class ChatViewSet(viewsets.ModelViewSet):
         """The creator is automatically assigned as user_id_sender"""
         datas = serializer.validated_data
         return serializer.save(user_id_sender=self.request.user, **datas)
+
+    def get_queryset(self):
+        """Superuser can see all files, others can see theirs own and all with access"""
+        if self.request.user.is_superuser:
+            queryset = Chat.objects.all()
+        else:
+            exclude_items = get_custom_queryset(Chat, self.request.user, self.kwargs)
+            set_owners_exclude=set()
+            for exclude_item in exclude_items:
+                set_owners_exclude.add(exclude_item.owner_id)
+            exclude_id_access = Access.objects.filter(owner_id__in=set_owners_exclude).exclude(user_id_id=self.request.user).values('owner_id')
+            queryset = get_custom_queryset(Chat, self.request.user, self.kwargs).exclude(owner_id__in=exclude_id_access)
+        return queryset
 
 
 class ChartDashboardViewSet(viewsets.ModelViewSet):

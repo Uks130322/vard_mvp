@@ -11,6 +11,7 @@ from appchat.models import Chat
 from appquery.serializers import ClientDataSerializer
 from APIapp.utils import load_csv, load_json
 from .hash_md import get_hash_md5
+from django.db.models import Q
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -139,12 +140,7 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data, **kwargs):
-        #print('**validated_data',validated_data['clientdb_id'])
         clientdata = ClientData.objects.create(user_id=validated_data['user_id'], data='')
-        # for i in validated_data['clientdb_id']:
-        #     clientdb_ids = ClientDB.objects.get(id=validated_data['clientdb_id'])
-        # print('clientdb_id',clientdb_ids)
-        #chart = Chart.objects.create(user_id=validated_data['user_id'], clientdata=clientdata, clientdb_id=validated_data['clientdb_id'], str_query=validated_data['str_query'])
         chart = Chart.objects.create(**validated_data, clientdata=clientdata)
         return chart
 
@@ -167,21 +163,35 @@ class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 
+class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """Class for get only user's clientdb to add it to the chart"""
+
+    def get_queryset(self):
+        request = self.context.get("request")
+        user_ = User.objects.get(email=request.user)
+        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+        list_access_owner = []
+        for access_owner in access_owners:
+            list_access_owner.append(access_owner['owner_id'])
+        users = User.objects.filter(id__in=list_access_owner)
+        query = User.objects.filter(id__in=users)
+        return query
 
 class ChatSerializer(serializers.HyperlinkedModelSerializer):
+    owner_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
     class Meta:
         model = Chat
         fields = [
             'id',
-            'user_id_owner',
-            'user_id_sender',
+            'owner_id',
+            'user_id',
             'date_send',
             'message'
         ]
 
         extra_kwargs = {
             'id': {'read_only': True},
-            'user_id_sender': {'read_only': True},
+            'user_id': {'read_only': True},
         }
 
 

@@ -109,7 +109,6 @@ def get_custom_queryset(model, request_user, kwargs):
     if user_.is_superuser:
         return model.objects.all()
     access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-    #print('access_owners',access_owners)
     if access_owners.exists() and 'pk' not in kwargs:
         list_access_owner=[]
         for access_owner in access_owners:
@@ -135,6 +134,26 @@ def can_comment(request, data):
                                       owner_id=post.user_id).exists()
     return any([is_owner, is_commentator, is_editor])
 
+
+class ChatAccessPermission(BasePermission):
+    """
+    For chat
+    чат доступен присутствующем в списке access
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
+        is_reader = Access.objects.filter(user_id=request.user.id, owner_id=obj.owner_id).exists()
+        is_owner = request.user == obj.owner_id
+        is_editor = Access.objects.filter(user_id=request.user.id, owner_id=obj.owner_id).filter(user_id=obj.user_id).exists()
+        if request.method in SAFE_METHODS and any([is_reader,is_owner,is_editor]):
+            return True
+        elif request.method == "DELETE" and any([is_owner,is_editor]):
+            return True
+        elif request.method == "PUT" and any([is_owner,is_editor]):
+            return True
+        else:
+            return False
 
 
 
