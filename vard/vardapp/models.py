@@ -156,6 +156,9 @@ class ReadComment(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='id of user')
     date_reading = models.DateTimeField(auto_now_add=True, verbose_name='date of read')
 
+    class Meta:
+        unique_together = ('comment_id', 'user_id')
+
 
 class ClientDB(models.Model):
     driver1 = 1

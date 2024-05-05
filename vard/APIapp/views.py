@@ -244,6 +244,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
 
+    @transaction.atomic
     def get_queryset(self):
         """Superuser can see all comments, others can see theirs own and all with access"""
         if self.request.user.is_superuser:
@@ -265,9 +266,11 @@ class CommentViewSet(viewsets.ModelViewSet):
                                           Q(id__in=chart_items) |
                                           Q(id__in=dashboard_items)).order_by('-date_send')
         if 'pk' in self.kwargs:
-            queryset = Comment.objects.filter(Q(id__in=file_items) |
-                                              Q(id__in=chart_items) |
-                                              Q(id__in=dashboard_items)).filter(id=self.kwargs['pk'])
+            queryset = Comment.objects.filter( Q(id__in=file_items) |
+                                               Q(id__in=chart_items) |
+                                               Q(id__in=dashboard_items) ).filter(id=self.kwargs['pk'])
+        for query in queryset:
+            ReadComment.objects.get_or_create(comment_id_id=query.id, user_id_id=query.user_id.id)
         return queryset
 
 
