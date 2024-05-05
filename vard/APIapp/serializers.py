@@ -40,13 +40,18 @@ class AccessSerializer(serializers.HyperlinkedModelSerializer):
         }
 
     def create(self, validated_data, **kwargs):
-        # TODO: fix
-        qs = Access.objects.filter(owner_id=validated_data['owner_id']).filter(user_id=validated_data['user_id'])
-        if not qs.exists():
-            access = Access.objects.create(**validated_data)
-        else:
-            access = Access.objects.get(**validated_data)
-        return access
+        try:
+            querysets = Access.objects.filter(owner_id=validated_data['owner_id']).filter(
+                user_id=validated_data['user_id'])
+            for queryset in querysets:
+                id = queryset.id
+            if not querysets.exists() and validated_data['owner_id'] != validated_data['user_id']:
+                access = Access.objects.create(**validated_data)
+            else:
+                access = Access.objects.get(id=id)
+            return access
+        except BaseException as error:
+            raise ValidationError('нельзя самому себе назначить права')
 
 
 class FileSerializer(serializers.HyperlinkedModelSerializer):

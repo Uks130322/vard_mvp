@@ -77,6 +77,9 @@ class Access(models.Model):
     date_access_open = models.DateTimeField(auto_now=True, verbose_name='date access open')
     date_access_close = models.DateTimeField(auto_now=True, verbose_name='date access close')
 
+    class Meta:
+        unique_together = ('owner_id', 'user_id')
+
 
 class File(models.Model):
 

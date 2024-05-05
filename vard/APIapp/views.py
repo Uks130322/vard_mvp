@@ -41,8 +41,10 @@ class AccessViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as owner_id"""
-        datas = serializer.validated_data
-        return serializer.save(owner_id=self.request.user, **datas)
+        if serializer.validated_data['user_id']:
+            datas = serializer.validated_data
+            return Response(serializer.save(owner_id=self.request.user, **datas), status=status.HTTP_201_CREATED)
+
 
     permission_classes = [IsAuthenticated]
 
