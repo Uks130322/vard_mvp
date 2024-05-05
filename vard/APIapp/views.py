@@ -316,17 +316,13 @@ class ChatViewSet(viewsets.ModelViewSet):
         return serializer.save(user_id=self.request.user, **datas)
 
     def get_queryset(self):
-        # TODO: fix, now only owner can see messages
         """Superuser can see all messages, others can see theirs own and all with access"""
+        user_ = User.objects.get(email=self.request.user)
         if self.request.user.is_superuser:
             queryset = Chat.objects.all()
         else:
-            exclude_items = get_custom_queryset(Chat, self.request.user, self.kwargs)
-            set_owners_exclude = set()
-            for exclude_item in exclude_items:
-                set_owners_exclude.add(exclude_item.owner_id)
-            exclude_id_access = (Access.objects.filter(owner_id__in=set_owners_exclude).exclude(user_id_id=self.request.user).values('owner_id'))
-            queryset = get_custom_queryset(Chat, self.request.user, self.kwargs).exclude(owner_id__in=exclude_id_access)
+            access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
+            queryset = Chat.objects.filter( Q(owner_id_id__in=access_owners) | Q(owner_id_id=self.request.user) ).order_by('-date_send')
         return queryset
 
 

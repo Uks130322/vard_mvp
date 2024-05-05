@@ -232,6 +232,7 @@ class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
         user_ = User.objects.get(email=request.user)
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
         list_access_owner = []
+        list_access_owner.append(user_.id)
         for access_owner in access_owners:
             list_access_owner.append(access_owner['owner_id'])
         users = User.objects.filter(id__in=list_access_owner)

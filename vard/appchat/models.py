@@ -10,3 +10,6 @@ class Chat(models.Model):
     date_remove = models.DateTimeField(auto_now=True)
     is_remove = models.BooleanField(null=False, default=False)
     message = models.TextField()
+
+    def __str__(self):
+        return f'{self.id} {self.user_id}'
