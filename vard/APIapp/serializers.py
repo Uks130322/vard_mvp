@@ -176,7 +176,7 @@ class CommentDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelat
     """Only for demonstrate. Don't use it in production"""
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = email=request.user
+        user_ = email = request.user
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
         list_access_owner = []
         for access_owner in access_owners:
