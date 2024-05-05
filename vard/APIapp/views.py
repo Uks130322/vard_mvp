@@ -164,7 +164,7 @@ class ChartViewSet(viewsets.ModelViewSet):
     """
     queryset = Chart.objects.all()
     serializer_class = ChartSerializer
-    filterset_fields = ['user_id__id']
+    filterset_fields = ['user_id__id', 'clientdata__id']
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id"""
@@ -210,17 +210,18 @@ class CommentViewSet(viewsets.ModelViewSet):
     """
     queryset = Comment.objects.all().order_by('-date_send')
     serializer_class = CommentSerializer
-    filterset_fields = ['user_id__id']
+    filterset_fields = ['user_id__id', 'file_id', 'chart_id', 'dashboard_id']
     permission_classes = [IsAuthenticated, CommentAccessPermission]
 
     def create(self, request, *args, **kwargs):
         serializer = CommentSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        """проверка внешних ключей. если комментарий делается более чем для одной таблицы, возвращается отшибка"""
+
+        # checking comment has relation with exactly one table, else 409 error
         valid_file_id = 1 if request.data['file_id'] else 0
         valid_chart_id = 1 if request.data['chart_id'] else 0
         valid_dashboard_id = 1 if request.data['dashboard_id'] else 0
-        valid_foreign_keys = valid_file_id+valid_chart_id+valid_dashboard_id
+        valid_foreign_keys = valid_file_id + valid_chart_id + valid_dashboard_id
 
         if can_comment(request, serializer.validated_data) and valid_foreign_keys == 1:
             self.perform_create(serializer)
@@ -228,7 +229,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         elif can_comment(request, serializer.validated_data) and valid_foreign_keys != 1:
             return Response({
                 'status': status.HTTP_409_CONFLICT,
-                'message': "указано более одной комменитруемой таблицы. выберите одну из file, chart, dashboard",
+                'message': "Comment should have relation with exactly one table: file, chart or dashboard",
             })
         else:
             return Response({
@@ -242,25 +243,29 @@ class CommentViewSet(viewsets.ModelViewSet):
         return serializer.save(user_id=self.request.user, **datas)
 
     def get_queryset(self):
-        """админ может читать и изменять все коментарии, владелец изменять все коменты у себя в экосистеме, остальные тлько читать,а изменятьтлько свои"""
+        """Superuser can see all comments, others can see theirs own and all with access"""
+        if self.request.user.is_superuser:
+            queryset = Comment.objects.all()
+            return queryset
+
         if 'pk' in self.kwargs:
             pk = {'pk': self.kwargs['pk']}
             pk.pop('pk', None)
         else:
             pk = self.kwargs
-
-        if self.request.user.is_superuser:
-            queryset = Comment.objects.all()
-        else:
-            file = get_custom_queryset(File, self.request.user, pk)
-            file_items = Comment.objects.filter(file_id__in=file)
-            chart = get_custom_queryset(Chart, self.request.user, pk)
-            chart_items = Comment.objects.filter(chart_id__in=chart)
-            dashboard = get_custom_queryset(Dashboard, self.request.user, pk)
-            dashboard_items = Comment.objects.filter(dashboard_id__in=dashboard)
-            queryset = Comment.objects.filter( Q(id__in=file_items) | Q(id__in=chart_items) | Q(id__in=dashboard_items) ).order_by('-date_send')
+        file = get_custom_queryset(File, self.request.user, pk)
+        file_items = Comment.objects.filter(file_id__in=file)
+        chart = get_custom_queryset(Chart, self.request.user, pk)
+        chart_items = Comment.objects.filter(chart_id__in=chart)
+        dashboard = get_custom_queryset(Dashboard, self.request.user, pk)
+        dashboard_items = Comment.objects.filter(dashboard_id__in=dashboard)
+        queryset = Comment.objects.filter(Q(id__in=file_items) |
+                                          Q(id__in=chart_items) |
+                                          Q(id__in=dashboard_items)).order_by('-date_send')
         if 'pk' in self.kwargs:
-            queryset = Comment.objects.filter(Q(id__in=file_items) | Q(id__in=chart_items) | Q(id__in=dashboard_items)).filter(id=self.kwargs['pk'])
+            queryset = Comment.objects.filter(Q(id__in=file_items) |
+                                              Q(id__in=chart_items) |
+                                              Q(id__in=dashboard_items)).filter(id=self.kwargs['pk'])
         return queryset
 
 
@@ -308,18 +313,19 @@ class ChatViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id_sender"""
         datas = serializer.validated_data
-        return serializer.save(user_id_sender=self.request.user, **datas)
+        return serializer.save(user_id=self.request.user, **datas)
 
     def get_queryset(self):
-        """Superuser can see all files, others can see theirs own and all with access"""
+        # TODO: fix, now only owner can see messages
+        """Superuser can see all messages, others can see theirs own and all with access"""
         if self.request.user.is_superuser:
             queryset = Chat.objects.all()
         else:
             exclude_items = get_custom_queryset(Chat, self.request.user, self.kwargs)
-            set_owners_exclude=set()
+            set_owners_exclude = set()
             for exclude_item in exclude_items:
                 set_owners_exclude.add(exclude_item.owner_id)
-            exclude_id_access = Access.objects.filter(owner_id__in=set_owners_exclude).exclude(user_id_id=self.request.user).values('owner_id')
+            exclude_id_access = (Access.objects.filter(owner_id__in=set_owners_exclude).exclude(user_id_id=self.request.user).values('owner_id'))
             queryset = get_custom_queryset(Chat, self.request.user, self.kwargs).exclude(owner_id__in=exclude_id_access)
         return queryset
 

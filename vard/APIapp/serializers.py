@@ -1,17 +1,18 @@
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from drf_writable_nested import WritableNestedModelSerializer
 
+from vard.settings import DEBUG
 from vardapp.models import (User, Access, File, Chart, ClientData, Dashboard,
                             Feedback, ChartDashboard, Comment, ReadComment, ClientDB)
 from appchat.models import Chat
 from appquery.serializers import ClientDataSerializer
 from APIapp.utils import load_csv, load_json
 from .hash_md import get_hash_md5
-from django.db.models import Q
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -39,6 +40,7 @@ class AccessSerializer(serializers.HyperlinkedModelSerializer):
         }
 
     def create(self, validated_data, **kwargs):
+        # TODO: fix
         qs = Access.objects.filter(owner_id=validated_data['owner_id']).filter(user_id=validated_data['user_id'])
         if not qs.exists():
             access = Access.objects.create(**validated_data)
@@ -110,7 +112,7 @@ class ChartClientdbFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedF
 
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = User.objects.get(email=request.user)
+        user_ = request.user
         query = ClientDB.objects.filter(user_id=user_)
         return query
 
@@ -142,10 +144,10 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CommentChartFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
+    """Only for demonstrate. Don't use it in production"""
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = User.objects.get(email=request.user)
+        user_ = request.user
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
         list_access_owner = []
         for access_owner in access_owners:
@@ -157,10 +159,10 @@ class CommentChartFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedFi
 
 
 class CommentFileFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
+    """Only for demonstrate. Don't use it in production"""
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = User.objects.get(email=request.user)
+        user_ = request.user
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
         list_access_owner = []
         for access_owner in access_owners:
@@ -171,10 +173,10 @@ class CommentFileFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedFie
 
 
 class CommentDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
+    """Only for demonstrate. Don't use it in production"""
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = User.objects.get(email=request.user)
+        user_ = email=request.user
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
         list_access_owner = []
         for access_owner in access_owners:
@@ -185,28 +187,32 @@ class CommentDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelat
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
-    file_id = CommentFileFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
-    chart_id = CommentChartFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
-    dashboard_id = CommentDashboardFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
+    if DEBUG:
+        file_id = CommentFileFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
+        chart_id = CommentChartFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
+        dashboard_id = CommentDashboardFilteredPrimaryKeyRelatedField(many=False, allow_null=True)
+
     class Meta:
         model = Comment
-        fields = ['id','file_id','chart_id','dashboard_id','user_id','date_send','date_remove','date_delivery','comment']
+        fields = [
+            'id',
+            'file_id',
+            'chart_id',
+            'dashboard_id',
+            'user_id',
+            'date_send',
+            'date_remove',
+            'date_delivery',
+            'comment'
+        ]
         extra_kwargs = {
             'user_id': {'read_only': True},
         }
 
-    def validate(self, data):
-        if self.instance is not None:
-            instance_user = self.instance.user
-            data_user = data.get('user')
-            validating_user_fields = [
-                instance_user.file_id != data_user['file_id'],
-                instance_user.chart_id != data_user['chart_id'],
-                instance_user.dashboard_id != data_user['dashboard_id'],
-            ]
-            if data_user is not None and any(validating_user_fields):
-                raise serializers.ValidationError({'отклонено':'нельзя изменить комментируемый объект'})
-        return data
+    def update(self, instance, validated_data):
+        instance.comment = validated_data.get('comment', instance.comment)
+        instance.save()
+        return instance
 
 
 class ReadCommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -232,8 +238,10 @@ class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
         query = User.objects.filter(id__in=users)
         return query
 
+
 class ChatSerializer(serializers.HyperlinkedModelSerializer):
     owner_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
+
     class Meta:
         model = Chat
         fields = [
@@ -264,7 +272,7 @@ class ChartDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelated
 
         if request.parser_context['kwargs'].get('pk',False):
             id_obj = request.parser_context['kwargs']['pk']
-            obj = Dashboard.objects.get(id = id_obj)
+            obj = Dashboard.objects.get(id=id_obj)
             if obj.user_id == user_:
                 query = Chart.objects.filter(user_id=user_)
             else:
