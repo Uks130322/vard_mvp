@@ -276,7 +276,7 @@ class ChartDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelated
         request = self.context.get("request")
         user_ = User.objects.get(email=request.user)
 
-        if request.parser_context['kwargs'].get('pk',False):
+        if request.parser_context['kwargs'].get('pk', False):
             id_obj = request.parser_context['kwargs']['pk']
             obj = Dashboard.objects.get(id=id_obj)
             if obj.user_id == user_:
