@@ -63,7 +63,8 @@ For authorizated users only
   - Giving an Access to other Users to read, comment or edit your Files, Charts and Dashboards
   - Commenting Files, Charts and Dashboards in case having access
   - Internal Chat for all team members
-  -  Access for all datas for Admin
+  - Access to all datas for Admin
+  - Sending Feedback to developers
 
 Swagger
 ---------------
