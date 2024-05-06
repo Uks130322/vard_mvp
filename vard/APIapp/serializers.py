@@ -51,7 +51,7 @@ class AccessSerializer(serializers.HyperlinkedModelSerializer):
                 access = Access.objects.get(id=id)
             return access
         except BaseException as error:
-            raise ValidationError('нельзя самому себе назначить права')
+            raise ValidationError('You can not add access to yourself')
 
 
 class FileSerializer(serializers.HyperlinkedModelSerializer):
@@ -236,7 +236,7 @@ class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
         request = self.context.get("request")
         user_ = User.objects.get(email=request.user)
         access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        list_access_owner = []
+        list_access_owner = list()
         list_access_owner.append(user_.id)
         for access_owner in access_owners:
             list_access_owner.append(access_owner['owner_id'])

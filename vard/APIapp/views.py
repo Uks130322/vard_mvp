@@ -38,15 +38,13 @@ class AccessViewSet(viewsets.ModelViewSet):
     queryset = Access.objects.all()
     serializer_class = AccessSerializer
     filterset_fields = ['user_id__id', 'owner_id__id']
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         """The creator is automatically assigned as owner_id"""
         if serializer.validated_data['user_id']:
             datas = serializer.validated_data
             return Response(serializer.save(owner_id=self.request.user, **datas), status=status.HTTP_201_CREATED)
-
-
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """Superuser can see all access, others can see only theirs own"""
@@ -266,9 +264,9 @@ class CommentViewSet(viewsets.ModelViewSet):
                                           Q(id__in=chart_items) |
                                           Q(id__in=dashboard_items)).order_by('-date_send')
         if 'pk' in self.kwargs:
-            queryset = Comment.objects.filter( Q(id__in=file_items) |
-                                               Q(id__in=chart_items) |
-                                               Q(id__in=dashboard_items) ).filter(id=self.kwargs['pk'])
+            queryset = Comment.objects.filter(Q(id__in=file_items) |
+                                              Q(id__in=chart_items) |
+                                              Q(id__in=dashboard_items)).filter(id=self.kwargs['pk'])
         for query in queryset:
             ReadComment.objects.get_or_create(comment_id_id=query.id, user_id_id=query.user_id.id)
         return queryset
@@ -327,7 +325,8 @@ class ChatViewSet(viewsets.ModelViewSet):
             queryset = Chat.objects.all()
         else:
             access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-            queryset = Chat.objects.filter( Q(owner_id_id__in=access_owners) | Q(owner_id_id=self.request.user) ).order_by('-date_send')
+            queryset = Chat.objects.filter(Q(owner_id_id__in=access_owners) |
+                                           Q(owner_id_id=self.request.user)).order_by('-date_send')
         return queryset
 
 
