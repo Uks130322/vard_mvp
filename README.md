@@ -67,6 +67,10 @@ For authorizated users only
   - Access to all datas for Admin
   - Sending Feedback to developers
 
+ER diagram
+--------------
+https://github.com/Uks130322/vard_mvp/blob/main/ERD.jpg
+
 Swagger
 ---------------
 For superuser (admin) only  
