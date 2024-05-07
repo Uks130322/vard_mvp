@@ -62,6 +62,7 @@ For authorizated users only
   - Creating Dashboard with some Charts
   - Giving an Access to other Users to read, comment or edit your Files, Charts and Dashboards
   - Commenting Files, Charts and Dashboards in case having access
+  - Filter by User and some others fields for datas
   - Internal Chat for all team members
   - Access to all datas for Admin
   - Sending Feedback to developers
