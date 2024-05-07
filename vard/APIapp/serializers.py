@@ -117,8 +117,17 @@ class ChartClientdbFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedF
 
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = request.user
-        query = ClientDB.objects.filter(user_id=user_)
+        user_ = User.objects.get(email=request.user)
+
+        if request.parser_context['kwargs'].get('pk', False):
+            id_obj = request.parser_context['kwargs']['pk']
+            obj = Chart.objects.get(id=id_obj)
+            if obj.user_id == user_:
+                query = ClientDB.objects.filter(user_id=user_)
+            else:
+                query = ClientDB.objects.filter(user_id=obj.user_id)
+        else:
+            query = ClientDB.objects.filter(user_id=user_)
         return query
 
 
