@@ -53,8 +53,3 @@ class DataBaseQuery:
             data = [r._asdict() for r in rows]
             json_data = json.dumps(data)
         return json_data
-
-
-# a = DataBaseQuery('mysql', 'root', 'P@r0l', '', 'localhost', '', 'baza_test1','','',
-#                   'SELECT id,email FROM vardapp_user')
-# print(a.get_query)

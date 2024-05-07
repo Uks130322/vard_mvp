@@ -1,4 +1,6 @@
 import re
+
+from django.db import transaction
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
@@ -25,9 +27,12 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        user_ = User.objects.get(email=self.request.user)
-        query = ClientDB.objects.filter(user_id=user_)
-        return query
+        if self.request.user.is_superuser:
+            return ClientDB.objects.all()
+        else:
+            user_ = User.objects.get(email=self.request.user)
+            query = ClientDB.objects.filter(user_id=user_)
+            return query
 
     def get_host(self, url, host, port):
         if host == 'localhost' or host == '127.0.0.1':
@@ -92,6 +97,32 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             str_datas_for_connection=str_datas_for_connection
         )
 
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        """Updating str_datas_for_connection in case of updating ClientDB object"""
+        clientdb = self.get_object()
+        # print('clientdb', clientdb.user_name)
+        serializer = ClientDBSerializer(clientdb, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            id = request.parser_context['kwargs']['pk']
+            clientdbinstance = ClientDB.objects.get(id=id)
+            str_datas_for_connection = self.get_str_connect_sqlalchemy(
+                clientdbinstance.user_name,
+                clientdbinstance.password,
+                clientdbinstance.url,
+                clientdbinstance.host,
+                clientdbinstance.port,
+                clientdbinstance.data_base_name
+            )
+            clientdbinstance.str_datas_for_connection = str_datas_for_connection
+            clientdbinstance.save()
+            return serializer
+        else:
+            return Response({
+                'message': serializer.errors
+            })
+
 
 class ClientDataViewSet(viewsets.ModelViewSet):
     queryset = ClientData.objects.all()
@@ -105,7 +136,10 @@ class ClientDataViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        return get_custom_queryset(ClientData, self.request.user, self.kwargs)
+        if self.request.user.is_superuser:
+            return ClientData.objects.all()
+        else:
+            return get_custom_queryset(ClientData, self.request.user, self.kwargs)
 
     def list(self, request, *args, **kwargs):
         L = []
