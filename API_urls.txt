@@ -25,5 +25,8 @@ https://natalietkachuk.pythonanywhere.com/auth/signup/ - maybe we don't need it
 https://natalietkachuk.pythonanywhere.com/auth/signup/ - google_login
 https://natalietkachuk.pythonanywhere.com/auth/github/ - github_login
 
+https://natalietkachuk.pythonanywhere.com/swagger/ - swagger
+https://natalietkachuk.pythonanywhere.com/redoc/ - redoc
+
 using django-allauth and dj-rest-auth
 https://django.fun/articles/tutorials/autentifikaciya-v-django-rest-frejmvorke/
