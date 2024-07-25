@@ -24,13 +24,15 @@ load_dotenv(dotenv_path)
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+# SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'django-insecure-u(wb%zucp82-c%gx!4a^+akbs=-%g50dw^06t*9w%ayt9auxym'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '0.0.0.0',
     '127.0.0.1',
     '192.168.0.12',
     '95.163.185.57',
@@ -157,21 +159,26 @@ WSGI_APPLICATION = 'vard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'admin',
+        'PASSWORD': 'prod',
+        'HOST': 'db',
+        'PORT': '5432',
     }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'baza_test1',
-    #     'USER': 'root',
-    #     'PASSWORD': os.getenv("MYSQLPWD"),
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '3306',
-    #     'OPTIONS': {
-    #         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-    #     }
-    # }
 }
+# 'default': {
+#     'ENGINE': 'django.db.backends.mysql',
+#     'NAME': 'baza_test1',
+#     'USER': 'root',
+#     'PASSWORD': os.getenv("MYSQLPWD"),
+#     'HOST': '127.0.0.1',
+#     'PORT': '3306',
+#     'OPTIONS': {
+#         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+#     }
+# }
+
 
 AUTH_USER_MODEL = 'vardapp.User'
 
