@@ -44,6 +44,7 @@ class AccessViewSet(viewsets.ModelViewSet):
         """The creator is automatically assigned as owner_id"""
         if serializer.validated_data['user_id']:
             datas = serializer.validated_data
+            #print('datas.user_id', datas['user_id'])
             return Response(serializer.save(owner_id=self.request.user, **datas), status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
@@ -337,3 +338,4 @@ class ChartDashboardViewSet(viewsets.ModelViewSet):
     queryset = ChartDashboard.objects.all()
     serializer_class = ChartDashboardSerializer
     permission_classes = [IsAuthenticated]
+

@@ -43,6 +43,7 @@ class AccessSerializer(serializers.HyperlinkedModelSerializer):
         try:
             querysets = Access.objects.filter(owner_id=validated_data['owner_id']).filter(
                 user_id=validated_data['user_id'])
+
             for queryset in querysets:
                 id = queryset.id
             if not querysets.exists() and validated_data['owner_id'] != validated_data['user_id']:
@@ -52,6 +53,7 @@ class AccessSerializer(serializers.HyperlinkedModelSerializer):
             return access
         except BaseException as error:
             raise ValidationError('You can not add access to yourself')
+
 
 
 class FileSerializer(serializers.HyperlinkedModelSerializer):
