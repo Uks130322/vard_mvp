@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  vardserver:
+    build: ./vard
+    command: bash -c "
+      python manage.py migrate &&
+      gunicorn vard.wsgi:application --bind 0.0.0.0:8000 --reload"
+    volumes:
+      - ./vard:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://admin:prod@db:5432/postgres
+    networks:
+      - mynetwork
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+volumes:
+  pg_data:
+    driver: local
+
+networks:
+  mynetwork:
+    driver: bridge
+
