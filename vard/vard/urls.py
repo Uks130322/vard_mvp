@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
 from allauth.socialaccount.views import signup
-from rest_framework import permissions
+from rest_framework import permissions, routers
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -21,7 +21,6 @@ schema_view = get_schema_view(
    permission_classes=(permissions.IsAuthenticated, permissions.IsAdminUser,),
 )
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
@@ -31,6 +30,7 @@ urlpatterns = [
     path('api/', include('appchart_DB.urls')),
     path('api/', include('appcomment.urls')),
     path('api/', include('appchat.urls')),
+    path('api/', include('appuser.urls')),
 
     path('drf/', include('rest_framework.urls', namespace='rest_framework')),
 
