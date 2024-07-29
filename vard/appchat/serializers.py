@@ -6,7 +6,7 @@ from appuser.models import User, Access
 
 
 class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-    """Class for get only user's clientdb to add it to the chart"""
+    """Class for get only user's with access"""
 
     def get_queryset(self):
         request = self.context.get("request")
@@ -40,7 +40,6 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MessageSerializer(serializers.HyperlinkedModelSerializer):
-    # chat_id = ChatSerializer(many=False)
     class Meta:
         model = Message
         fields = [
@@ -50,10 +49,11 @@ class MessageSerializer(serializers.HyperlinkedModelSerializer):
             'date_send',
             'message',
             'doc',
+            'is_remove',
         ]
 
         extra_kwargs = {
             'id': {'read_only': True},
             'user_id': {'read_only': True},
-            # 'chat_id': {'read_only': True},
+            'is_remove': {'read_only': True},
         }

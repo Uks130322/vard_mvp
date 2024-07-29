@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from appchat.models import Chat, Message
-from appchat.permissions import ChatAccessPermission
+from appchat.permissions import ChatAccessPermission, MessageAccessPermission
 from appchat.serializers import ChatSerializer, MessageSerializer
 from appuser.models import User, Access
 
@@ -48,7 +48,7 @@ class ChatViewSet(viewsets.ModelViewSet):
         else:
             access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
             queryset = Chat.objects.filter(Q(owner_id_id__in=access_owners) |
-                                           Q(owner_id_id=self.request.user)).order_by('-date_send')
+                                           Q(owner_id_id=self.request.user), is_remove=False).order_by('-date_send')
         return queryset
 
 
@@ -60,7 +60,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
 
     filterset_fields = ['chat_id__id', 'user_id__id', 'date_send']
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, MessageAccessPermission]
 
     def get_queryset(self):
         """Superuser can see all messages, others can see theirs own and all with access"""
@@ -70,20 +70,13 @@ class MessageViewSet(viewsets.ModelViewSet):
         else:
             access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
             queryset = Message.objects.filter(Q(chat_id__owner_id_id__in=access_owners) |
-                                              Q(chat_id__owner_id_id=self.request.user)).order_by('-date_send')
+                                              Q(user_id=self.request.user), is_remove=False).order_by('-date_send')
         return queryset
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     def perform_create(self, serializer):
         """The creator is automatically assigned as user_id_sender"""
         datas = serializer.validated_data
         return serializer.save(user_id=self.request.user, **datas)
-
 
     def destroy(self, request, *args, **kwargs):
         message = self.get_object()
