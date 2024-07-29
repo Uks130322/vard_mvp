@@ -1,7 +1,7 @@
 from django.db.models import Q
 from rest_framework import serializers
 
-from appchat.models import Chat
+from appchat.models import Chat, Message
 from appuser.models import User, Access
 
 
@@ -22,7 +22,7 @@ class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
 
 
 class ChatSerializer(serializers.HyperlinkedModelSerializer):
-    owner_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
+    # owner_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
 
     class Meta:
         model = Chat
@@ -31,10 +31,29 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
             'owner_id',
             'user_id',
             'date_send',
-            'message'
         ]
 
         extra_kwargs = {
             'id': {'read_only': True},
             'user_id': {'read_only': True},
+        }
+
+
+class MessageSerializer(serializers.HyperlinkedModelSerializer):
+    # chat_id = ChatSerializer(many=False)
+    class Meta:
+        model = Message
+        fields = [
+            'id',
+            'chat_id',
+            'user_id',
+            'date_send',
+            'message',
+            'doc',
+        ]
+
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'user_id': {'read_only': True},
+            # 'chat_id': {'read_only': True},
         }
