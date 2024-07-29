@@ -55,10 +55,12 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
 
     # users apps
-    'vardapp',
-    'appquery',
-    'APIapp',
     'appchat',
+    'appuser',
+    'appcomment',
+    'appchart_DB',
+    'appfeedback',
+    'appfile',
 
     # allauth
     'allauth',
@@ -115,7 +117,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     # 'allauth.account.middleware.AccountMiddleware', # not for this django version
-    'APIapp.middleware.Process500',
+    'appchart_DB.middleware.Process500',
 ]
 
 ROOT_URLCONF = 'vard.urls'
@@ -181,7 +183,7 @@ DATABASES = {
 # }
 
 
-AUTH_USER_MODEL = 'vardapp.User'
+AUTH_USER_MODEL = 'appuser.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

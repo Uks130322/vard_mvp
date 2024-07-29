@@ -1,6 +1,6 @@
 from django.db import models
 
-from vardapp.models import User
+from appuser.models import User
 
 
 class Chat(models.Model):
