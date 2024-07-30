@@ -8,6 +8,16 @@ from drf_yasg import openapi
 
 from appuser.views import RegisterView, GoogleLogin, GitHubLogin
 
+from appchart_DB.urls import router as appchart_DBrouter
+from appchat.urls import router as appchatrouter
+from appcomment.urls import router as appcommentrouter
+from appfeedback.urls import router as appfeedbackrouter
+from appfile.urls import router as appfilerouter
+from appuser.urls import router as appuserrouter
+
+
+
+
 schema_view = get_schema_view(
    openapi.Info(
       title="Snippets API",
@@ -21,19 +31,20 @@ schema_view = get_schema_view(
    permission_classes=(permissions.IsAuthenticated, permissions.IsAdminUser,),
 )
 
+router = routers.DefaultRouter()
+router.registry.extend(appchart_DBrouter.registry)
+router.registry.extend(appchatrouter.registry)
+router.registry.extend(appcommentrouter.registry)
+router.registry.extend(appfeedbackrouter.registry)
+router.registry.extend(appfilerouter.registry)
+router.registry.extend(appuserrouter.registry)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('api/', include('appchat.urls')),
-    path('api/', include('appfile.urls')),
-    path('api/', include('appfeedback.urls')),
-    path('api/', include('appchart_DB.urls')),
-    path('api/', include('appcomment.urls')),
-    path('api/', include('appchat.urls')),
-    path('api/', include('appuser.urls')),
+    path('api/', include(router.urls)),
+
 
     path('drf/', include('rest_framework.urls', namespace='rest_framework')),
-
     path("auth/register/", RegisterView.as_view(), name="rest_register"),
     path("auth/login/", LoginView.as_view(), name="rest_login"),
     path("auth/logout/", LogoutView.as_view(), name="rest_logout"),

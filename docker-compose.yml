@@ -13,7 +13,7 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgresql://admin:prod@db:5432/postgres
+      - DATABASE_URL=postgresql://admin:prod@db:5433/postgres
     networks:
       - mynetwork
 
@@ -24,7 +24,7 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=prod
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
