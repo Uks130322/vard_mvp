@@ -40,18 +40,18 @@ router.registry.extend(appfilerouter.registry)
 router.registry.extend(appuserrouter.registry)
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
+    path('api/accounts/', include('allauth.urls')),
     path('api/', include(router.urls)),
 
 
     path('drf/', include('rest_framework.urls', namespace='rest_framework')),
-    path("auth/register/", RegisterView.as_view(), name="rest_register"),
-    path("auth/login/", LoginView.as_view(), name="rest_login"),
-    path("auth/logout/", LogoutView.as_view(), name="rest_logout"),
-    path("auth/user/", UserDetailsView.as_view(), name="rest_user_details"),
-    path("auth/signup/", signup, name="socialaccount_signup"),
-    path("auth/google/", GoogleLogin.as_view(), name="google_login"),
-    path('auth/github/', GitHubLogin.as_view(), name='github_login'),
+    path("api/auth/register/", RegisterView.as_view(), name="rest_register"),
+    path("api/auth/login/", LoginView.as_view(), name="rest_login"),
+    path("api/auth/logout/", LogoutView.as_view(), name="rest_logout"),
+    path("api/auth/user/", UserDetailsView.as_view(), name="rest_user_details"),
+    path("api/auth/signup/", signup, name="socialaccount_signup"),
+    path("api/auth/google/", GoogleLogin.as_view(), name="google_login"),
+    path('api/auth/github/', GitHubLogin.as_view(), name='github_login'),
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
