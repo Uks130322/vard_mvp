@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'appregistration.apps.AppregistrationConfig',  #users apps
     'django.contrib.sites',
     'django.contrib.flatpages',
 
