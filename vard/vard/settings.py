@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
     '95.163.185.57',
     'google.com',
     'github.com',
+    'localhost',
     'natalietkachuk.pythonanywhere.com',
 ]
 
