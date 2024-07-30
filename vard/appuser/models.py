@@ -63,7 +63,7 @@ class Access(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, null=False, verbose_name='user id',
                                 related_name='invited_user')
     owner_id = models.ForeignKey('User', on_delete=models.CASCADE, null=False, verbose_name='owner id',
-                                 related_name='owner')
+                                 related_name='owne')
     access_type_id = models.IntegerField(choices=AccessType.choices, null=False, verbose_name='access type id')
     date_access_open = models.DateTimeField(auto_now=True, verbose_name='date access open')
     date_access_close = models.DateTimeField(auto_now=True, verbose_name='date access close')

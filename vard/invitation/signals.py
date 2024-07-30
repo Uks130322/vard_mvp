@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.core.mail import mail_managers
-from vardapp.models import User, Access
+from appuser.models import User, Access
 from django.core.mail import send_mail
 
 
@@ -19,8 +19,8 @@ def notify_managers_appointment(sender, instance, created, **kwargs):
 
     for key, value in recipients.items():
         send_mail(
-            subject='Добавление в команду Варда',
-            message=f'пользователь {instance.owner_id} добавил вас в свою группу с ролью {value}',
+            subject='Adding to VARD team',
+            message=f'User {instance.owner_id} add you to their team with role {value}',
             from_email='stds58@yandex.ru',
             recipient_list=[key, ],
         )
