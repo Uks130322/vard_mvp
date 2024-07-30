@@ -24,5 +24,7 @@ ENV DJANGO_SETTINGS_MODULE=vard.settings
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH /app
 
+RUN python manage.py collectstatic --noinput
+
 
 CMD ["gunicorn", "vard.wsgi:application", "--bind", "0.0.0.0:8000"]
