@@ -172,7 +172,7 @@ DATABASES = {
         'USER': 'admin',
         # 'USER': 'postgres',
         'PASSWORD': 'prod',
-        # 'HOST': 'localhost',
+        #'HOST': 'localhost',
         'HOST': 'db',
         'PORT': '5432',
     }

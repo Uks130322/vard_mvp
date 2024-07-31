@@ -16,8 +16,6 @@ from appfile.urls import router as appfilerouter
 from appuser.urls import router as appuserrouter
 
 
-
-
 schema_view = get_schema_view(
    openapi.Info(
       title="Snippets API",
@@ -31,6 +29,7 @@ schema_view = get_schema_view(
    permission_classes=(permissions.IsAuthenticated, permissions.IsAdminUser,),
 )
 
+
 router = routers.DefaultRouter()
 router.registry.extend(appchart_DBrouter.registry)
 router.registry.extend(appchatrouter.registry)
@@ -38,6 +37,10 @@ router.registry.extend(appcommentrouter.registry)
 router.registry.extend(appfeedbackrouter.registry)
 router.registry.extend(appfilerouter.registry)
 router.registry.extend(appuserrouter.registry)
+
+
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('allauth.urls')),
@@ -45,7 +48,6 @@ urlpatterns = [
 
 
     path('drf/', include('rest_framework.urls', namespace='rest_framework')),
-    path("api/auth/register/", RegisterView.as_view(), name="rest_register"),
     path("api/auth/login/", LoginView.as_view(), name="rest_login"),
     path("api/auth/logout/", LogoutView.as_view(), name="rest_logout"),
     path("api/auth/user/", UserDetailsView.as_view(), name="rest_user_details"),

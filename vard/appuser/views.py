@@ -6,6 +6,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView, RegisterView
+from rest_framework import viewsets
 from dj_rest_auth.app_settings import api_settings
 from dj_rest_auth.serializers import TokenSerializer
 
@@ -25,7 +26,8 @@ class GitHubLogin(SocialLoginView):
     client_class = OAuth2Client
 
 
-class RegisterView(RegisterView):
+class RegisterView(RegisterView, viewsets.GenericViewSet):
+
     def get_response_data(self, user):
         return TokenSerializer(user.auth_token, context=self.get_serializer_context()).data, \
                {
