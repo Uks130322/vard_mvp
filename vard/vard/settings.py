@@ -120,7 +120,10 @@ MIDDLEWARE = [
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     # 'allauth.account.middleware.AccountMiddleware', # not for this django version
     'appchart_DB.middleware.Process500',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 ROOT_URLCONF = 'vard.urls'
 CSRF_COOKIE_SECURE = False
@@ -225,7 +228,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = '/usr/src/app/staticfiles'
 SITE_URL = 'http://127.0.0.1:8000'
 SITE_ID = 1
