@@ -242,6 +242,7 @@ SITE_ID = 1
 
 ### allauth #######################################################################
 LOGIN_URL = '/api/auth/login/'
+LOGOUT_URL = '/api/auth/logout/'
 LOGIN_REDIRECT_URL = '/api/auth/logout/'
 LOGOUT_REDIRECT_URL = '/api/auth/login/'
 

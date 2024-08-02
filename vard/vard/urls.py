@@ -6,7 +6,7 @@ from rest_framework import permissions, routers
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from appuser.views import RegisterView, GoogleLogin, GitHubLogin, FlatpageView
+from appuser.views import RegisterView, GoogleLogin, GitHubLogin, FlatpageView, UserViewSet, AccessViewSet
 
 from appchart_DB.urls import router as appchart_DBrouter
 from appchat.urls import router as appchatrouter
@@ -39,20 +39,19 @@ router.registry.extend(appfilerouter.registry)
 router.registry.extend(appuserrouter.registry)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/accounts/', include('allauth.urls')),
-    #path('api/', include(router.urls)),
-
-    path('api/', FlatpageView, name="api"),  ### ! новые пути не забываем добавлять в defaults/default_api.html !
-    path('drf/', include('rest_framework.urls', namespace='rest_framework')),
-    path("api/auth/login/", LoginView.as_view(), name="rest_login"),
-    path("api/auth/logout/", LogoutView.as_view(), name="rest_logout"),
-    path("api/auth/user/", UserDetailsView.as_view(), name="rest_user_details"),
-    path("api/auth/signup/", signup, name="socialaccount_signup"),
+    path("api/auth/signup/", signup, name="socialaccount_signup"), # нет в свагере
     path("api/auth/google/", GoogleLogin.as_view(), name="google_login"),
     path('api/auth/github/', GitHubLogin.as_view(), name='github_login'),
+    path("api/auth/login/", LoginView.as_view(), name="rest_login"),
+    path("api/auth/logout/", LogoutView.as_view(), name="rest_logout"),
+    path('admin/', admin.site.urls), # нет в свагере
+    path('api/accounts/', include('allauth.urls')), # нет в свагере
+    path("api/auth/user/", UserDetailsView.as_view(), name="rest_user_details"),
+    path('api/', include(router.urls)),
+    path('apilist/', FlatpageView, name="api"),  # нет в свагере ### ! новые пути не забываем добавлять в defaults/default_api.html !
+    path('drf/', include('rest_framework.urls', namespace='rest_framework')), # нет в свагере # не работает путь
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'), # нет в свагере
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'), # нет в свагере
 
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
