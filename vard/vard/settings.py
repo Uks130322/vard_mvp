@@ -224,26 +224,30 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
+### статика #######################################################################
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
 STATIC_ROOT = '/usr/src/app/staticfiles'
 SITE_URL = 'http://127.0.0.1:8000'
-SITE_ID = 1
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/accounts/logout/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+MEDIA_URL = ''  # TODO clarify details
+MEDIA_ROOT = os.path.join('files')
+### статика #######################################################################
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static'
-# ]
+SITE_ID = 1
+
+
+### allauth #######################################################################
+LOGIN_URL = '/api/auth/login/'
+LOGIN_REDIRECT_URL = '/api/auth/logout/'
+LOGOUT_REDIRECT_URL = '/api/auth/login/'
+
+#api/auth/logout/
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
 
@@ -258,7 +262,53 @@ ACCOUNT_USERNAME_BLACKLIST = ["admin", "administrator", "moderator"]
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
 
+#### описание библиотеки
+# #https://docs-allauth-org.translate.goog/en/latest/account/configuration.html?_x_tr_sl=en&_x_tr_tl=ru&_x_tr_hl=ru&_x_tr_pto=wapp
+# ACCOUNT_AUTHENTICATION_METHOD = 'email' #'username'
+# ACCOUNT_CHANGE_EMAIL = False
+# #ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/accounts/login/'
+# ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
+# ACCOUNT_EMAIL_CONFIRMATION_HMAC = False #поставить True для отпавки ссылки на подтверждение
+# ACCOUNT_EMAIL_NOTIFICATIONS = False #поставить True когда заработает почта
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_EMAIL_VERIFICATION = 'none' #'mandatory'
+# ACCOUNT_EMAIL_SUBJECT_PREFIX = 'tbc-spb.ru'
+# ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
+# ACCOUNT_USERNAME_MIN_LENGTH = 4
+# ACCOUNT_USERNAME_MAX_LENGTH = 30
+# ACCOUNT_MAX_EMAIL_ADDRESSES = 1
+#
+# # ACCOUNT_FORMS = {
+# #     'add_email': 'allauth.account.forms.AddEmailForm',
+# #     'change_password': 'allauth.account.forms.ChangePasswordForm',
+# #     'confirm_login_code': 'allauth.account.forms.ConfirmLoginCodeForm',
+# #     'login': 'allauth.account.forms.LoginForm',
+# #     'request_login_code': 'allauth.account.forms.RequestLoginCodeForm',
+# #     'reset_password': 'allauth.account.forms.ResetPasswordForm',
+# #     'reset_password_from_key': 'allauth.account.forms.ResetPasswordKeyForm',
+# #     'set_password': 'allauth.account.forms.SetPasswordForm',
+# #     'signup': 'allauth.account.forms.SignupForm',
+# #     'user_token': 'allauth.account.forms.UserTokenForm',
+# # }
+# ACCOUNT_LOGIN_BY_CODE_ENABLED = False #True - пользователь вводит только адрес электронной почты.
+# # Затем на этот адрес электронной почты отправляется одноразовый код,
+# # который позволяет пользователю войти в систему
+# #ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 180 #Код, отправленный по электронной почте, имеет ограниченный срок действия.
+# # Срок его действия истекает через столько секунд, после которых он был отправлен.
+# ACCOUNT_SESSION_REMEMBER = None #Управляет временем существования сеанса.
+# # Установите значение None, чтобы спрашивать пользователя («Помнишь меня?»), False не запоминать и Trueвсегда помнить.
+# ACCOUNT_USERNAME_BLACKLIST = ["admin", "administrator", "moderator"] #Список имен пользователей, которые не могут быть использованы пользователем
+# ACCOUNT_UNIQUE_EMAIL = True
+# ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email' #по умолчанию: "email" Имя поля, содержащего email, если таковое имеется. См. пользовательские модели пользователей
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+# #ACCOUNT_USERNAME_MIN_LENGTH = 5
+# ACCOUNT_USERNAME_REQUIRED = False
 
+### allauth #######################################################################
+
+
+### мыло #######################################################################
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
@@ -270,9 +320,7 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 MANAGERS = [("n1", "stds58@gmail.com")]
 ADMINS = [("n2", "stds58@yandex.ru")]
 SERVER_EMAIL = 'stds58@yandex.ru'
-
-MEDIA_URL = ''  # TODO clarify details
-MEDIA_ROOT = os.path.join('files')
+### мыло #######################################################################
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

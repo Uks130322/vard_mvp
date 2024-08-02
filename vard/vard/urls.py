@@ -6,7 +6,7 @@ from rest_framework import permissions, routers
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from appuser.views import RegisterView, GoogleLogin, GitHubLogin
+from appuser.views import RegisterView, GoogleLogin, GitHubLogin, FlatpageView
 
 from appchart_DB.urls import router as appchart_DBrouter
 from appchat.urls import router as appchatrouter
@@ -38,15 +38,12 @@ router.registry.extend(appfeedbackrouter.registry)
 router.registry.extend(appfilerouter.registry)
 router.registry.extend(appuserrouter.registry)
 
-
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('allauth.urls')),
-    path('api/', include(router.urls)),
+    #path('api/', include(router.urls)),
 
-
+    path('api/', FlatpageView, name="api"),  ### ! новые пути не забываем добавлять в defaults/default_api.html !
     path('drf/', include('rest_framework.urls', namespace='rest_framework')),
     path("api/auth/login/", LoginView.as_view(), name="rest_login"),
     path("api/auth/logout/", LogoutView.as_view(), name="rest_logout"),
