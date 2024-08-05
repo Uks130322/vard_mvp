@@ -3,9 +3,11 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import ClientDB, Dashboard, Chart
+from .models import ClientDB, Dashboard, Chart, ClientData, ChartDashboard
 
 admin.site.register(Dashboard)
 admin.site.register(Chart)
 admin.site.register(ClientDB)
+admin.site.register(ClientData)
+admin.site.register(ChartDashboard)
 

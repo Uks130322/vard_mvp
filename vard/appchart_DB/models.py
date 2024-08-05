@@ -4,17 +4,6 @@ from sqlalchemy import exc
 from appuser.models import User
 
 
-class Dashboard(models.Model):
-    # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='dashboard id')
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
-    date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
-    date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
-    chart = models.ManyToManyField('Chart', blank=True, through='ChartDashboard')
-
-    def __str__(self):
-        return f'{self.id} {self.user_id}'
-
-
 class ClientDB(models.Model):
     driver1 = 1
     DRIVERS = [
@@ -66,21 +55,64 @@ class ClientDB(models.Model):
         return f'{self.connection_name}'
 
 
+class ClientData(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
+    data = models.TextField(blank=True, null=True)
+
+
 class Chart(models.Model):
+
+    class PlotType(models.IntegerChoices):
+        PLOT = 1
+        SCATTER = 2
+        BAR = 3
+        PIE = 4
+        STACKPLOT = 5
+
+    class Color(models.TextChoices):
+        RED = '#F15C3C'
+        GREEN = '#8FC73C'
+        BLUE = '#26ADE1'
+        PURPLE = '#DE4AF0'
+        YELLOW = '#FCD205'
+        GREY = '#6C6C6C'
+
+    class ImageFormat(models.IntegerChoices):
+        PNG = 1
+        PS = 2
+        PDF = 3
+        SVG = 4
+
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     clientdb_id = models.ForeignKey(ClientDB, on_delete=models.PROTECT, verbose_name='clientdb id')
-    str_query = models.TextField(blank=True)
-    clientdata = models.OneToOneField('ClientData', on_delete=models.CASCADE)
+    str_query = models.TextField(blank=True, verbose_name='query')
+    clientdata = models.OneToOneField(ClientData, on_delete=models.CASCADE, verbose_name='clientdata')
+
+    x_data = models.CharField(blank=True, null=True, max_length=3, default='A', verbose_name='x data')
+    y_data = models.CharField(blank=True, null=True, max_length=3, default='B', verbose_name='y data')
+    x_label = models.CharField(blank=True, null=True, max_length=3, default='X', verbose_name='x label')
+    y_label = models.CharField(blank=True, null=True, max_length=3, default='y', verbose_name='y label')
+
+    plot_type = models.IntegerField(choices=PlotType.choices, default=0, verbose_name='plot type')
+    color = models.CharField(max_length=15, choices=Color.choices, default=Color.BLUE, verbose_name='color')
+    image_format = models.IntegerField(choices=ImageFormat.choices, default=0, verbose_name='image format')
+
 
     def __str__(self):
         return f'{self.id} {self.user_id}'
 
 
-class ClientData(models.Model):
+class Dashboard(models.Model):
+    # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='dashboard id')
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
-    data = models.TextField(blank=True, null=True)
+    date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
+    date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
+    chart = models.ManyToManyField(Chart, blank=True, through='ChartDashboard')
+
+    def __str__(self):
+        return f'{self.id} {self.user_id}'
 
 
 class ChartDashboard(models.Model):

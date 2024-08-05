@@ -37,7 +37,14 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
             'date_change',
             'clientdb_id',
             'str_query',
-            'clientdata'
+            'clientdata',
+            'x_data',
+            'y_data',
+            'x_label',
+            'y_label',
+            'plot_type',
+            'color',
+            'image_format',
         ]
         extra_kwargs = {
             'user_id': {'read_only': True},
@@ -49,9 +56,6 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
         clientdata = ClientData.objects.create(user_id=validated_data['user_id'], data='')
         chart = Chart.objects.create(**validated_data, clientdata=clientdata)
         return chart
-
-
-
 
 
 class ChartDashboardSerializer(serializers.HyperlinkedModelSerializer):

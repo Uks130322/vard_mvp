@@ -29,7 +29,6 @@ schema_view = get_schema_view(
    permission_classes=(permissions.IsAuthenticated, permissions.IsAdminUser,),
 )
 
-
 router = routers.DefaultRouter()
 router.registry.extend(appchart_DBrouter.registry)
 router.registry.extend(appchatrouter.registry)
@@ -39,13 +38,10 @@ router.registry.extend(appfilerouter.registry)
 router.registry.extend(appuserrouter.registry)
 
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('allauth.urls')),
     path('api/', include(router.urls)),
-
 
     path('drf/', include('rest_framework.urls', namespace='rest_framework')),
     path("api/auth/login/", LoginView.as_view(), name="rest_login"),

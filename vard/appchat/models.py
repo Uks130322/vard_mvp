@@ -22,4 +22,4 @@ class Message(models.Model):
     doc = models.FileField(upload_to='uploads/', blank=True, null=True)
 
     def __str__(self):
-        return f'{self.id} {self.user_id}'
+        return f'{self.message} {self.user_id}'
