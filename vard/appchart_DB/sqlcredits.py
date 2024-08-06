@@ -21,16 +21,16 @@ SQLCREDITS = {
                          "volumes": {"DATA_DIR": "/var/opt/sqlserver/data", "LOG_DIR": "/var/opt/sqlserver/log", "BACKUP_DIR": "/var/opt/sqlserver/backup"}
                          },
 
-"MYSQLROOT-DOCKER"     : {"driver": "",
+"MYSQLROOT-DOCKER"     : {"driver": "mysql+pymysql",
                          "driver2": "",
                          "user": "root",
                          "pwd": "rootmysql",
                          "hostname": "localhost",
                          "dbname": "bdmysql",
-                         "port": "6000",
+                         "port": "6001",
                          "volumes": {"DATA_DIR": "/var/lib/mysql/", "LOG_DIR": "", "BACKUP_DIR": ""}
                          },
-"MYSQLROOT-HOSTING"   : {"driver": "",
+"MYSQLROOT-HOSTING"   : {"driver": "mysql+pymysql",
                          "driver2": "",
                          "user": "root",
                          "pwd": "rootmysql",
@@ -39,7 +39,7 @@ SQLCREDITS = {
                          "port": "3306",
                          "volumes": {"DATA_DIR": "/var/lib/mysql/", "LOG_DIR": "", "BACKUP_DIR": ""}
                          },
-"MYSQL-DOCKER"         : {"driver": "",
+"MYSQL-DOCKER"         : {"driver": "mysql+pymysql",
                          "driver2": "",
                          "user": "mysqluser",
                          "pwd": "mysqlpass",
@@ -48,7 +48,7 @@ SQLCREDITS = {
                           "port": "6000",
                           "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
                           },
-"MYSQL-HOSTING"        : {"driver": "",
+"MYSQL-HOSTING"        : {"driver": "mysql+pymysql",
                          "driver2": "",
                          "user": "mysqluser",
                          "pwd": "mysqlpass",
@@ -56,13 +56,67 @@ SQLCREDITS = {
                          "dbname": "bdmysql",
                          "port": "3306",
                          "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
+                          },
+"POSTGRES-DOCKER"      : {"driver": "postgresql+psycopg2",
+                          "driver2": "",
+                          "user": "postgresuser",
+                          "pwd": "postgrespass",
+                          "hostname": "localhost",
+                          "dbname": "bdpostgres",
+                          "port": "6002",
+                          "volumes": {"DATA_DIR": "/var/lib/postgresql/data/testpgdata", "LOG_DIR": "", "BACKUP_DIR": ""}
+                          },
+"POSTGRES-HOSTING"     : {"driver": "postgresql+psycopg2",
+                          "driver2": "",
+                          "user": "postgresuser",
+                          "pwd": "postgrespass",
+                          "hostname": "testpostgres",
+                          "dbname": "bdpostgres",
+                          "port": "5432",
+                          "volumes": {"DATA_DIR": "/var/lib/postgresql/data/testpgdata", "LOG_DIR": "", "BACKUP_DIR": ""}
+                          },
+"MARIADB-DOCKER"       : {"driver": "mysql+pymysql",
+                          "driver2": "",
+                          "user": "mariauser",
+                          "pwd": "mariapass",
+                          "hostname": "localhost",
+                          "dbname": "bdmaria",
+                          "port": "6000",
+                          "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
+                          },
+"MARIADB-HOSTING"      : {"driver": "mysql+pymysql",
+                          "driver2": "",
+                          "user": "mariauser",
+                          "pwd": "mariapass",
+                          "hostname": "testmariadb",
+                          "dbname": "bdmaria",
+                          "port": "3306",
+                          "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
+                          },
+"MARIADBROOT-DOCKER"   : {"driver": "mysql+pymysql",
+                          "driver2": "",
+                          "user": "root",
+                          "pwd": "rootmaria",
+                          "hostname": "localhost",
+                          "dbname": "bdmaria",
+                          "port": "6000",
+                          "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
+                          },
+"MARIADBROOT-HOSTING"  : {"driver": "mysql+pymysql",
+                          "driver2": "",
+                          "user": "root",
+                          "pwd": "rootmaria",
+                          "hostname":  "testmariadb",
+                          "dbname": "bdmaria",
+                          "port": "3306",
+                          "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
                           }
-# "POSTGRES"    = {"driver": "", "driver2": "", "user": "postgresuser", "pwd": "postgrespass", "hostname": ["localhost", "testpostgres"], "dbname": "bdpostgres", "port": ["6002", "5432"], "volumes": {"DATA_DIR": "/var/lib/postgresql/data/testpgdata"} }
-# "MARIADB"     = {"driver": "", "driver2": "", "user": "mariauser",    "pwd": "mariapass",    "hostname": ["localhost", "testmariadb"],  "dbname": "bdmaria",    "port": ["6000", "3306"], "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""} }
-# "MARIADBROOT" = {"driver": "", "driver2": "", "user": "root",         "pwd": "rootmaria",    "hostname": ["localhost", "testmariadb"],  "dbname": "bdmaria",    "port": ["6000", "3306"], "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""} }
 
 }
-L = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",]
+LISTSUBD = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",
+     "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING",
+     "POSTGRES-DOCKER","POSTGRES-HOSTING",]
+
 SUBD = "MSSQL-DOCKER"
 driver = SQLCREDITS[SUBD]["driver"]
 driver2 = SQLCREDITS[SUBD]["driver2"]
@@ -73,6 +127,7 @@ port = SQLCREDITS[SUBD]["port"]
 dbname =  SQLCREDITS[SUBD]["dbname"]
 datadir = SQLCREDITS[SUBD]["volumes"]["DATA_DIR"]
 logdir = SQLCREDITS[SUBD]["volumes"]["LOG_DIR"]
+
 
 ###################################################
 

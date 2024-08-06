@@ -1,43 +1,43 @@
-# -*- coding: utf-8 -*-
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import MetaData
-from sqlalchemy import Column, Integer, String, NVARCHAR, Boolean, Float, Index
-from sqlalchemy.dialects.mssql import SQL_VARIANT
-from sqlalchemy.schema import CreateSchema
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
 import pandas as pd
 import pyodbc
-from sqlcredits import SQLCREDITS, EXTENSIONS
+from sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS
 import json
 import base64
-from django.conf import settings
 
 
 
 class Work:
-    def __init__(self, SUBD, query, ext):
-        self.SUBD = SUBD
-        self.driver = SQLCREDITS[SUBD]["driver"]
-        self.driver2 = SQLCREDITS[SUBD]["driver2"]
-        self.user = SQLCREDITS[SUBD]["user"]
-        self.pwd = SQLCREDITS[SUBD]["pwd"]
-        self.hostname = SQLCREDITS[SUBD]["hostname"]
-        self.port = SQLCREDITS[SUBD]["port"]
-        self.dbname = SQLCREDITS[SUBD]["dbname"]
-        self.datadir = SQLCREDITS[SUBD]["volumes"]["DATA_DIR"]
-        self.logdir = SQLCREDITS[SUBD]["volumes"]["LOG_DIR"]
-        self.backupdir = SQLCREDITS[SUBD]["volumes"]["BACKUP_DIR"]
+    def __init__(self, SUBDja, query, ext):
+        self.SUBDja = SUBDja
+        self.SUBD = self.set_subd
+        self.driver = SQLCREDITS[self.SUBD]["driver"]
+        self.driver2 = SQLCREDITS[self.SUBD]["driver2"]
+        self.user = SQLCREDITS[self.SUBD]["user"]
+        self.pwd = SQLCREDITS[self.SUBD]["pwd"]
+        self.hostname = SQLCREDITS[self.SUBD]["hostname"]
+        self.port = SQLCREDITS[self.SUBD]["port"]
+        self.dbname = SQLCREDITS[self.SUBD]["dbname"]
+        self.datadir = SQLCREDITS[self.SUBD]["volumes"]["DATA_DIR"]
+        self.logdir = SQLCREDITS[self.SUBD]["volumes"]["LOG_DIR"]
+        self.backupdir = SQLCREDITS[self.SUBD]["volumes"]["BACKUP_DIR"]
         self.echo = False #True #False
         self.connection = self.get_string_connection
         self.engine = self.get_engine
         self.query = query
         self.ext = ext
         self.extension = self.set_extension
+
+    @property
+    def set_subd(self):
+        if self.SUBDja in LISTSUBD:
+            return self.SUBDja
+        else:
+            return f'supported bases are {LISTSUBD}'
 
     @property
     def set_extension(self):
@@ -51,11 +51,13 @@ class Work:
         if self.SUBD == "MSSQL-DOCKER" or self.SUBD == "MSSQL-HOSTING" :
             self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}?driver={self.driver2};"
         elif self.SUBD in ("MYSQLROOT-DOCKER", "MYSQLROOT-HOSTING", "MYSQL-DOCKER", "MYSQL-HOSTING"):
-            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}?driver={self.driver2};"
-            #?charset=utf8mb4
+            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}?charset=utf8mb4;"
+        elif self.SUBD in ("POSTGRES-DOCKER", "POSTGRES-HOSTING"):
+            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}"
+        elif self.SUBD in ("MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING"):
+            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}"
         else:
             None
-            #postgres client_encoding='utf8'
         return self.connection
 
     @property
@@ -63,7 +65,11 @@ class Work:
         if self.SUBD == "MSSQL-DOCKER" or self.SUBD == "MSSQL-HOSTING" :
             self.engine = create_engine(self.connection, fast_executemany=True, echo=self.echo).execution_options(isolation_level="AUTOCOMMIT")
         elif self.SUBD in ("MYSQLROOT-DOCKER", "MYSQLROOT-HOSTING", "MYSQL-DOCKER", "MYSQL-HOSTING"):
-            self.engine = create_engine(self.connection, fast_executemany=True, echo=self.echo)
+            self.engine = create_engine(self.connection, echo=self.echo)
+        elif self.SUBD in ("POSTGRES-DOCKER","POSTGRES-HOSTING"):
+            self.engine = create_engine(self.connection, echo=self.echo)
+        elif self.SUBD in ("MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING"):
+            self.engine = create_engine(self.connection, echo=self.echo)
         else:
             None
         return self.engine
@@ -113,10 +119,12 @@ class Work:
             return self.rezult
 
 
-L = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",]
-x = Work("MSSQL-DOCKER", "select 'tttttrr' as ff", 'xlsx'); #.get_result;
+L = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",
+     "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING",
+     "POSTGRES-DOCKER","POSTGRES-HOSTING",]
+x = Work("MARIADB-DOCKER", "select 'tttttrr' as ff", 'xlsx'); #.get_result;
 print(x.get_result())
-
+#решить вопрос с неправильным именем субд
 #print(x.get_result)
 #print(x) CREATE DATABASE Sales21
 #"select N'ddは一生に一度の選手vvсмвамамиvv' COLLATE Latin1_General_BIN"
