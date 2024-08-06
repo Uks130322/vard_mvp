@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+print('BASE_DIR',BASE_DIR)
 dotenv_path = os.path.join(BASE_DIR, '.env')
 load_dotenv(dotenv_path)
 # Quick-start development settings - unsuitable for production
@@ -172,8 +172,8 @@ DATABASES = {
         'USER': 'admin',
         # 'USER': 'postgres',
         'PASSWORD': 'prod',
-        #'HOST': 'localhost',
-        'HOST': 'db',
+        'HOST': 'localhost',
+        #'HOST': 'db',
         'PORT': '5432',
     }
 }

@@ -58,7 +58,8 @@ services:
       MYSQL_PASSWORD: mysqlpass
       MYSQL_DATABASE: bdmysql
     volumes:
-      - ./dbdata:/var/lib/mysql/
+      #- ./dbdata:/var/lib/mysql/
+      - /var/lib/mysql/
     networks:
       - mynetwork
 
@@ -82,20 +83,29 @@ services:
 #sa у mssql должен быть сложный иначе пользователь не создастся
   testmssql:
     container_name: testmssql
-    image: mcr.microsoft.com/mssql/server:latest
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=QeTuo123
-      - MSSQL_DATA_DIR=/var/opt/sqlserver/data
-      - MSSQL_LOG_DIR=/var/opt/sqlserver/log
-      - MSSQL_BACKUP_DIR=/var/opt/sqlserver/backup
+    image: my/testmssq/image/name #mcr.microsoft.com/mssql/server:2017
+
+#    environment:
+#      - ACCEPT_EULA=Y
+#      - MSSQL_SA_PASSWORD=QeTuo123
+#      - MSSQL_DATA_DIR=/var/opt/sqlserver/data
+#      - MSSQL_LOG_DIR=/var/opt/sqlserver/log
+#      - MSSQL_BACKUP_DIR=/var/opt/sqlserver/backup
+
     ports:
       - 6003:1433
     volumes:
-      - sqlsystem:/var/opt/mssql/
-      - sqldata:/var/opt/sqlserver/data
-      - sqllog:/var/opt/sqlserver/log
-      - sqlbackup:/var/opt/sqlserver/backup
+      - mssqldata:/var/opt/mssql
+#      - sqlsystem:/var/opt/mssql/
+#      - sqldata:/var/opt/sqlserver/data
+#      - sqllog:/var/opt/sqlserver/log
+#      - sqlbackup:/var/opt/sqlserver/backup
+    #command: chattr -a entrypoint* && bash -c "chmod -R 777 /src/entrypoint.sh"
+    #command: chattr -a /var/opt/ && bash -c "chmod -R 777 /var/opt/"
+    build:
+      context: .
+      dockerfile: vard/mssqlconf/Dockerfile
+
 ### test db ####
 
 volumes:
@@ -103,10 +113,11 @@ volumes:
     driver: local
   testpgdata:
     driver: local
-  sqlsystem:
-  sqldata:
-  sqllog:
-  sqlbackup:
+  mssqldata:
+#  sqlsystem:
+#  sqldata:
+#  sqllog:
+#  sqlbackup:
 
 networks:
   mynetwork:
