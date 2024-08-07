@@ -32,70 +32,70 @@ services:
       - mynetwork
 
 ### test db ####
-  testmariadb:
-    container_name: testmariadb
-    image: mariadb:latest
-    ports:
-      - 6000:3306
-    environment:
-      MARIADB_USER: mariauser
-      MARIADB_PASSWORD: mariapass
-      MARIADB_ROOT_PASSWORD: rootmaria
-      MARIADB_DATABASE: bdmaria
-    restart: always
-    networks:
-      - mynetwork
-
-  testmysql:
-    container_name: testmysql
-    image: mysql:latest
-    restart: always
-    ports:
-      - 6001:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: rootmysql
-      MYSQL_USER: mysqluser
-      MYSQL_PASSWORD: mysqlpass
-      MYSQL_DATABASE: bdmysql
-    volumes:
-      - ./dbdata:/var/lib/mysql/
-    networks:
-      - mynetwork
-
-  testpostgres:
-    container_name: testpostgres
-    image: postgres:13
-    ports:
-      - 6002:5432
-    shm_size: 128mb
-    environment:
-      - POSTGRES_DB=bdpostgres
-      - POSTGRES_USER=postgresuser
-      - POSTGRES_PASSWORD=postgrespass
-      - PGDATA=/var/lib/postgresql/data/pgdata
-    volumes:
-      - testpgdata:/var/lib/postgresql/data/testpgdata
-    restart: always
-    networks:
-      - mynetwork
+#  testmariadb:
+#    container_name: testmariadb
+#    image: mariadb:latest
+#    ports:
+#      - 6000:3306
+#    environment:
+#      MARIADB_USER: mariauser
+#      MARIADB_PASSWORD: mariapass
+#      MARIADB_ROOT_PASSWORD: rootmaria
+#      MARIADB_DATABASE: bdmaria
+#    restart: always
+#    networks:
+#      - mynetwork
+#
+#  testmysql:
+#    container_name: testmysql
+#    image: mysql:latest
+#    restart: always
+#    ports:
+#      - 6001:3306
+#    environment:
+#      MYSQL_ROOT_PASSWORD: rootmysql
+#      MYSQL_USER: mysqluser
+#      MYSQL_PASSWORD: mysqlpass
+#      MYSQL_DATABASE: bdmysql
+#    volumes:
+#      - ./dbdata:/var/lib/mysql/
+#    networks:
+#      - mynetwork
+#
+#  testpostgres:
+#    container_name: testpostgres
+#    image: postgres:13
+#    ports:
+#      - 6002:5432
+#    shm_size: 128mb
+#    environment:
+#      - POSTGRES_DB=bdpostgres
+#      - POSTGRES_USER=postgresuser
+#      - POSTGRES_PASSWORD=postgrespass
+#      - PGDATA=/var/lib/postgresql/data/pgdata
+#    volumes:
+#      - testpgdata:/var/lib/postgresql/data/testpgdata
+#    restart: always
+#    networks:
+#      - mynetwork
 
 #sa у mssql должен быть сложный иначе пользователь не создастся
-  testmssql:
-    container_name: testmssql
-    image: mcr.microsoft.com/mssql/server:latest
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=QeTuo123
-      - MSSQL_DATA_DIR=/var/opt/sqlserver/data
-      - MSSQL_LOG_DIR=/var/opt/sqlserver/log
-      - MSSQL_BACKUP_DIR=/var/opt/sqlserver/backup
-    ports:
-      - 6003:1433
-    volumes:
-      - sqlsystem:/var/opt/mssql/
-      - sqldata:/var/opt/sqlserver/data
-      - sqllog:/var/opt/sqlserver/log
-      - sqlbackup:/var/opt/sqlserver/backup
+#  testmssql:
+#    container_name: testmssql
+#    image: mcr.microsoft.com/mssql/server:latest
+#    environment:
+#      - ACCEPT_EULA=Y
+#      - MSSQL_SA_PASSWORD=QeTuo123
+#      - MSSQL_DATA_DIR=/var/opt/sqlserver/data
+#      - MSSQL_LOG_DIR=/var/opt/sqlserver/log
+#      - MSSQL_BACKUP_DIR=/var/opt/sqlserver/backup
+#    ports:
+#      - 6003:1433
+#    volumes:
+#      - sqlsystem:/var/opt/mssql/
+#      - sqldata:/var/opt/sqlserver/data
+#      - sqllog:/var/opt/sqlserver/log
+#      - sqlbackup:/var/opt/sqlserver/backup
 ### test db ####
 
 volumes:
