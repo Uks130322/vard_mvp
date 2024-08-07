@@ -1,6 +1,6 @@
 from django.db import models
 from sqlalchemy import exc
-
+from sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS
 from appuser.models import User
 
 
@@ -17,22 +17,41 @@ class Dashboard(models.Model):
 
 class ClientDB(models.Model):
     driver1 = 1
+    driver2 = 2
+    driver3 = 3
+    driver4 = 4
+
     DRIVERS = [
-        (driver1, 'SQLAlchemy for MySQL'),
+        (driver1, 'MSSQL', SQLCREDITS['MSSQL-HOSTING']),  ##### "driver": "mssql+pyodbc", "driver2": "ODBC+Driver+17+for+SQL+Server",
+        (driver2, 'MYSQL', SQLCREDITS['MYSQLROOT-HOSTING']),
+        (driver3, 'MARIADB', SQLCREDITS['MARIADB-HOSTING']),
+        (driver4, 'POSTGRES', SQLCREDITS['POSTGRES-HOSTING']),
+    ]
+
+    dbtype1 = 1
+    dbtype2 = 2
+    dbtype3 = 3
+    dbtype4 = 4
+
+    DBTYPE = [
+        (driver1, 'MSSQL'),
+        (driver2, 'MYSQL'),
+        (driver3, 'MARIADB'),
+        (driver4, 'POSTGRES'),
     ]
 
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    connection_name = models.CharField(max_length=255, null=False, default='')
-    user_name = models.CharField(max_length=16, null=False)
-    password = models.CharField(max_length=128, null=False)
-    driver = models.IntegerField(choices=DRIVERS, default=driver1)
-    url = models.CharField(max_length=255, null=True)
-    host = models.CharField(max_length=60, null=True, default='localhost')
-    port = models.IntegerField(null=True, default=3306)
-    data_base_type = models.CharField(null=True, max_length=255)
-    data_base_name = models.CharField(max_length=63, null=False)
-    description = models.CharField(null=True, max_length=255)
-    str_datas_for_connection = models.CharField(blank=True, null=True, max_length=255)
+    connection_name = models.CharField(max_length=255, null=False)
+    url = models.CharField(max_length=255, blank=True, null=True)
+    data_base_type = models.CharField(choices=DBTYPE, blank=True, null=True)
+    driver = models.IntegerField(choices=DRIVERS, blank=True, null=True) ##### пока не надо, понадобится если на 1 субд пользователь будет выбирать из несколькких драйверов
+    user_name = models.CharField(max_length=16, blank=True, null=True)
+    password = models.CharField(max_length=128, blank=True, null=True)
+    host = models.CharField(max_length=60, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    data_base_name = models.CharField(max_length=63, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    #str_datas_for_connection = models.CharField(max_length=255, blank=True, null=True) ##### не надо. вместо неё url
 
     def get_responses(self, id):
         try:
@@ -61,6 +80,9 @@ class ClientDB(models.Model):
     def update_response(self, id):
         result = self.get_responses(id)
         return result
+
+    def get_status_db(self):
+        pass
 
     def __str__(self):
         return f'{self.connection_name}'

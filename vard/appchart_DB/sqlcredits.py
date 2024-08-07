@@ -110,14 +110,23 @@ SQLCREDITS = {
                           "dbname": "bdmaria",
                           "port": "3306",
                           "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
+                          },
+"ERROR"                : {"driver": "",
+                          "driver2": "",
+                          "user": "",
+                          "pwd": "",
+                          "hostname":  "",
+                          "dbname": "",
+                          "port": "",
+                          "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
                           }
 
 }
 LISTSUBD = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",
      "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING",
-     "POSTGRES-DOCKER","POSTGRES-HOSTING",]
+     "POSTGRES-DOCKER","POSTGRES-HOSTING","ERROR"]
 
-SUBD = "MSSQL-DOCKER"
+SUBD = "ERROR"
 driver = SQLCREDITS[SUBD]["driver"]
 driver2 = SQLCREDITS[SUBD]["driver2"]
 user = SQLCREDITS[SUBD]["user"]
