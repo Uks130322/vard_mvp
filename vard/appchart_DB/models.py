@@ -94,6 +94,7 @@ class Chart(models.Model):
     y_data = models.CharField(blank=True, null=True, max_length=3, default='B', verbose_name='y data')
     x_label = models.CharField(blank=True, null=True, max_length=3, default='X', verbose_name='x label')
     y_label = models.CharField(blank=True, null=True, max_length=3, default='y', verbose_name='y label')
+    title = models.CharField(blank=True, null=True, max_length=255, verbose_name='title')
 
     plot_type = models.IntegerField(choices=PlotType.choices, default=0, verbose_name='plot type')
     color = models.CharField(max_length=15, choices=Color.choices, default=Color.BLUE, verbose_name='color')

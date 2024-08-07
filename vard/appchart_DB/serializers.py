@@ -42,6 +42,7 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
             'y_data',
             'x_label',
             'y_label',
+            'title',
             'plot_type',
             'color',
             'image_format',
