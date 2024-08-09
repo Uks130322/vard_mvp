@@ -46,10 +46,12 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
             'plot_type',
             'color',
             'image_format',
+            'plot',
         ]
         extra_kwargs = {
             'user_id': {'read_only': True},
             'clientdata': {'read_only': True},
+            'plot': {'read_only': True},
         }
 
     @transaction.atomic

@@ -99,6 +99,7 @@ class Chart(models.Model):
     plot_type = models.IntegerField(choices=PlotType.choices, default=0, verbose_name='plot type')
     color = models.CharField(max_length=15, choices=Color.choices, default=Color.BLUE, verbose_name='color')
     image_format = models.IntegerField(choices=ImageFormat.choices, default=0, verbose_name='image format')
+    plot = models.TextField(blank=True, null=True, verbose_name='plot_in_base64')
 
 
     def __str__(self):

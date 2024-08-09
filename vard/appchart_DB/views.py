@@ -12,12 +12,12 @@ from sqlalchemy_utils import create_database, drop_database, database_exists
 
 from appchart_DB.models import Dashboard, Chart, ClientData, ChartDashboard
 from appchart_DB.permissions import DataAccessPermission, DataAccessPermissionSafe, get_custom_queryset
+from appchart_DB.plot_utils import create_plot
 from appchart_DB.serializers import (DashboardSerializer, ChartSerializer,
                                      ChartDashboardSerializer, ClientDataSerializer, ClientDBSerializer)
 
 from appchart_DB.models import ClientDB, ClientData, Chart
 from appuser.models import User
-
 
 
 class DashboardViewSet(viewsets.ModelViewSet):
@@ -58,9 +58,23 @@ class ChartViewSet(viewsets.ModelViewSet):
     filterset_fields = ['user_id__id', 'clientdata__id']
 
     def perform_create(self, serializer):
-        """The creator is automatically assigned as user_id"""
+        """The creator is automatically assigned as user_id; if x_data and y_data are provided, a plot is creating"""
         datas = serializer.validated_data
-        return serializer.save(user_id=self.request.user, **datas)
+        if datas['x_data'] and datas['y_data']:
+            plot=create_plot(
+                key_x=datas['x_data'],
+                key_y=datas['y_data'],
+                chart_data=datas['clientdata__data'],
+                image_format=datas['image_format'],
+                x_label=datas['x_label'],
+                y_label=datas['y_label'],
+                color=datas['color'],
+                title=datas['title'],
+                plot_type=datas['plot_type']
+            )
+        else:
+            plot = None
+        return serializer.save(user_id=self.request.user, plot=plot, **datas)
 
     def get_permissions(self):
         if self.action == 'list':
