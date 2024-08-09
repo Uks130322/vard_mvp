@@ -90,10 +90,10 @@ class Chart(models.Model):
     str_query = models.TextField(blank=True, verbose_name='query')
     clientdata = models.OneToOneField(ClientData, on_delete=models.CASCADE, verbose_name='clientdata')
 
-    x_data = models.CharField(blank=True, null=True, max_length=3, default='A', verbose_name='x data')
-    y_data = models.CharField(blank=True, null=True, max_length=3, default='B', verbose_name='y data')
-    x_label = models.CharField(blank=True, null=True, max_length=3, default='X', verbose_name='x label')
-    y_label = models.CharField(blank=True, null=True, max_length=3, default='y', verbose_name='y label')
+    x_data = models.CharField(blank=True, null=True, max_length=100, verbose_name='x data')
+    y_data = models.CharField(blank=True, null=True, max_length=100, verbose_name='y data')
+    x_label = models.CharField(blank=True, null=True, max_length=100, default='X', verbose_name='x label')
+    y_label = models.CharField(blank=True, null=True, max_length=100, default='y', verbose_name='y label')
     title = models.CharField(blank=True, null=True, max_length=255, verbose_name='title')
 
     plot_type = models.IntegerField(choices=PlotType.choices, default=0, verbose_name='plot type')

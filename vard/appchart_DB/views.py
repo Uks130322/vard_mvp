@@ -10,13 +10,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, drop_database, database_exists
 
-from appchart_DB.models import Dashboard, Chart, ClientData, ChartDashboard
+from appchart_DB.models import Dashboard, Chart, ClientData, ChartDashboard, ClientDB
 from appchart_DB.permissions import DataAccessPermission, DataAccessPermissionSafe, get_custom_queryset
 from appchart_DB.plot_utils import create_plot
 from appchart_DB.serializers import (DashboardSerializer, ChartSerializer,
                                      ChartDashboardSerializer, ClientDataSerializer, ClientDBSerializer)
 
-from appchart_DB.models import ClientDB, ClientData, Chart
 from appuser.models import User
 
 
@@ -304,4 +303,3 @@ class ClientDataViewSet(viewsets.ModelViewSet):
             L = [{'error': 'access denied'}]
         new_response_data = L
         return Response(new_response_data)
-

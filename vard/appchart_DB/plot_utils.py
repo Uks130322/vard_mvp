@@ -5,7 +5,7 @@ import tempfile
 
 
 def get_data(key_x: str, key_y: str, chart_data: list) -> tuple:
-    """Get two lists, x and y, from data by key_x and key_y"""
+    """Get two lists, x and y, from data query by key_x and key_y"""
     x = []
     y = []
     for item in chart_data:
@@ -15,6 +15,7 @@ def get_data(key_x: str, key_y: str, chart_data: list) -> tuple:
 
 
 def plot_to_base64(plot, image_format='png'):
+    """Convert plot from required format to base64 string"""
     plot_file = tempfile.NamedTemporaryFile(suffix=f'.{image_format}')
     plot.savefig(plot_file, format=image_format)
     plot_file.seek(0)
@@ -23,8 +24,9 @@ def plot_to_base64(plot, image_format='png'):
     return plot_data
 
 
-def create_plot(key_x: str, key_y: str, chart_data: list, image_format='png', x_label='x', y_label='y', color='blue',
-                title='', plot_type='plot'):
+def create_plot(key_x: str, key_y: str, chart_data: list, image_format='png', x_label='x', y_label='y',
+                color='blue', title='', plot_type='plot'):
+    """Create plot in required format"""
     x, y = get_data(key_x, key_y, chart_data)
     image_format = image_format.lower()
     plot_type = plot_type.lower()
@@ -40,6 +42,7 @@ def create_plot(key_x: str, key_y: str, chart_data: list, image_format='png', x_
 
 
 def make_plot(x: list, y: list, image_format='png', x_label='x', y_label='y', color='blue', title=''):
+    """Simple plot, one line"""
 
     plt.style.use('_mpl-gallery')
 
@@ -59,6 +62,7 @@ def make_plot(x: list, y: list, image_format='png', x_label='x', y_label='y', co
 
 
 def make_scatter(x: list, y: list, image_format='png', x_label='x', y_label='y', color='blue', title=''):
+    """Scatter plot, many points"""
     plt.style.use('_mpl-gallery')
 
     # make the data
@@ -79,6 +83,7 @@ def make_scatter(x: list, y: list, image_format='png', x_label='x', y_label='y',
     return plot_to_base64(plt, image_format)
 
 def make_bar(x: list, y: list, image_format='png', x_label='x', y_label='y', color='blue', title=''):
+    """Bar chart"""
     plt.style.use('_mpl-gallery')
 
     # make data:
@@ -98,6 +103,7 @@ def make_bar(x: list, y: list, image_format='png', x_label='x', y_label='y', col
 
 
 def make_stackplot(x: list, y: list, image_format='png', x_label='x', y_label='y', color='blue', title=''):
+    """Stackplot, line with fill"""
     plt.style.use('_mpl-gallery')
 
     # make data
@@ -116,6 +122,7 @@ def make_stackplot(x: list, y: list, image_format='png', x_label='x', y_label='y
 
 
 def make_pie(x: list, y: list, image_format='png', x_label='x', y_label='y', color='blue', title=''):
+    """Pie chart, round diagram, x must be numbers"""
     plt.style.use('_mpl-gallery-nogrid')
 
     # make data

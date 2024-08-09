@@ -21,6 +21,7 @@ TEST_JSON = [
             }
         ]
 
+# everything is ok
 # print('menu_name', 'price', TEST_JSON)
 # make_plot(*get_data('menu_name', 'price', TEST_JSON),
 #           x_label='menu_name', y_label='price', title='menu_name vs price', color='red')
@@ -28,7 +29,7 @@ TEST_JSON = [
 #              x_label='menu_name', y_label='price', title='menu_name vs price', color='red')
 # make_bar(*get_data('menu_name', 'price', TEST_JSON),
 #          x_label='menu_name', y_label='price', title='menu_name vs price', color='red')
-print(make_pie(*get_data('price', 'menu_name', TEST_JSON),
-         x_label='price', y_label='menu_name', title='price vs menu_name', color='yellow', image_format='svg'))
+# print(make_pie(*get_data('price', 'menu_name', TEST_JSON),
+#          x_label='price', y_label='menu_name', title='price vs menu_name', color='yellow', image_format='svg'))
 # make_stackplot(*get_data('menu_name', 'price', TEST_JSON),
 #                x_label='menu_name', y_label='price', title='product_id vs price', color='green')
