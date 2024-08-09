@@ -17,7 +17,7 @@ from io import StringIO, BytesIO
 MEDIA_DIR = 'C:\\pitonprojekt\\vard_mvp\\vard\media'
 TEMP_FILES_DIR = MEDIA_DIR+'\\temp_files\\'
 
-
+#url, user_name, password, host, port, data_base_name, str_query
 class Work:
     def __init__(self, **kwargs):
         self.SUBDja = kwargs["SUBDja"]
@@ -86,9 +86,9 @@ class Work:
     @property
     def get_string_connection(self):
         if self.SUBD == "MSSQL-DOCKER" or self.SUBD == "MSSQL-HOSTING" :
-            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}?driver={self.driver2};"
+            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}{self.driver2}"
         elif self.SUBD in ("MYSQLROOT-DOCKER", "MYSQLROOT-HOSTING", "MYSQL-DOCKER", "MYSQL-HOSTING"):
-            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}?charset=utf8mb4;"
+            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}"
         elif self.SUBD in ("POSTGRES-DOCKER", "POSTGRES-HOSTING"):
             self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}"
         elif self.SUBD in ("MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING"):
@@ -175,15 +175,25 @@ class Work:
 L = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",
      "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING","POSTGRES-DOCKER","POSTGRES-HOSTING",]
 
-# x = Work(SUBDja="MSSQL-DOCKER", bdname="", query="select 'fff' as j", ext="csv").get_result();
-# print(x)
+
+#url, user_name, password, host, port, data_base_name, str_query
+#Work(SUBDja="MYSQLROOT-DOCKER", bdname="", query="select 'fff' as j", ext="csv")
+x = Work(SUBDja="MYSQLROOT-DOCKER", bdname="", query="select 'fff' as j", ext="csv").get_result();
+print(x)
 
 
-
-
-
-
-
-
-
+# from django.db import models
+#
+# class ModelDeal(models.Model):
+#     STATUS_CHOISES = (
+#         ('ok', 'Выполнена'),
+#         ('new', 'Новая заявка'),
+#         ('cancel', 'Отменена'),
+#         ('error', 'Ошибка'),
+#         ('timesup', 'Время вышло'),
+#     )
+#     deal_status = models.CharField('Статус', max_length=50, choices=STATUS_CHOISES, default='new')
+#
+# var = ModelDeal.return_choises()
+# print(var)
 

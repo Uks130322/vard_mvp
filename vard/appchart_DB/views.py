@@ -17,7 +17,7 @@ from appchart_DB.serializers import (DashboardSerializer, ChartSerializer,
 
 from appchart_DB.models import ClientDB, ClientData, Chart
 from appuser.models import User
-
+from sql_alhimia import Work
 
 
 class DashboardViewSet(viewsets.ModelViewSet):
@@ -124,42 +124,42 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             query = ClientDB.objects.filter(user_id=user_)
             return query
 
-    def get_host(self, url, host, port):
-        if host == 'localhost' or host == '127.0.0.1':
-            result = host
-        elif port == '' or port is None or not port:
-            result = f'{url}:3306'
-        else:
-            result = f'{url}:{port}'
-        return result
-
-    def get_str_connect_sqlalchemy(self, user_name, password, url, host, port, data_base_name):
-        password_new = password.replace('@', '%40')
-        password_new = re.escape(password_new)
-        host_new = self.get_host(url, host, port)
-        str_connect = f"mysql://{user_name}:{password_new}@{host_new}/{data_base_name}"
-        return str_connect
-
-    def get_engine(self, user_name, password, url, host, port, data_base_name):
-        str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
-        engine = create_engine(f"{str_connect_new}", echo=False)
-        return engine
-
-    def create_data_base(self, user_name, password, url, host, port, data_base_name):
-        str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
-        if not database_exists(f"{str_connect_new}"):
-            create_database(f"{str_connect_new}")
-            return f'{data_base_name} создана'
-        else:
-            return f'{data_base_name} уже существует'
-
-    def drop_data_base(self, user_name, password, url, host, port, data_base_name):
-        str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
-        if database_exists(f"{str_connect_new}"):
-            drop_database(f"{str_connect_new}")
-            return f'{data_base_name} удалена'
-        else:
-            return f'{data_base_name} не найдена'
+    # def get_host(self, url, host, port):
+    #     if host == 'localhost' or host == '127.0.0.1':
+    #         result = host
+    #     elif port == '' or port is None or not port:
+    #         result = f'{url}:3306'
+    #     else:
+    #         result = f'{url}:{port}'
+    #     return result
+    #
+    # def get_str_connect_sqlalchemy(self, user_name, password, url, host, port, data_base_name):
+    #     password_new = password.replace('@', '%40')
+    #     password_new = re.escape(password_new)
+    #     host_new = self.get_host(url, host, port)
+    #     str_connect = f"mysql://{user_name}:{password_new}@{host_new}/{data_base_name}"
+    #     return str_connect
+    #
+    # def get_engine(self, user_name, password, url, host, port, data_base_name):
+    #     str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
+    #     engine = create_engine(f"{str_connect_new}", echo=False)
+    #     return engine
+    #
+    # def create_data_base(self, user_name, password, url, host, port, data_base_name):
+    #     str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
+    #     if not database_exists(f"{str_connect_new}"):
+    #         create_database(f"{str_connect_new}")
+    #         return f'{data_base_name} создана'
+    #     else:
+    #         return f'{data_base_name} уже существует'
+    #
+    # def drop_data_base(self, user_name, password, url, host, port, data_base_name):
+    #     str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
+    #     if database_exists(f"{str_connect_new}"):
+    #         drop_database(f"{str_connect_new}")
+    #         return f'{data_base_name} удалена'
+    #     else:
+    #         return f'{data_base_name} не найдена'
 
     def get_query(self, user_name, password, url, host, port, data_base_name, str_query, user_id):
         engine = self.get_engine(user_name, password, url, host, port, data_base_name)
@@ -168,6 +168,8 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             rows = db.execute(text(str_query)).fetchall()
             user = [{'user_id': user_id}]
             result = user + [r._asdict() for r in rows]
+        # rows = Work(SUBDja="MSSQL-DOCKER", bdname=data_base_name, query="select 'fff' as j", ext="csv").get_result()
+        # result = user + rows
         return result
 
     def perform_create(self, serializer):

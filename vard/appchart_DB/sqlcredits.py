@@ -3,7 +3,7 @@
 
 SQLCREDITS = {
 "MSSQL-DOCKER"        : {"driver": "mssql+pyodbc",
-                         "driver2": "ODBC+Driver+17+for+SQL+Server",
+                         "driver2": "?driver=ODBC+Driver+17+for+SQL+Server",
                          "user": "sa",
                          "pwd": "QeTuo123",
                          "hostname": "localhost",
@@ -12,7 +12,7 @@ SQLCREDITS = {
                          "volumes": {"DATA_DIR": "/var/opt/sqlserver/data", "LOG_DIR": "/var/opt/sqlserver/log", "BACKUP_DIR": "/var/opt/sqlserver/backup"}
                          },
 "MSSQL-HOSTING"       : {"driver": "mssql+pyodbc",
-                         "driver2": "ODBC+Driver+17+for+SQL+Server",
+                         "driver2": "?driver=ODBC+Driver+17+for+SQL+Server",
                          "user": "sa",
                          "pwd": "QeTuo123",
                          "hostname": "testmssql",
@@ -22,7 +22,7 @@ SQLCREDITS = {
                          },
 
 "MYSQLROOT-DOCKER"     : {"driver": "mysql+pymysql",
-                         "driver2": "",
+                         "driver2": "?charset=utf8mb4",
                          "user": "root",
                          "pwd": "rootmysql",
                          "hostname": "localhost",
@@ -31,7 +31,7 @@ SQLCREDITS = {
                          "volumes": {"DATA_DIR": "/var/lib/mysql/", "LOG_DIR": "", "BACKUP_DIR": ""}
                          },
 "MYSQLROOT-HOSTING"   : {"driver": "mysql+pymysql",
-                         "driver2": "",
+                         "driver2": "?charset=utf8mb4",
                          "user": "root",
                          "pwd": "rootmysql",
                          "hostname": "testmysql",
@@ -40,7 +40,7 @@ SQLCREDITS = {
                          "volumes": {"DATA_DIR": "/var/lib/mysql/", "LOG_DIR": "", "BACKUP_DIR": ""}
                          },
 "MYSQL-DOCKER"         : {"driver": "mysql+pymysql",
-                         "driver2": "",
+                         "driver2": "?charset=utf8mb4",
                          "user": "mysqluser",
                          "pwd": "mysqlpass",
                          "hostname": "localhost",
@@ -49,7 +49,7 @@ SQLCREDITS = {
                           "volumes": {"DATA_DIR": "", "LOG_DIR": "", "BACKUP_DIR": ""}
                           },
 "MYSQL-HOSTING"        : {"driver": "mysql+pymysql",
-                         "driver2": "",
+                         "driver2": "?charset=utf8mb4",
                          "user": "mysqluser",
                          "pwd": "mysqlpass",
                          "hostname": "testmysql",
@@ -138,6 +138,11 @@ datadir = SQLCREDITS[SUBD]["volumes"]["DATA_DIR"]
 logdir = SQLCREDITS[SUBD]["volumes"]["LOG_DIR"]
 
 
+# 1 "MSSQL-DOCKER","MSSQL-HOSTING"
+# 2 "MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING"
+# 3 "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING"
+# 4 "POSTGRES-DOCKER","POSTGRES-HOSTING"
+
 ###################################################
 
 EXTENSION_DIC = {
@@ -145,7 +150,8 @@ EXTENSION_DIC = {
     'xlsx': True,
     'xlsb': False,
     'csv': True,
-    'json': True
+    'json': True,
+    'pandas': False,
 }
 
 EXTENSIONS = []
@@ -156,7 +162,25 @@ for key, value in EXTENSION_DIC.items():
 
 ###################################################
 
+# CHOISES_TYPE_DB = [
+#     {'MSSQL': [
+#                 {'lib':'SQL Alchemy', "is_available": True,  "driver": "mssql+pyodbc", "driver2": "ODBC+Driver+17+for+SQL+Server"},
+#                 {'lib':'pyodbc', "is_available": False, "driver": "Driver={SQL Server Native Client 11.0};", "driver2": ""},
+#                 {'lib':'pymssql', "is_available": False, "driver": "Driver={SQL Server Native Client 11.0};", "driver2": ""},
+#              ]},
+#
+# ]
+#
+# "{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}{self.driver2}"
+# connectionString = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};Server=localhost:1433;Database=cars;UID=sa;PWD=QeTuo123;")
+# connectionString = pymssql.connect(server='host:port', user='user', password='pass', database ='database')
 
+# DBTYPE = [
+#         (1, 'MSSQL'),
+#         (2, 'MYSQL'),
+#         (3, CHOISES_TYPE_DB[3]),
+#         (4, 'POSTGRES'),
+#     ]
 
-
+###################################################
 

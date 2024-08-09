@@ -16,35 +16,20 @@ class Dashboard(models.Model):
 
 
 class ClientDB(models.Model):
-    driver1 = 1
-    driver2 = 2
-    driver3 = 3
-    driver4 = 4
-
-    DRIVERS = [
-        (driver1, 'MSSQL', SQLCREDITS['MSSQL-HOSTING']),  ##### "driver": "mssql+pyodbc", "driver2": "ODBC+Driver+17+for+SQL+Server",
-        (driver2, 'MYSQL', SQLCREDITS['MYSQLROOT-HOSTING']),
-        (driver3, 'MARIADB', SQLCREDITS['MARIADB-HOSTING']),
-        (driver4, 'POSTGRES', SQLCREDITS['POSTGRES-HOSTING']),
-    ]
-
-    dbtype1 = 1
-    dbtype2 = 2
-    dbtype3 = 3
-    dbtype4 = 4
 
     DBTYPE = [
-        (driver1, 'MSSQL'),
-        (driver2, 'MYSQL'),
-        (driver3, 'MARIADB'),
-        (driver4, 'POSTGRES'),
+        (1, 'MSSQL SQLAlchemy mssql+pyodbc'),
+        (2, 'MYSQL SQLAlchemy mysql+pymysql'),
+        (3, 'MARIADB SQLAlchemy mssql+pyodbc'),
+        (4, 'POSTGRES SQLAlchemy postgresql+psycopg2'),
+        #(5, 'MSSQL pyodbc'),
     ]
 
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     connection_name = models.CharField(max_length=255, null=False)
+    data_base_type = models.CharField(choices=DBTYPE, null=False)
+    #driver = models.IntegerField(choices=DRIVERS, default=1)
     url = models.CharField(max_length=255, blank=True, null=True)
-    data_base_type = models.CharField(choices=DBTYPE, blank=True, null=True)
-    driver = models.IntegerField(choices=DRIVERS, blank=True, null=True) ##### пока не надо, понадобится если на 1 субд пользователь будет выбирать из несколькких драйверов
     user_name = models.CharField(max_length=16, blank=True, null=True)
     password = models.CharField(max_length=128, blank=True, null=True)
     host = models.CharField(max_length=60, blank=True, null=True)
@@ -69,8 +54,7 @@ class ClientDB(models.Model):
             if not str_query or str_query is None or str_query == '':
                 result = {'user_id': user_id, 'fieldname': None, 'data': None, 'error': None}
             else:
-                result = self.get_query(user_id, url, host, port, password, driver, user_name,
-                                        data_base_name, str_query)
+                result = self.get_query(user_id, url, host, port, password, driver, user_name, data_base_name, str_query)
             return result
         except exc.SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
