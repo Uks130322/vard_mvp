@@ -5,7 +5,7 @@ from sqlalchemy.sql import text
 from sqlalchemy import exc
 import pandas as pd
 import pyodbc
-from sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS
+from appchart_DB.sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS, DATABASETYPE_DIC, EXTENSION_DIC
 import json
 import base64
 import os
@@ -17,102 +17,127 @@ from io import StringIO, BytesIO
 MEDIA_DIR = 'C:\\pitonprojekt\\vard_mvp\\vard\media'
 TEMP_FILES_DIR = MEDIA_DIR+'\\temp_files\\'
 
-#url, user_name, password, host, port, data_base_name, str_query
+
 class Work:
-    def __init__(self, **kwargs):
-        self.SUBDja = kwargs["SUBDja"]
-        self.SUBD = self.set_subd
-        self.driver = SQLCREDITS[self.SUBD]["driver"]
-        self.driver2 = SQLCREDITS[self.SUBD]["driver2"]
-        self.user = SQLCREDITS[self.SUBD]["user"]
-        self.pwd = SQLCREDITS[self.SUBD]["pwd"]
-        self.hostname = SQLCREDITS[self.SUBD]["hostname"]
-        self.port = SQLCREDITS[self.SUBD]["port"]
-        self.bdname = kwargs["bdname"]
-        self.dbname = self.set_dbname
-        self.datadir = SQLCREDITS[self.SUBD]["volumes"]["DATA_DIR"]
-        self.logdir = SQLCREDITS[self.SUBD]["volumes"]["LOG_DIR"]
-        self.backupdir = SQLCREDITS[self.SUBD]["volumes"]["BACKUP_DIR"]
-        self.echo = False #True #False
-        self.connection = self.get_string_connection
-        self.engine = self.get_engine
-        self.querykw = kwargs["query"]
-        self.query = self.set_query
-        self.ext = kwargs["ext"]
-        self.extension = self.set_extension
+    def __init__(self, data_base_type, url, user_name, password, host, port, data_base_name, str_query, extension):
+        self.data_base_type = data_base_type
+        self.data_base_type_cleaned = self.set_data_base_type
+        self.url = url
+        #self.url_cleaned = self.set_url
+        self.user_name = user_name
+        self.password = password
+        self.host = host
+        self.port = port
+        self.port_cleaned = self.set_port
+        self.data_base_name = data_base_name
+        self.str_query = str_query
+        self.str_query_cleaned = self.set_str_query
+        self.extension = extension
+        self.extension_cleaned = self.set_extension
+        self.driver_cleaned = self.set_driver
+        self.driver2_cleaned = self.set_driver2
+        self.echo = False  # True #False
         self.filename = self.set_filename
         self.path = self.set_path
         self.status = self.set_status
+        self.engine = self.set_engine
+
+    @property
+    def set_data_base_type(self):
+        for item in DATABASETYPE_DIC:
+            if self.data_base_type == item['id'] and item['is_available']:
+                result = self.data_base_type
+                break
+            else:
+                result = 'ERROR'
+        return result
+
+    @property
+    def set_extension(self):
+        for item in EXTENSION_DIC:
+            if self.extension == item['id'] and item['is_available']:
+                result = self.extension
+                break
+            else:
+                result = f'filetype {self.extension} not supported yet'
+        return result
+
+    @property
+    def set_port(self):
+        for item in DATABASETYPE_DIC:
+            if self.data_base_type == item['id'] and item['is_available'] and not self.port:
+                result = item['port']
+                break
+            else:
+                result = self.port
+        return result
 
     @property
     def set_status(self):
-        if self.querykw:
+        if self.str_query:
             self.status = 'ok'
         else:
             self.status = 'test connection'
         return self.status
 
     @property
-    def set_query(self):
-        if self.querykw:
-            self.query = self.querykw
-        else:
-            self.query = "select 1"
-        return self.query
+    def set_filename(self):
+        self.filename = uuid.uuid4()
+        return self.filename
 
     @property
-    def set_subd(self):
-        if self.SUBDja in LISTSUBD:
-            return self.SUBDja
-        else:
-            self.SUBDja = 'ERROR'
-            return self.SUBDja
+    def set_path(self):
+        self.path = f'{TEMP_FILES_DIR}{self.filename}.{self.extension}'
+        return self.path
 
     @property
-    def set_extension(self):
-        if self.ext in EXTENSIONS:
-            return self.ext
+    def set_str_query(self):
+        if self.str_query:
+            result = self.str_query
         else:
-            return f'filetype {self.ext} not supported yet'
+            result = "select 1"
+        return result
 
     @property
-    def set_dbname(self):
-        if self.bdname:
-            self.dbname = self.bdname
-        else:
-            self.dbname = SQLCREDITS[self.SUBD]["dbname"]
-        return self.dbname
+    def set_driver(self):
+        for item in DATABASETYPE_DIC:
+            if self.data_base_type == item['id'] and item['is_available']:
+                result = item['driver']
+                break
+            else:
+                result = 'ERROR'
+        return result
 
     @property
-    def get_string_connection(self):
-        if self.SUBD == "MSSQL-DOCKER" or self.SUBD == "MSSQL-HOSTING" :
-            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}{self.driver2}"
-        elif self.SUBD in ("MYSQLROOT-DOCKER", "MYSQLROOT-HOSTING", "MYSQL-DOCKER", "MYSQL-HOSTING"):
-            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}"
-        elif self.SUBD in ("POSTGRES-DOCKER", "POSTGRES-HOSTING"):
-            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}"
-        elif self.SUBD in ("MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING"):
-            self.connection = f"{self.driver}://{self.user}:{self.pwd}@{self.hostname}:{self.port}/{self.dbname}"
+    def set_driver2(self):
+        for item in DATABASETYPE_DIC:
+            if self.data_base_type == item['id'] and item['is_available']:
+                result = item['driver2']
+                break
+            else:
+                result = 'ERROR'
+        return result
+
+    #@property
+    def set_url(self):
+        if self.url:
+            result = self.url
         else:
-            self.connection = None
-        return self.connection
+            result = f"{self.driver_cleaned}://{self.user_name}:{self.password}@{self.host}:{self.port}/{self.data_base_name}{self.driver2_cleaned}"
+        return result
 
     @property
-    def get_engine(self):
-        if self.SUBD == "MSSQL-DOCKER" or self.SUBD == "MSSQL-HOSTING" :
-            try:
-                self.engine = create_engine(self.connection, fast_executemany=True, echo=self.echo).execution_options(isolation_level="AUTOCOMMIT")
-            except Exception as e:
-                print(format(e))
-                self.engine = None
-        elif self.SUBD in ("MYSQLROOT-DOCKER", "MYSQLROOT-HOSTING", "MYSQL-DOCKER", "MYSQL-HOSTING","POSTGRES-DOCKER","POSTGRES-HOSTING",
-                           "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING"):
-            try:
-                self.engine = create_engine(self.connection, echo=self.echo)
-            except Exception as e:
-                print(format(e))
-                self.engine = None
-        else:
+    def set_engine(self):
+        try:
+            if self.data_base_type_cleaned == 1:
+                """'id': 1, 'name': 'MSSQL SQLAlchemy mssql+pyodbc'"""
+                self.engine = create_engine(self.set_url(), fast_executemany=True, echo=self.echo).execution_options(isolation_level="AUTOCOMMIT")
+            elif self.data_base_type_cleaned  in [2,3,4]:
+                self.engine = create_engine(self.set_url(), echo=self.echo)
+            else:
+                self.engine = f'{self.url_cleaned} not aviable yet'
+        except Exception as e:
+            print(format(e))
             self.engine = None
         return self.engine
 
@@ -125,16 +150,6 @@ class Work:
     def file_b64decode(self, file):
         decoded = base64.b64decode(file)
         return decoded
-
-    @property
-    def set_filename(self):
-        self.filename = uuid.uuid4()
-        return self.filename
-
-    @property
-    def set_path(self):
-        self.path = f'{TEMP_FILES_DIR}{self.filename}.{self.extension}'
-        return self.path
 
     def data_to_file(self, rows):
         if self.extension == 'xlsx':
@@ -159,41 +174,35 @@ class Work:
     def get_result(self):
         Session = sessionmaker(autoflush=False, bind=self.engine)
         with Session(autoflush=False, bind=self.engine) as db:
-            sql = text(self.query)
+            sql = text(self.str_query)
             try:
                 rows = db.execute(sql).all()
                 encoded = self.data_to_file(rows)
                 self.rezult = {'http_code': 200,'status': self.status, 'name': f'{self.filename}', 'rezult': encoded, 'extension': self.extension, 'countrows': len(rows)}
             except Exception as e:
                 if format(e).find('This result object does not return rows') >= 0:
-                    self.rezult = {'http_code': 204,'status': self.status, 'name': '', 'result': format(e), 'extension': '', 'query': self.query, 'countrows': 0}
+                    self.rezult = {'http_code': 204,'status': self.status, 'name': '', 'result': format(e), 'extension': '', 'query': self.str_query, 'countrows': 0}
                 else:
-                    self.rezult = {'http_code': 400,'status': 'error', 'name': '', 'result': format(e), 'extension': '', 'query': self.query, 'countrows': None}
+                    self.rezult = {'http_code': 400,'status': 'error', 'name': '', 'result': format(e), 'extension': '', 'query': self.str_query, 'countrows': None}
             return self.rezult
 
 
 L = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",
      "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING","POSTGRES-DOCKER","POSTGRES-HOSTING",]
 
+SUBD = "MYSQLROOT-DOCKER"
+user = SQLCREDITS[SUBD]["user"]
+pwd = SQLCREDITS[SUBD]["pwd"]
+hostname = SQLCREDITS[SUBD]["hostname"]
+port = SQLCREDITS[SUBD]["port"]
+bdname = SQLCREDITS[SUBD]["dbname"]
+query = "select 'fff' as j"
+extension = "csv"
 
-#url, user_name, password, host, port, data_base_name, str_query
-#Work(SUBDja="MYSQLROOT-DOCKER", bdname="", query="select 'fff' as j", ext="csv")
-x = Work(SUBDja="MYSQLROOT-DOCKER", bdname="", query="select 'fff' as j", ext="csv").get_result();
-print(x)
+
+x = Work(data_base_type=2, url="", user_name=user, password=pwd, host=hostname, port=port, data_base_name=bdname, str_query=query, extension=extension);
+print(x.get_result())
+print(x.set_engine)
 
 
-# from django.db import models
-#
-# class ModelDeal(models.Model):
-#     STATUS_CHOISES = (
-#         ('ok', 'Выполнена'),
-#         ('new', 'Новая заявка'),
-#         ('cancel', 'Отменена'),
-#         ('error', 'Ошибка'),
-#         ('timesup', 'Время вышло'),
-#     )
-#     deal_status = models.CharField('Статус', max_length=50, choices=STATUS_CHOISES, default='new')
-#
-# var = ModelDeal.return_choises()
-# print(var)
 

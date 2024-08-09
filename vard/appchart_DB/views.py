@@ -17,7 +17,7 @@ from appchart_DB.serializers import (DashboardSerializer, ChartSerializer,
 
 from appchart_DB.models import ClientDB, ClientData, Chart
 from appuser.models import User
-from sql_alhimia import Work
+from appchart_DB.sql_alhimia import Work
 
 
 class DashboardViewSet(viewsets.ModelViewSet):

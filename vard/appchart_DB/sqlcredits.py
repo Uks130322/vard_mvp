@@ -143,22 +143,51 @@ logdir = SQLCREDITS[SUBD]["volumes"]["LOG_DIR"]
 # 3 "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING"
 # 4 "POSTGRES-DOCKER","POSTGRES-HOSTING"
 
+
 ###################################################
 
-EXTENSION_DIC = {
-    'xls': False,
-    'xlsx': True,
-    'xlsb': False,
-    'csv': True,
-    'json': True,
-    'pandas': False,
-}
+DATABASETYPE_DIC = [
+    {'id': 1, 'name': 'MSSQL SQLAlchemy mssql+pyodbc', 'is_available': True, 'port': 1433, 'driver': 'mssql+pyodbc', 'driver2': '?driver=ODBC+Driver+17+for+SQL+Server'},
+    {'id': 2, 'name': 'MYSQL SQLAlchemy mysql+pymysql', 'is_available': True, 'port': 3306, 'driver': 'mysql+pymysql', 'driver2': '?charset=utf8mb4'},
+    {'id': 3, 'name': 'MARIADB SQLAlchemy mssql+pyodbc', 'is_available': True, 'port': 3306, 'driver': 'mysql+pymysql', 'driver2': ''},
+    {'id': 4, 'name': 'POSTGRES SQLAlchemy postgresql+psycopg2', 'is_available': True, 'port': 5432, 'driver': 'postgresql+psycopg2', 'driver2': ''},
+    {'id': 5, 'name': 'MSSQL pyodbc', 'is_available': False, 'port': 1433, 'driver': '', 'driver2': ''},
+    ]
+
+DATABASETYPE = []
+for dic in DATABASETYPE_DIC:
+    if dic['is_available']:
+        tuple = (dic['id'], dic['name'])
+        DATABASETYPE.append(tuple)
+#print(DATABASETYPE)
+
+###################################################
+
+# EXTENSION_DIC = {
+#     'xls': False,
+#     'xlsx': True,
+#     'xlsb': False,
+#     'csv': True,
+#     'json': True,
+#     'pandas': False,
+# }
+
+EXTENSION_DIC = [
+                 {'id': 1, 'extension': False, 'name': 'json api', 'is_available': True},
+                 {'id': 2, 'extension': 'xls', 'name': 'excel xls', 'is_available': False},
+                 {'id': 3, 'extension': 'xlsx', 'name': 'excel xlsx', 'is_available': True},
+                 {'id': 4, 'extension': 'xlsb', 'name': 'excel xlsb', 'is_available': False},
+                 {'id': 5, 'extension': 'csv', 'name': 'csv', 'is_available': True},
+                 {'id': 6, 'extension': 'json', 'name': 'json', 'is_available': True},
+                 {'id': 7, 'extension': 'pandas', 'name': 'pandas', 'is_available': False},
+                ]
+
 
 EXTENSIONS = []
-
-for key, value in EXTENSION_DIC.items():
-    if value == True:
-        EXTENSIONS.append(key)
+for dic in EXTENSION_DIC:
+    if dic['is_available']:
+        EXTENSIONS.append(dic['extension'])
+#print('EXTENSIONS ',EXTENSIONS)
 
 ###################################################
 
