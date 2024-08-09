@@ -31,6 +31,22 @@ services:
     networks:
       - mynetwork
 
+  testmysql:
+    container_name: testmysql
+    image: mysql:latest
+    restart: always
+    ports:
+      - 6001:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: rootmysql
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: mysqlpass
+      MYSQL_DATABASE: bdmysql
+    volumes:
+      - ./dbdata:/var/lib/mysql/
+    networks:
+      - mynetwork
+
 volumes:
   pg_data:
     driver: local
