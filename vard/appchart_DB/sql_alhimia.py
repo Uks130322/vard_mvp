@@ -178,7 +178,7 @@ class Work:
             try:
                 rows = db.execute(sql).all()
                 encoded = self.data_to_file(rows)
-                self.rezult = {'http_code': 200,'status': self.status, 'name': f'{self.filename}', 'rezult': encoded, 'extension': self.extension, 'countrows': len(rows)}
+                self.rezult = {'http_code': 200,'status': self.status, 'name': f'{self.filename}', 'result': encoded, 'extension': self.extension, 'query': self.str_query, 'countrows': len(rows)}
             except Exception as e:
                 if format(e).find('This result object does not return rows') >= 0:
                     self.rezult = {'http_code': 204,'status': self.status, 'name': '', 'result': format(e), 'extension': '', 'query': self.str_query, 'countrows': 0}
@@ -197,7 +197,7 @@ hostname = SQLCREDITS[SUBD]["hostname"]
 port = SQLCREDITS[SUBD]["port"]
 bdname = SQLCREDITS[SUBD]["dbname"]
 query = "select 'fff' as j"
-extension = "csv"
+extension = ""
 
 
 x = Work(data_base_type=2, url="", user_name=user, password=pwd, host=hostname, port=port, data_base_name=bdname, str_query=query, extension=extension);
