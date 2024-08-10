@@ -12,10 +12,8 @@ import os
 import uuid
 import io
 from io import StringIO, BytesIO
-
-
-MEDIA_DIR = 'C:\\pitonprojekt\\vard_mvp\\vard\media'
-TEMP_FILES_DIR = MEDIA_DIR+'\\temp_files\\'
+import os
+from pathlib import Path
 
 
 class Work:
@@ -34,6 +32,7 @@ class Work:
         self.str_query_cleaned = self.set_str_query
         self.extension = extension
         self.extension_cleaned = self.set_extension
+        self.extension_cleaned_name = self.set_extension_name
         self.driver_cleaned = self.set_driver
         self.driver2_cleaned = self.set_driver2
         self.echo = False  # True #False
@@ -57,6 +56,16 @@ class Work:
         for item in EXTENSION_DIC:
             if self.extension == item['id'] and item['is_available']:
                 result = self.extension
+                break
+            else:
+                result = f'filetype {self.extension} not supported yet'
+        return result
+
+    @property
+    def set_extension_name(self):
+        for item in EXTENSION_DIC:
+            if self.extension_cleaned == item['id']:
+                result = item['name']
                 break
             else:
                 result = f'filetype {self.extension} not supported yet'
@@ -87,7 +96,9 @@ class Work:
 
     @property
     def set_path(self):
-        self.path = f'{TEMP_FILES_DIR}{self.filename}.{self.extension}'
+        MEDIA_DIR = os.path.join(Path(__file__).resolve().parent.parent, 'media')
+        TEMP_FILES_DIR = os.path.join(MEDIA_DIR, 'temp_files')
+        self.path = f'{TEMP_FILES_DIR}/{self.filename}.{self.extension}'
         return self.path
 
     @property
@@ -124,6 +135,7 @@ class Work:
             result = self.url
         else:
             result = f"{self.driver_cleaned}://{self.user_name}:{self.password}@{self.host}:{self.port}/{self.data_base_name}{self.driver2_cleaned}"
+        #print('result--------',result)
         return result
 
     @property
@@ -137,7 +149,7 @@ class Work:
             else:
                 self.engine = f'{self.url_cleaned} not aviable yet'
         except Exception as e:
-            print(format(e))
+            #print(format(e))
             self.engine = None
         return self.engine
 
@@ -152,18 +164,17 @@ class Work:
         return decoded
 
     def data_to_file(self, rows):
-        if self.extension == 'xlsx':
+        if self.extension_cleaned_name == 'xlsx':
             pd.DataFrame(rows).to_excel(self.path)
             result = self.file_b64encode(self.path)
             os.remove(self.path)
             return result
-        elif self.extension == 'json':
+        elif self.extension_cleaned_name == 'json':
             data = [row._asdict() for row in rows]
             json_data = json.dumps(data)
             result = base64.b64encode(json_data.encode('utf-8'))
-
             return result
-        elif self.extension == 'csv':
+        elif self.extension_cleaned_name == 'csv':
             pd.DataFrame(rows).to_csv(self.path, sep='\t', encoding='utf-8', index=False, header=True, float_format='%.2f')
             result = self.file_b64encode(self.path)
             os.remove(self.path)
@@ -177,8 +188,11 @@ class Work:
             sql = text(self.str_query)
             try:
                 rows = db.execute(sql).all()
-                encoded = self.data_to_file(rows)
-                self.rezult = {'http_code': 200,'status': self.status, 'name': f'{self.filename}', 'result': encoded, 'extension': self.extension, 'query': self.str_query, 'countrows': len(rows)}
+                if self.extension_cleaned == 1:
+                    encoded = [row._asdict() for row in rows]
+                else:
+                    encoded = self.data_to_file(rows)
+                self.rezult = {'http_code': 200,'status': self.status, 'name': f'{self.filename}', 'result': encoded, 'extension': self.extension_cleaned_name, 'query': self.str_query, 'countrows': len(rows)}
             except Exception as e:
                 if format(e).find('This result object does not return rows') >= 0:
                     self.rezult = {'http_code': 204,'status': self.status, 'name': '', 'result': format(e), 'extension': '', 'query': self.str_query, 'countrows': 0}
@@ -200,9 +214,9 @@ query = "select 'fff' as j"
 extension = ""
 
 
-x = Work(data_base_type=2, url="", user_name=user, password=pwd, host=hostname, port=port, data_base_name=bdname, str_query=query, extension=extension);
-print(x.get_result())
-print(x.set_engine)
+# x = Work(data_base_type=2, url="", user_name=user, password=pwd, host=hostname, port=port, data_base_name=bdname, str_query=query, extension=extension);
+# print(x.get_result())
+# print(x.set_engine)
 
 
 
