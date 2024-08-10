@@ -19,6 +19,7 @@ idna==3.6
 importlib_metadata==7.1.0
 inflection==0.5.1
 Markdown==3.6
+matplotlib==3.7.5
 mysqlclient==2.2.4
 oauthlib==3.2.2
 packaging==24.0

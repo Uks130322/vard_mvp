@@ -30,14 +30,15 @@ schema_view = get_schema_view(
    permission_classes=(permissions.IsAuthenticated, permissions.IsAdminUser,),
 )
 
-
 router = DefaultRouterWithSimpleViews()
+
 router.registry.extend(appchart_DBrouter.registry)
 router.registry.extend(appchatrouter.registry)
 router.registry.extend(appcommentrouter.registry)
 router.registry.extend(appfeedbackrouter.registry)
 router.registry.extend(appfilerouter.registry)
 router.registry.extend(appuserrouter.registry)
+
 router.register(r'register',RegisterView, basename="register")
 router.register(r'login', LoginView, basename="login")
 router.register(r'logout', LogoutView, basename="logout")
@@ -51,10 +52,9 @@ router.register(r'github_login', GitHubLogin, basename="github_login")
 urlpatterns = [
     path('admin/', admin.site.urls), # нет в свагере
     path('api/accounts/', include('allauth.urls')), # нет в свагере
-
     path('api/', include(router.urls)),
 
     path('drf/', include('rest_framework.urls', namespace='rest_framework')), # нет в свагере # не работает путь
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'), # нет в свагере
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'), # нет в свагере
-]
+
