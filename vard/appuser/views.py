@@ -13,6 +13,9 @@ from dj_rest_auth.serializers import TokenSerializer
 from appuser.models import Access, User
 from appuser.serializers import UserSerializer, AccessSerializer
 
+from django.shortcuts import render, redirect, get_object_or_404
+
+
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
@@ -88,3 +91,10 @@ class AccessViewSet(viewsets.ModelViewSet):
         else:
             queryset = Access.objects.filter(owner_id=self.request.user)
         return queryset
+
+
+
+
+
+def FlatpageView(request):
+    return render(request, 'defaults/default_api.html')
