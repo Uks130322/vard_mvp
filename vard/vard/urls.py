@@ -57,4 +57,4 @@ urlpatterns = [
     path('drf/', include('rest_framework.urls', namespace='rest_framework')), # нет в свагере # не работает путь
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'), # нет в свагере
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'), # нет в свагере
-
+]
