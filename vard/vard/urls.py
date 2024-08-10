@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
-from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
+from dj_rest_auth.views import (LoginView, LogoutView, UserDetailsView,
+                                PasswordResetView, PasswordResetConfirmView, PasswordChangeView)
 from rest_framework import permissions, routers
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -40,6 +41,9 @@ router.registry.extend(appuserrouter.registry)
 router.register(r'register',RegisterView, basename="register")
 router.register(r'login', LoginView, basename="login")
 router.register(r'logout', LogoutView, basename="logout")
+router.register(r'password/reset', PasswordResetView, basename="password_reset")
+router.register(r'password/reset/confirm', PasswordResetConfirmView, basename="password_reset_confirm")
+router.register(r'password/change', PasswordChangeView, basename="password_change")
 router.register(r'user', UserDetailsView, basename="user_details")
 router.register(r'google_login', GoogleLogin, basename="google_login")
 router.register(r'github_login', GitHubLogin, basename="github_login")
