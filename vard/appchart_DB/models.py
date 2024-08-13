@@ -1,55 +1,28 @@
 from django.db import models
 from sqlalchemy import exc
-
+#from appchart_DB.sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS
 from appuser.models import User
-
+from appchart_DB.sqlcredits import EXTENSION_DIC, DATABASETYPE_DIC
 
 class ClientDB(models.Model):
-    driver1 = 1
-    DRIVERS = [
-        (driver1, 'SQLAlchemy for MySQL'),
-    ]
+
+    DBTYPE = []
+    for dic in DATABASETYPE_DIC:
+        if dic['is_available']:
+            tuple = (dic['id'], dic['name'])
+            DBTYPE.append(tuple)
 
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    connection_name = models.CharField(max_length=255, null=False, default='')
-    user_name = models.CharField(max_length=16, null=False)
-    password = models.CharField(max_length=128, null=False)
-    driver = models.IntegerField(choices=DRIVERS, default=driver1)
-    url = models.CharField(max_length=255, null=True)
-    host = models.CharField(max_length=60, null=True, default='localhost')
-    port = models.IntegerField(null=True, default=3306)
-    data_base_type = models.CharField(null=True, max_length=255)
-    data_base_name = models.CharField(max_length=63, null=False)
-    description = models.CharField(null=True, max_length=255)
-    str_datas_for_connection = models.CharField(blank=True, null=True, max_length=255)
-
-    def get_responses(self, id):
-        try:
-            user = User.objects.get(id=self.user.id)
-            connect = ClientDB.objects.get(id=id)
-            user_id = user.id
-            url = connect.url
-            host = connect.host
-            port = connect.port
-            password = connect.password
-            driver = connect.driver
-            user_name = connect.user_name
-            data_base_name = connect.data_base_name
-            str_query = connect.str_query
-            if not str_query or str_query is None or str_query == '':
-                result = {'user_id': user_id, 'fieldname': None, 'data': None, 'error': None}
-            else:
-                result = self.get_query(user_id, url, host, port, password, driver, user_name,
-                                        data_base_name, str_query)
-            return result
-        except exc.SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
-            result = {'user_id': user_id, 'fieldname': None, 'data': None, 'error': f'{error}'}
-            return result
-
-    def update_response(self, id):
-        result = self.get_responses(id)
-        return result
+    connection_name = models.CharField(max_length=255, null=False)
+    data_base_type = models.CharField(choices=DBTYPE, null=False)
+    #driver = models.IntegerField(choices=DRIVERS, default=1)
+    url = models.CharField(max_length=255, blank=True, null=True)
+    user_name = models.CharField(max_length=16, blank=True, null=True)
+    password = models.CharField(max_length=128, blank=True, null=True)
+    host = models.CharField(max_length=60, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    data_base_name = models.CharField(max_length=63, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f'{self.connection_name}'
@@ -61,6 +34,12 @@ class ClientData(models.Model):
 
 
 class Chart(models.Model):
+    EXTENSIONS = []
+    for dic in EXTENSION_DIC:
+        if dic['is_available']:
+            tuple = (dic['id'], dic['name'])
+            EXTENSIONS.append(tuple)
+
 
     class PlotType(models.IntegerChoices):
         PLOT = 1
@@ -101,14 +80,28 @@ class Chart(models.Model):
     image_format = models.IntegerField(choices=ImageFormat.choices, default=0, verbose_name='image format')
     plot = models.TextField(blank=True, null=True, verbose_name='plot_in_base64')
 
+    str_query = models.TextField(blank=True)
+    clientdata = models.OneToOneField('ClientData', on_delete=models.CASCADE)
+    extension = models.IntegerField(choices=EXTENSIONS, default=1)
 
     def __str__(self):
         return f'{self.id} {self.user_id}'
 
 
+class ClientData(models.Model):
+
+    # EXTENSIONS = []
+    # for dic in EXTENSION_DIC:
+    #     if dic['is_available']:
+    #         tuple = (dic['id'], dic['name'])
+    #         EXTENSIONS.append(tuple)
+
+    #charts_id = models.ForeignKey(Chart, on_delete=models.CASCADE, verbose_name='charts id', null=True)
 class Dashboard(models.Model):
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='dashboard id')
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
+    #extension = models.IntegerField(choices=EXTENSIONS, default=1)
+    data = models.TextField(blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name='date of creation')
     date_change = models.DateTimeField(auto_now=True, verbose_name='date of change')
     chart = models.ManyToManyField(Chart, blank=True, through='ChartDashboard')

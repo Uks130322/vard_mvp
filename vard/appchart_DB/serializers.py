@@ -47,6 +47,8 @@ class ChartSerializer(serializers.HyperlinkedModelSerializer):
             'color',
             'image_format',
             'plot',
+            'clientdata',
+            'extension',
         ]
         extra_kwargs = {
             'user_id': {'read_only': True},
@@ -125,14 +127,14 @@ class ClientDBSerializer(serializers.HyperlinkedModelSerializer):
             'connection_name',
             'user_name',
             'password',
-            'driver',
+            #'driver',
             'url',
             'host',
             'port',
             'data_base_type',
             'data_base_name',
             'description',
-            'str_datas_for_connection'
+            #'str_datas_for_connection'
         ]
         extra_kwargs = {
             # 'user': {'write_only': True},
@@ -146,6 +148,5 @@ class ClientDBSerializer(serializers.HyperlinkedModelSerializer):
             'port': {'write_only': False},
             'data_base_type': {'write_only': False},
             'data_base_name': {'write_only': False},
-
-            'str_datas_for_connection': {'read_only': True},
+            #'str_datas_for_connection': {'read_only': True},
         }

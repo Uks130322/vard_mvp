@@ -17,7 +17,7 @@ from appchart_DB.serializers import (DashboardSerializer, ChartSerializer,
                                      ChartDashboardSerializer, ClientDataSerializer, ClientDBSerializer)
 
 from appuser.models import User
-
+from appchart_DB.sql_alhimia import Work
 
 class DashboardViewSet(viewsets.ModelViewSet):
     """
@@ -137,57 +137,28 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             query = ClientDB.objects.filter(user_id=user_)
             return query
 
-    def get_host(self, url, host, port):
-        if host == 'localhost' or host == '127.0.0.1':
-            result = host
-        elif port == '' or port is None or not port:
-            result = f'{url}:3306'
-        else:
-            result = f'{url}:{port}'
-        return result
-
     def get_str_connect_sqlalchemy(self, user_name, password, url, host, port, data_base_name):
         password_new = password.replace('@', '%40')
         password_new = re.escape(password_new)
-        host_new = self.get_host(url, host, port)
-        str_connect = f"mysql://{user_name}:{password_new}@{host_new}/{data_base_name}"
+        str_connect = Work(data_base_type=2, url="", user_name=user_name, password=password_new,
+                           host=host, port=port, data_base_name=data_base_name, str_query="", extension="").set_url()
         return str_connect
 
-    def get_engine(self, user_name, password, url, host, port, data_base_name):
-        str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
-        engine = create_engine(f"{str_connect_new}", echo=False)
-        return engine
-
-    def create_data_base(self, user_name, password, url, host, port, data_base_name):
-        str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
-        if not database_exists(f"{str_connect_new}"):
-            create_database(f"{str_connect_new}")
-            return f'{data_base_name} создана'
-        else:
-            return f'{data_base_name} уже существует'
-
-    def drop_data_base(self, user_name, password, url, host, port, data_base_name):
-        str_connect_new = self.get_str_connect(user_name, password, url, host, port, data_base_name)
-        if database_exists(f"{str_connect_new}"):
-            drop_database(f"{str_connect_new}")
-            return f'{data_base_name} удалена'
-        else:
-            return f'{data_base_name} не найдена'
-
     def get_query(self, user_name, password, url, host, port, data_base_name, str_query, user_id):
-        engine = self.get_engine(user_name, password, url, host, port, data_base_name)
-        Session = sessionmaker(autoflush=False, bind=engine)
-        with Session(autoflush=False, bind=engine) as db:
-            rows = db.execute(text(str_query)).fetchall()
-            user = [{'user_id': user_id}]
-            result = user + [r._asdict() for r in rows]
+        password_new = password.replace('@', '%40')
+        password_new = re.escape(password_new)
+        str_connect = Work(data_base_type=2, url="", user_name=user_name, password=password_new, host=host, port=port,
+                           data_base_name=data_base_name, str_query=str_query, extension="")
+        rows = str_connect.get_result()
+        user = [{'user_id': user_id}]
+        result = user + rows
         return result
 
     def perform_create(self, serializer):
         # serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         datas = serializer.validated_data
-        str_datas_for_connection = self.get_str_connect_sqlalchemy(
+        url = self.get_str_connect_sqlalchemy(
             datas['user_name'],
             datas['password'],
             datas['url'],
@@ -197,20 +168,19 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         )
         return serializer.save(
             user_id=self.request.user,
-            str_datas_for_connection=str_datas_for_connection
+            url=url
         )
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         """Updating str_datas_for_connection in case of updating ClientDB object"""
         clientdb = self.get_object()
-        # print('clientdb', clientdb.user_name)
         serializer = ClientDBSerializer(clientdb, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             id = request.parser_context['kwargs']['pk']
             clientdbinstance = ClientDB.objects.get(id=id)
-            str_datas_for_connection = self.get_str_connect_sqlalchemy(
+            url = self.get_str_connect_sqlalchemy(
                 clientdbinstance.user_name,
                 clientdbinstance.password,
                 clientdbinstance.url,
@@ -218,7 +188,7 @@ class ClientDBViewSet(viewsets.ModelViewSet):
                 clientdbinstance.port,
                 clientdbinstance.data_base_name
             )
-            clientdbinstance.str_datas_for_connection = str_datas_for_connection
+            clientdbinstance.url = url
             clientdbinstance.save()
             return serializer
         else:
@@ -253,16 +223,12 @@ class ClientDataViewSet(viewsets.ModelViewSet):
         for i, j in zip(client_data, old_response_data.data):
             obj = Chart.objects.get(id=i.chart.id)
             str_query = obj.str_query
-            str_datas_for_connection = ClientDB.objects.get(id=obj.clientdb_id.id).str_datas_for_connection
+            extension = obj.extension
+            url = ClientDB.objects.get(id=obj.clientdb_id.id).url
             try:
-                engine = create_engine(f"{str_datas_for_connection}", echo=False)
-                Session = sessionmaker(autoflush=False, bind=engine)
-                with Session(autoflush=False, bind=engine) as db:
-                    rows = db.execute(text(str_query)).fetchall()
-                    result = [r._asdict() for r in rows]
-                    if not ClientData.objects.filter(id=i.chart.id):
-                        ClientData.objects.filter(id=i.chart.id).update(data=result)
-                print('i.chart.id', i.chart.id)
+                x = Work(data_base_type=2, url="mysql+pymysql://root:rootmysql@localhost:6001/bdmysql?charset=utf8mb4", user_name="", password="", host="", port="",
+                         data_base_name="", str_query=str_query, extension=extension)
+                result = x.get_result()
             except exc.SQLAlchemyError as e:
                 error = str(e.__dict__['orig'])
             if not error:
@@ -283,15 +249,13 @@ class ClientDataViewSet(viewsets.ModelViewSet):
         for i, j in zip(client_data, old_response_data.data):
             obj = Chart.objects.get(id=i.chart.id)
             str_query = obj.str_query
-            str_datas_for_connection = ClientDB.objects.get(id=obj.clientdb_id.id).str_datas_for_connection
+            extension = obj.extension
+            url = ClientDB.objects.get(id=obj.clientdb_id.id).url
             try:
-                engine = create_engine(f"{str_datas_for_connection}", echo=False)
-                Session = sessionmaker(autoflush=False, bind=engine)
-                with Session(autoflush=False, bind=engine) as db:
-                    rows = db.execute(text(str_query)).fetchall()
-                    result = [r._asdict() for r in rows]
-                    if not ClientData.objects.filter(id=i.chart.id):
-                        ClientData.objects.filter(id=i.chart.id).update(data=result)
+                x = Work(data_base_type=2, url=url,
+                         user_name="", password="", host="", port="",
+                         data_base_name="", str_query=str_query, extension=extension)
+                result = x.get_result()
             except exc.SQLAlchemyError as e:
                 error = str(e.__dict__['orig'])
             if not error:
