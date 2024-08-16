@@ -29,8 +29,18 @@ class ClientDB(models.Model):
 
 
 class ClientData(models.Model):
+    # EXTENSIONS = []
+    # for dic in EXTENSION_DIC:
+    #     if dic['is_available']:
+    #         tuple = (dic['id'], dic['name'])
+    #         EXTENSIONS.append(tuple)
+
+    # charts_id = models.ForeignKey(Chart, on_delete=models.CASCADE, verbose_name='charts id', null=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
     data = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.data}'
 
 
 class Chart(models.Model):
@@ -80,23 +90,12 @@ class Chart(models.Model):
     image_format = models.IntegerField(choices=ImageFormat.choices, default=0, verbose_name='image format')
     plot = models.TextField(blank=True, null=True, verbose_name='plot_in_base64')
 
-    str_query = models.TextField(blank=True)
-    clientdata = models.OneToOneField('ClientData', on_delete=models.CASCADE)
     extension = models.IntegerField(choices=EXTENSIONS, default=1)
 
     def __str__(self):
         return f'{self.id} {self.user_id}'
 
 
-class ClientData(models.Model):
-
-    # EXTENSIONS = []
-    # for dic in EXTENSION_DIC:
-    #     if dic['is_available']:
-    #         tuple = (dic['id'], dic['name'])
-    #         EXTENSIONS.append(tuple)
-
-    #charts_id = models.ForeignKey(Chart, on_delete=models.CASCADE, verbose_name='charts id', null=True)
 class Dashboard(models.Model):
     # id = models.AutoField(primary_key=True, blank=False, null=False, unique=True, verbose_name='dashboard id')
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')

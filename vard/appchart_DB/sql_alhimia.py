@@ -1,10 +1,11 @@
+from urllib.parse import quote_plus
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy import exc
 import pandas as pd
-import pyodbc
+# import pyodbc
 from appchart_DB.sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS, DATABASETYPE_DIC, EXTENSION_DIC
 import json
 import base64
@@ -23,7 +24,7 @@ class Work:
         self.url = url
         #self.url_cleaned = self.set_url
         self.user_name = user_name
-        self.password = password
+        self.password = quote_plus(password)
         self.host = host
         self.port = port
         self.port_cleaned = self.set_port
@@ -98,7 +99,7 @@ class Work:
     def set_path(self):
         MEDIA_DIR = os.path.join(Path(__file__).resolve().parent.parent, 'media')
         TEMP_FILES_DIR = os.path.join(MEDIA_DIR, 'temp_files')
-        self.path = f'{TEMP_FILES_DIR}/{self.filename}.{self.extension}'
+        self.path = os.path.join(TEMP_FILES_DIR, f'{self.filename}.{self.extension}')
         return self.path
 
     @property
@@ -129,12 +130,22 @@ class Work:
                 result = 'ERROR'
         return result
 
-    #@property
+    # @property
     def set_url(self):
         if self.url:
             result = self.url
         else:
-            result = f"{self.driver_cleaned}://{self.user_name}:{self.password}@{self.host}:{self.port}/{self.data_base_name}{self.driver2_cleaned}"
+            # password_updated = quote_plus(self.password) # to encode special symbols
+            result = (f"{self.driver_cleaned}://{self.user_name}:{self.password}@"
+                      f"{self.host}:{self.port}/{self.data_base_name}{self.driver2_cleaned}")
+            # result = URL.create(
+            #     self.driver_cleaned,
+            #     username=self.user_name,
+            #     password=self.password,
+            #     host=self.host,
+            #     port=self.port_cleaned,
+            #     database=self.data_base_name,
+            # )
         #print('result--------',result)
         return result
 
@@ -143,11 +154,12 @@ class Work:
         try:
             if self.data_base_type_cleaned == 1:
                 """'id': 1, 'name': 'MSSQL SQLAlchemy mssql+pyodbc'"""
-                self.engine = create_engine(self.set_url(), fast_executemany=True, echo=self.echo).execution_options(isolation_level="AUTOCOMMIT")
+                self.engine = create_engine(self.set_url(), fast_executemany=True,
+                                            echo=self.echo).execution_options(isolation_level="AUTOCOMMIT")
             elif self.data_base_type_cleaned  in [2,3,4]:
                 self.engine = create_engine(self.set_url(), echo=self.echo)
             else:
-                self.engine = f'{self.url_cleaned} not aviable yet'
+                self.engine = f'{self.set_url()} not aviable yet'
         except Exception as e:
             #print(format(e))
             self.engine = None
@@ -175,7 +187,8 @@ class Work:
             result = base64.b64encode(json_data.encode('utf-8'))
             return result
         elif self.extension_cleaned_name == 'csv':
-            pd.DataFrame(rows).to_csv(self.path, sep='\t', encoding='utf-8', index=False, header=True, float_format='%.2f')
+            pd.DataFrame(rows).to_csv(self.path, sep='\t', encoding='utf-8',
+                                      index=False, header=True, float_format='%.2f')
             result = self.file_b64encode(self.path)
             os.remove(self.path)
             return result
@@ -192,13 +205,37 @@ class Work:
                     encoded = [row._asdict() for row in rows]
                 else:
                     encoded = self.data_to_file(rows)
-                self.rezult = {'http_code': 200,'status': self.status, 'name': f'{self.filename}', 'result': encoded, 'extension': self.extension_cleaned_name, 'query': self.str_query, 'countrows': len(rows)}
+                self.result = {
+                    'http_code': 200,
+                    'status': self.status,
+                    'name': f'{self.filename}',
+                    'result': encoded,
+                    'extension': self.extension_cleaned_name,
+                    'query': self.str_query,
+                    'countrows': len(rows)
+                }
             except Exception as e:
                 if format(e).find('This result object does not return rows') >= 0:
-                    self.rezult = {'http_code': 204,'status': self.status, 'name': '', 'result': format(e), 'extension': '', 'query': self.str_query, 'countrows': 0}
+                    self.result = {
+                        'http_code': 204,
+                        'status': self.status,
+                        'name': '',
+                        'result': format(e),
+                        'extension': '',
+                        'query': self.str_query,
+                        'countrows': 0
+                    }
                 else:
-                    self.rezult = {'http_code': 400,'status': 'error', 'name': '', 'result': format(e), 'extension': '', 'query': self.str_query, 'countrows': None}
-            return self.rezult
+                    self.result = {
+                        'http_code': 400,
+                        'status': 'error',
+                        'name': '',
+                        'result': format(e),
+                        'extension': '',
+                        'query': self.str_query,
+                        'countrows': None
+                    }
+            return self.result
 
 
 L = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",

@@ -2,6 +2,7 @@ import re
 
 from django.db import transaction
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -57,23 +58,53 @@ class ChartViewSet(viewsets.ModelViewSet):
     filterset_fields = ['user_id__id', 'clientdata__id']
 
     def perform_create(self, serializer):
-        """The creator is automatically assigned as user_id; if x_data and y_data are provided, a plot is creating"""
+        """The creator is automatically assigned as user_id"""
         datas = serializer.validated_data
-        if datas['x_data'] and datas['y_data']:
-            plot=create_plot(
-                key_x=datas['x_data'],
-                key_y=datas['y_data'],
-                chart_data=datas['clientdata__data'],
-                image_format=datas['image_format'],
-                x_label=datas['x_label'],
-                y_label=datas['y_label'],
-                color=datas['color'],
-                title=datas['title'],
-                plot_type=datas['plot_type']
+        return serializer.save(user_id=self.request.user, **datas)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        """If x_data and y_data are provided, a plot is creating"""
+        instance = self.get_object()
+        datas = self.request.data
+        try:
+            connection_obj = Work(
+                data_base_type=int(instance.clientdb_id.data_base_type),
+                url=instance.clientdb_id.url,
+                user_name="",
+                password="",
+                host="",
+                port="",
+                data_base_name="",
+                str_query=instance.str_query,
+                extension=1
             )
-        else:
-            plot = None
-        return serializer.save(user_id=self.request.user, plot=plot, **datas)
+            chart_data = connection_obj.get_result()['result']
+            if datas['x_data'] and datas['y_data']:
+                plot=create_plot(
+                    key_x=datas['x_data'],
+                    key_y=datas['y_data'],
+                    chart_data=chart_data,
+                    image_format=Chart.ImageFormat(int(datas["image_format"])).name,
+                    x_label=datas['x_label'],
+                    y_label=datas['y_label'],
+                    color=Chart.Color(datas['color']).name,
+                    title=datas['title'],
+                    plot_type=Chart.PlotType(int(datas["plot_type"])).name
+                )
+            else:
+                plot = None
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(plot=plot)
 
     def get_permissions(self):
         if self.action == 'list':
@@ -137,18 +168,36 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             query = ClientDB.objects.filter(user_id=user_)
             return query
 
-    def get_str_connect_sqlalchemy(self, user_name, password, url, host, port, data_base_name):
-        password_new = password.replace('@', '%40')
-        password_new = re.escape(password_new)
-        str_connect = Work(data_base_type=2, url="", user_name=user_name, password=password_new,
-                           host=host, port=port, data_base_name=data_base_name, str_query="", extension="").set_url()
+    def get_str_connect_sqlalchemy(self, data_base_type, user_name, password, url, host, port, data_base_name):
+        # password_new = password.replace('@', '%40')
+        # password_new = re.escape(password_new)
+        str_connect = Work(
+            data_base_type=data_base_type,
+            url=url,
+            user_name=user_name,
+            password=password,
+            host=host,
+            port=port,
+            data_base_name=data_base_name,
+            str_query="",
+            extension=""
+        ).set_url()
         return str_connect
 
-    def get_query(self, user_name, password, url, host, port, data_base_name, str_query, user_id):
-        password_new = password.replace('@', '%40')
-        password_new = re.escape(password_new)
-        str_connect = Work(data_base_type=2, url="", user_name=user_name, password=password_new, host=host, port=port,
-                           data_base_name=data_base_name, str_query=str_query, extension="")
+    def get_query(self, data_base_type, user_name, password, url, host, port, data_base_name, str_query, user_id):
+        # password_new = password.replace('@', '%40')
+        # password_new = re.escape(password_new)
+        str_connect = Work(
+            data_base_type=data_base_type,
+            url="",
+            user_name=user_name,
+            password=password,
+            host=host,
+            port=port,
+            data_base_name=data_base_name,
+            str_query=str_query,
+            extension=""
+        )
         rows = str_connect.get_result()
         user = [{'user_id': user_id}]
         result = user + rows
@@ -159,12 +208,13 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         datas = serializer.validated_data
         url = self.get_str_connect_sqlalchemy(
-            datas['user_name'],
-            datas['password'],
-            datas['url'],
-            datas['host'],
-            datas['port'],
-            datas['data_base_name']
+            data_base_type=int(datas['data_base_type']),
+            user_name=datas['user_name'],
+            password=datas['password'],
+            url=datas['url'],
+            host=datas['host'],
+            port=datas['port'],
+            data_base_name=datas['data_base_name']
         )
         return serializer.save(
             user_id=self.request.user,
@@ -179,17 +229,18 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             id = request.parser_context['kwargs']['pk']
-            clientdbinstance = ClientDB.objects.get(id=id)
+            clientdb_instance = ClientDB.objects.get(id=id)
             url = self.get_str_connect_sqlalchemy(
-                clientdbinstance.user_name,
-                clientdbinstance.password,
-                clientdbinstance.url,
-                clientdbinstance.host,
-                clientdbinstance.port,
-                clientdbinstance.data_base_name
+                data_base_type=int(clientdb_instance.data_base_type),
+                user_name=clientdb_instance.user_name,
+                password=clientdb_instance.password,
+                url=clientdb_instance.url,
+                host=clientdb_instance.host,
+                port=clientdb_instance.port,
+                data_base_name=clientdb_instance.data_base_name
             )
-            clientdbinstance.url = url
-            clientdbinstance.save()
+            clientdb_instance.url = url
+            clientdb_instance.save()
             return serializer
         else:
             return Response({
@@ -215,7 +266,7 @@ class ClientDataViewSet(viewsets.ModelViewSet):
             return get_custom_queryset(ClientData, self.request.user, self.kwargs)
 
     def list(self, request, *args, **kwargs):
-        L = []
+        new_data_list = []
         result = []
         error = ''
         old_response_data = super(ClientDataViewSet, self).list(request, *args, **kwargs)
@@ -225,22 +276,32 @@ class ClientDataViewSet(viewsets.ModelViewSet):
             str_query = obj.str_query
             extension = obj.extension
             url = ClientDB.objects.get(id=obj.clientdb_id.id).url
+            data_base_type = int(ClientDB.objects.get(id=obj.clientdb_id.id).data_base_type)
             try:
-                x = Work(data_base_type=2, url="mysql+pymysql://root:rootmysql@localhost:6001/bdmysql?charset=utf8mb4", user_name="", password="", host="", port="",
-                         data_base_name="", str_query=str_query, extension=extension)
-                result = x.get_result()
+                connection_obj = Work(
+                    data_base_type=data_base_type,
+                    url=url,
+                    user_name="",
+                    password="",
+                    host="",
+                    port="",
+                    data_base_name="",
+                    str_query=str_query,
+                    extension=extension
+                )
+                result = connection_obj.get_result()
             except exc.SQLAlchemyError as e:
                 error = str(e.__dict__['orig'])
             if not error:
                 j['data'] = result
             else:
                 j['error'] = error
-            L.append(j)
-        new_response_data = L
+            new_data_list.append(j)
+        new_response_data = new_data_list
         return Response(new_response_data)
 
     def retrieve(self, request, pk, *args, **kwargs):
-        L = []
+        new_data_list = []
         result = []
         error = ''
         old_response_data = super(ClientDataViewSet, self).list(request, *args, **kwargs)
@@ -251,19 +312,28 @@ class ClientDataViewSet(viewsets.ModelViewSet):
             str_query = obj.str_query
             extension = obj.extension
             url = ClientDB.objects.get(id=obj.clientdb_id.id).url
+            data_base_type = int(ClientDB.objects.get(id=obj.clientdb_id.id).data_base_type)
             try:
-                x = Work(data_base_type=2, url=url,
-                         user_name="", password="", host="", port="",
-                         data_base_name="", str_query=str_query, extension=extension)
-                result = x.get_result()
+                connection_obj = Work(
+                    data_base_type=data_base_type,
+                    url=url,
+                    user_name="",
+                    password="",
+                    host="",
+                    port="",
+                    data_base_name="",
+                    str_query=str_query,
+                    extension=extension
+                )
+                result = connection_obj.get_result()
             except exc.SQLAlchemyError as e:
                 error = str(e.__dict__['orig'])
             if not error:
                 j['data'] = result
             else:
                 j['error'] = error
-            L.append(j)
-        if not L:
-            L = [{'error': 'access denied'}]
-        new_response_data = L
+            new_data_list.append(j)
+        if not new_data_list:
+            new_data_list = [{'error': 'access denied'}]
+        new_response_data = new_data_list
         return Response(new_response_data)
