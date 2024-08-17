@@ -231,8 +231,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = '/usr/src/app/staticfiles'
 SITE_URL = 'http://127.0.0.1:8000'
-MEDIA_URL = ''  # TODO clarify details
+MEDIA_URL = 'media/'  # TODO clarify details
 MEDIA_ROOT = os.path.join('files')
+MEDIA_DIR = os.path.join(BASE_DIR, 'media')
+
 ### статика #######################################################################
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -330,3 +332,4 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+#print('MEDIA_DIR',MEDIA_DIR)
