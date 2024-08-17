@@ -25,7 +25,8 @@ load_dotenv(dotenv_path)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.getenv('SECRET_KEY')
-SECRET_KEY = 'django-insecure-u(wb%zucp82-c%gx!4a^+akbs=-%g50dw^06t*9w%ayt9auxym'
+#SECRET_KEY = 'django-insecure-u(wb%zucp82-c%gx!4a^+akbs=-%g50dw^06t*9w%ayt9auxym'
+SECRET_KEY = os.environ.get('SECRET_KEY','django-insecure-u(wb%zucp82-c%gx!4a^+akbs=-%g50dw^06t*9w%ayt9auxym')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -168,13 +169,11 @@ WSGI_APPLICATION = 'vard.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'admin',
-        # 'USER': 'postgres',
-        'PASSWORD': 'prod',
-        # 'HOST': 'localhost',
-        'HOST': 'db',
-        'PORT': '5432',
+        'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
+        'USER': os.getenv('DJANGO_DB_LOGIN', 'admin'),
+        'PASSWORD': os.getenv('DJANGO_DB_PASS', 'prod'),
+        'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
+        'PORT': os.getenv('DJANGO_DB_PORT', 5432),
     }
 }
 #     'default': {

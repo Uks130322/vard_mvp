@@ -111,9 +111,9 @@ services:
 volumes:
   pg_data:
     driver: local
-  testpgdata:
-    driver: local
-  mssqldata:
+#  testpgdata:
+#    driver: local
+#  mssqldata:
 #  sqlsystem:
 #  sqldata:
 #  sqllog:
