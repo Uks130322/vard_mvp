@@ -1,15 +1,9 @@
-import re
-
 from django.db import transaction
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from sqlalchemy import create_engine, exc
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql import text
-from sqlalchemy_utils import create_database, drop_database, database_exists
+from sqlalchemy import exc
 
 from appchart_DB.models import Dashboard, Chart, ClientData, ChartDashboard, ClientDB
 from appchart_DB.permissions import DataAccessPermission, DataAccessPermissionSafe, get_custom_queryset
@@ -18,7 +12,8 @@ from appchart_DB.serializers import (DashboardSerializer, ChartSerializer,
                                      ChartDashboardSerializer, ClientDataSerializer, ClientDBSerializer)
 
 from appuser.models import User
-from appchart_DB.sql_alhimia import Work
+from appchart_DB.sql_alhimia_utils import Work
+
 
 class DashboardViewSet(viewsets.ModelViewSet):
     """
@@ -139,7 +134,6 @@ class ChartViewSet(viewsets.ModelViewSet):
             })
 
 
-
 class ChartDashboardViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows dashboards to be viewed or edited.
@@ -208,7 +202,7 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         datas = serializer.validated_data
         url = self.get_str_connect_sqlalchemy(
-            data_base_type=int(datas['data_base_type']),
+            data_base_type=datas['data_base_type'],
             user_name=datas['user_name'],
             password=datas['password'],
             url=datas['url'],
@@ -223,15 +217,17 @@ class ClientDBViewSet(viewsets.ModelViewSet):
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
+        # TODO doesn't work
         """Updating str_datas_for_connection in case of updating ClientDB object"""
+        partial = kwargs.pop('partial', False)
         clientdb = self.get_object()
-        serializer = ClientDBSerializer(clientdb, data=request.data, partial=True)
+        serializer = ClientDBSerializer(clientdb, data=request.data, partial=partial)
         if serializer.is_valid():
             serializer.save()
             id = request.parser_context['kwargs']['pk']
             clientdb_instance = ClientDB.objects.get(id=id)
             url = self.get_str_connect_sqlalchemy(
-                data_base_type=int(clientdb_instance.data_base_type),
+                data_base_type=clientdb_instance.data_base_type,
                 user_name=clientdb_instance.user_name,
                 password=clientdb_instance.password,
                 url=clientdb_instance.url,

@@ -41,8 +41,6 @@ class DataAccessPermission(BasePermission):
             return is_owner or is_editor
 
 
-
-
 class DataAccessPermissionSafe(BasePermission):
     """
     For files, charts and dashboards with no editing, just create and SAFE_METHODS.

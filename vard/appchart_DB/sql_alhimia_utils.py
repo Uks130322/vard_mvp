@@ -1,30 +1,25 @@
 from urllib.parse import quote_plus
 
-from sqlalchemy import create_engine, URL
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
-from sqlalchemy import exc
 import pandas as pd
-# import pyodbc
-from appchart_DB.sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS, DATABASETYPE_DIC, EXTENSION_DIC
+from appchart_DB.sqlcredits import SQLCREDITS, DATABASETYPE_DIC, EXTENSION_DIC
 import json
 import base64
-import os
 import uuid
-import io
-from io import StringIO, BytesIO
 import os
 from pathlib import Path
 
 
 class Work:
+    """Class to connection with user DB and get result of SQL-request"""
     def __init__(self, data_base_type, url, user_name, password, host, port, data_base_name, str_query, extension):
         self.data_base_type = data_base_type
         self.data_base_type_cleaned = self.set_data_base_type
         self.url = url
-        #self.url_cleaned = self.set_url
         self.user_name = user_name
-        self.password = quote_plus(password)
+        self.password = quote_plus(password)  # to encode special symbols
         self.host = host
         self.port = port
         self.port_cleaned = self.set_port
@@ -36,7 +31,7 @@ class Work:
         self.extension_cleaned_name = self.set_extension_name
         self.driver_cleaned = self.set_driver
         self.driver2_cleaned = self.set_driver2
-        self.echo = False  # True #False
+        self.echo = False
         self.filename = self.set_filename
         self.path = self.set_path
         self.status = self.set_status
@@ -135,18 +130,8 @@ class Work:
         if self.url:
             result = self.url
         else:
-            # password_updated = quote_plus(self.password) # to encode special symbols
             result = (f"{self.driver_cleaned}://{self.user_name}:{self.password}@"
                       f"{self.host}:{self.port}/{self.data_base_name}{self.driver2_cleaned}")
-            # result = URL.create(
-            #     self.driver_cleaned,
-            #     username=self.user_name,
-            #     password=self.password,
-            #     host=self.host,
-            #     port=self.port_cleaned,
-            #     database=self.data_base_name,
-            # )
-        #print('result--------',result)
         return result
 
     @property
@@ -240,6 +225,7 @@ class Work:
 
 L = ["MSSQL-DOCKER","MSSQL-HOSTING","MYSQLROOT-DOCKER","MYSQLROOT-HOSTING","MYSQL-DOCKER","MYSQL-HOSTING",
      "MARIADB-DOCKER","MARIADB-HOSTING","MARIADBROOT-DOCKER","MARIADBROOT-HOSTING","POSTGRES-DOCKER","POSTGRES-HOSTING",]
+
 
 SUBD = "MYSQLROOT-DOCKER"
 user = SQLCREDITS[SUBD]["user"]

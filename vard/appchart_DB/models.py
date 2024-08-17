@@ -1,6 +1,4 @@
 from django.db import models
-from sqlalchemy import exc
-#from appchart_DB.sqlcredits import LISTSUBD, SQLCREDITS, EXTENSIONS
 from appuser.models import User
 from appchart_DB.sqlcredits import EXTENSION_DIC, DATABASETYPE_DIC
 
@@ -15,7 +13,6 @@ class ClientDB(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     connection_name = models.CharField(max_length=255, null=False)
     data_base_type = models.CharField(choices=DBTYPE, null=False)
-    #driver = models.IntegerField(choices=DRIVERS, default=1)
     url = models.CharField(max_length=255, blank=True, null=True)
     user_name = models.CharField(max_length=16, blank=True, null=True)
     password = models.CharField(max_length=128, blank=True, null=True)
@@ -29,12 +26,6 @@ class ClientDB(models.Model):
 
 
 class ClientData(models.Model):
-    # EXTENSIONS = []
-    # for dic in EXTENSION_DIC:
-    #     if dic['is_available']:
-    #         tuple = (dic['id'], dic['name'])
-    #         EXTENSIONS.append(tuple)
-
     # charts_id = models.ForeignKey(Chart, on_delete=models.CASCADE, verbose_name='charts id', null=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user id')
     data = models.TextField(blank=True, null=True)
@@ -49,7 +40,6 @@ class Chart(models.Model):
         if dic['is_available']:
             tuple = (dic['id'], dic['name'])
             EXTENSIONS.append(tuple)
-
 
     class PlotType(models.IntegerChoices):
         PLOT = 1
