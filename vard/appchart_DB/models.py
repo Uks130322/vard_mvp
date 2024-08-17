@@ -12,7 +12,7 @@ class ClientDB(models.Model):
 
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     connection_name = models.CharField(max_length=255, null=False)
-    data_base_type = models.CharField(choices=DBTYPE, null=False)
+    data_base_type = models.CharField(choices=DBTYPE, null=True)
     url = models.CharField(max_length=255, blank=True, null=True)
     user_name = models.CharField(max_length=16, blank=True, null=True)
     password = models.CharField(max_length=128, blank=True, null=True)
