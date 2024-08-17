@@ -22,7 +22,7 @@ COPY . .
 
 ENV DJANGO_SETTINGS_MODULE=vard.settings
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH /app
+ENV PYTHONPATH=/app
 
 RUN python manage.py collectstatic --noinput
 

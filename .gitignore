@@ -15,3 +15,5 @@ vard/.env
 client_google
 API_urls.txt
 /files/
+/dbdata/
+/vard/media/
