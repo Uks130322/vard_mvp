@@ -15,7 +15,8 @@ from appcomment.urls import router as appcommentrouter
 from appfeedback.urls import router as appfeedbackrouter
 from appfile.urls import router as appfilerouter
 from appuser.urls import router as appuserrouter
-
+from appinvite.urls import router as appinviterouter
+from appinvite.views import InviteViewSet
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -39,6 +40,7 @@ router.registry.extend(appfeedbackrouter.registry)
 router.registry.extend(appfilerouter.registry)
 router.registry.extend(appuserrouter.registry)
 
+
 router.register(r'register',RegisterView, basename="register")
 router.register(r'login', LoginView, basename="login")
 router.register(r'logout', LogoutView, basename="logout")
@@ -48,7 +50,7 @@ router.register(r'password/change', PasswordChangeView, basename="password_chang
 router.register(r'user', UserDetailsView, basename="user_details")
 router.register(r'google_login', GoogleLogin, basename="google_login")
 router.register(r'github_login', GitHubLogin, basename="github_login")
-
+router.register(r'invite', InviteViewSet, basename="invite")
 urlpatterns = [
     path('admin/', admin.site.urls), # нет в свагере
     path('api/accounts/', include('allauth.urls')), # нет в свагере

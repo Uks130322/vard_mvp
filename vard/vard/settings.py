@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'appchart_DB',
     'appfeedback',
     'appfile',
+    'appinvite',
 
     # allauth
     'allauth',
