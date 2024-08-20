@@ -11,18 +11,25 @@ from django.shortcuts import render
 import hashlib
 import uuid
 
+
 class InviteViewSet(viewsets.ModelViewSet):
     queryset = Invite.objects.all()
     serializer_class = InviteSerializer
 
     def perform_create(self, serializer):
         datas = serializer.validated_data
-        print('datas ', datas)
+        # email = serializer.validated_data['email']
+        # user = User.objects.filter(email=email)
+        # if user:
+        #     print('user ', user)
+        # print('datas ', datas)
         id = hashlib.sha3_512(f'{uuid.uuid4()}'.encode('utf-8')).hexdigest()
         #link = hashlib.sha3_512(f'{self.request.user}'.encode('utf-8')).hexdigest()
         return serializer.save(owner_id=self.request.user, id=id, **datas)
 
-
+    #написать принятие приглашения и отказ. принятием будет считаться регистрация.
+    #при регистрации удалять записи из приглашения
+    #предусмотреть удаление учётки.
 
 
 

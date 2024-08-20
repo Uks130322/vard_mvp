@@ -26,6 +26,7 @@ class InviteSerializer(serializers.ModelSerializer):
             'id',
             'owner_id',
             'email',
+            'access_type_id',
             'date_invite',
         ]
 

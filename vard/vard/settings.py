@@ -59,12 +59,14 @@ INSTALLED_APPS = [
 
     # users apps
     'appchat',
-    'appuser',
+    #'appuser',
     'appcomment',
     'appchart_DB',
     'appfeedback',
     'appfile',
-    'appinvite',
+    #'appinvite',
+    'appinvite.apps.AppinviteConfig',
+    'appuser.apps.AppuserConfig',
 
     # allauth
     'allauth',
