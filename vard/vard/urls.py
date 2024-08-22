@@ -15,7 +15,6 @@ from appcomment.urls import router as appcommentrouter
 from appfeedback.urls import router as appfeedbackrouter
 from appfile.urls import router as appfilerouter
 from appuser.urls import router as appuserrouter
-from appinvite.urls import router as appinviterouter
 from appinvite.views import InviteViewSet
 
 schema_view = get_schema_view(
@@ -51,6 +50,7 @@ router.register(r'user', UserDetailsView, basename="user_details")
 router.register(r'google_login', GoogleLogin, basename="google_login")
 router.register(r'github_login', GitHubLogin, basename="github_login")
 router.register(r'invite', InviteViewSet, basename="invite")
+
 urlpatterns = [
     path('admin/', admin.site.urls), # нет в свагере
     path('api/accounts/', include('allauth.urls')), # нет в свагере

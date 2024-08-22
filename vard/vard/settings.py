@@ -261,7 +261,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+#ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 # ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}
 ACCOUNT_USERNAME_BLACKLIST = ["admin", "administrator", "moderator"]
 ACCOUNT_USERNAME_MIN_LENGTH = 4
@@ -314,18 +314,24 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
 
 
 ### мыло #######################################################################
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_USE_SSL = True
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-
+#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" #для яндекса не нужно
+EMAIL_HOST = os.getenv("EMAIL_HOST",'smtp.yandex.ru')
+EMAIL_PORT = os.getenv("EMAIL_PORT",465)
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER",'stds58')
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD","jfvqkihjqxvoxkhg")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL",True)
+#EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+ACCOUNT_CONFIRM_EMAIL_ON_GET = os.getenv("ACCOUNT_CONFIRM_EMAIL_ON_GET",True)
+#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'
 MANAGERS = [("n1", "stds58@gmail.com")]
-ADMINS = [("n2", "stds58@yandex.ru")]
-SERVER_EMAIL = 'stds58@yandex.ru'
+ADMINS = [("n3", "stds58@yandex.ru")] #("n2", "stds58@yandex.ru"),
+SERVER_EMAIL = os.getenv("SERVER_EMAIL",'stds58@yandex.ru')
 ### мыло #######################################################################
+
+### для того чтобы в ссылку вставить ip хоста, на котором запущен сервер #######################################################################
+CURRENT_HOST = os.getenv("CURRENT_HOST",'81.200.151.85:8000')
+### для того чтобы в ссылку вставить ip хоста, на котором запущен серве #######################################################################
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

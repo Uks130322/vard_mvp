@@ -17,6 +17,7 @@ class Invite(models.Model):
     email = models.EmailField(unique=True)
     access_type_id = models.IntegerField(choices=AccessType.choices, null=False)
     date_invite = models.DateTimeField(auto_now_add=True)
+    status_sending = models.CharField(max_length=4000, null=True, blank=True)
 
     class Meta:
         unique_together = ('owner_id', 'email')

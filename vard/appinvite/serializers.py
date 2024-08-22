@@ -28,6 +28,7 @@ class InviteSerializer(serializers.ModelSerializer):
             'email',
             'access_type_id',
             'date_invite',
+            'status_sending',
         ]
 
         extra_kwargs = {
@@ -35,6 +36,7 @@ class InviteSerializer(serializers.ModelSerializer):
             'owner_id': {'read_only': True},
             #'email': {'read_only': True},
             'date_invite': {'read_only': True},
+            'status_sending': {'read_only': True},
         }
 
 

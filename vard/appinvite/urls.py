@@ -8,4 +8,5 @@ router.register(r'invite', views.InviteViewSet, basename='invite')
 
 urlpatterns = [
     path('', include(router.urls)),
+
 ]
