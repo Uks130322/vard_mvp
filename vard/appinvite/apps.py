@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class AppuserConfig(AppConfig):
+class AppinviteConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'appuser'
+    name = 'appinvite'
 
     def ready(self):
         import appinvite.signals
