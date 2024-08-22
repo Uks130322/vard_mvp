@@ -149,10 +149,10 @@ class ClientDBViewSet(viewsets.ModelViewSet):
     filterset_fields = ['user_id__id']
 
     def get_permissions(self):
-        # if self.action == 'list':
-        #     permission_classes = [IsAuthenticated]
-        # else:
-        permission_classes = [IsAuthenticated, DataAccessPermission]
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, DataAccessPermission]
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
@@ -160,7 +160,7 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             return ClientDB.objects.all()
         else:
             user_ = User.objects.get(email=self.request.user)
-            query = ClientDB.objects.filter(user_id=user_)
+            query = get_custom_queryset(ClientDB, self.request.user, self.kwargs)
             return query
 
     def get_str_connect_sqlalchemy(self, data_base_type, user_name, password, url, host, port, data_base_name):

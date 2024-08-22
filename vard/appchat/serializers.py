@@ -1,8 +1,12 @@
+import logging
+
 from django.db.models import Q
 from rest_framework import serializers
 
 from appchat.models import Chat, Message
 from appuser.models import User, Access
+
+logging.basicConfig(level=logging.INFO)
 
 
 class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
@@ -11,9 +15,10 @@ class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
     def get_queryset(self):
         request = self.context.get("request")
         user = User.objects.get(email=request.user)
-        access_owners = Access.objects.filter(Q(user_id=user) |
-                                              Q(owner_id=user)).values('owner_id')
-        chats = Chat.objects.filter(owner_id__in=access_owners).values('id')
+        access_owners = Access.objects.filter(Q(user_id=user) | Q(owner_id=user)).values('owner_id')
+        access_owners = [access_owner['owner_id'] for access_owner in access_owners] + [user.id]
+        # logging.info(access_owners)
+        chats = Chat.objects.filter(Q(owner_id__id__in=access_owners))
         return chats
 
 
@@ -33,7 +38,7 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MessageSerializer(serializers.HyperlinkedModelSerializer):
-    # chat_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
+    chat_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
     class Meta:
         model = Message
         fields = [
