@@ -81,7 +81,7 @@ def get_custom_queryset(model, request_user, kwargs):
         return model.objects.all()
     access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
     if access_owners.exists() and 'pk' not in kwargs:
-        list_access_owner = []
+        list_access_owner = [user_.id]
         for access_owner in access_owners:
             list_access_owner.append(access_owner['owner_id'])
         users = User.objects.filter(id__in=list_access_owner)

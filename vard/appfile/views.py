@@ -1,3 +1,6 @@
+import base64
+import logging
+
 from rest_framework import viewsets, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -6,6 +9,8 @@ from rest_framework.response import Response
 from appchart_DB.permissions import get_custom_queryset, DataAccessPermission
 from appfile.models import File
 from appfile.serializers import FileSerializer
+
+logging.basicConfig(level=logging.INFO)
 
 
 class FileViewSet(viewsets.ModelViewSet):
@@ -50,3 +55,14 @@ class FileViewSet(viewsets.ModelViewSet):
         else:
             queryset = get_custom_queryset(File, self.request.user, self.kwargs)
         return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Add b64str to response.
+        Instead of this we can use FileResponse, it will return the file as it is but without other information
+        """
+        instance =  self.get_object()
+        instance.b64str = base64.b64encode(instance.link.read())
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

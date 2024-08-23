@@ -12,11 +12,25 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = File
-        fields = '__all__'
+        b64str = serializers.CharField(read_only=True, allow_blank=True, allow_null=True)
+        fields = [
+            'id',
+            'name',
+            'link',
+            'date_creation',
+            'date_change',
+            'date_delete',
+            'user_id',
+            'user_url',
+            'publish',
+            'type_id',
+            'b64str',
+        ]
         extra_kwargs = {
             'date_delete': {'read_only': True},
             'user_id': {'read_only': True},
             'type_id': {'read_only': True},
+            'b64str': {'read_only': True},
         }
 
     def load_by_url(self, validated_data):
@@ -42,7 +56,7 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
         file.type_id = File.FilesType[file_type].value
         file.save()
 
-        # delete duplicate files, don't work correctly
+        # check the hash of the file and delete duplicate files, don't work correctly
         #
         # path_instance = f'{settings.BASE_DIR}{settings.MEDIA_URL}files/{file.link}'.replace('\\', '/')
         # hash_instance = get_hash_md5(path_instance)
