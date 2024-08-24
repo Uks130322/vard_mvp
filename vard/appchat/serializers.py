@@ -1,8 +1,12 @@
+import logging
+
 from django.db.models import Q
 from rest_framework import serializers
 
 from appchat.models import Chat, Message
 from appuser.models import User, Access
+
+logging.basicConfig(level=logging.INFO)
 
 
 class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
@@ -10,36 +14,31 @@ class ChatUserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
 
     def get_queryset(self):
         request = self.context.get("request")
-        user_ = User.objects.get(email=request.user)
-        access_owners = Access.objects.filter(Q(user_id=user_) | Q(owner_id=user_)).values('owner_id')
-        list_access_owner = list()
-        list_access_owner.append(user_.id)
-        for access_owner in access_owners:
-            list_access_owner.append(access_owner['owner_id'])
-        users = User.objects.filter(id__in=list_access_owner)
-        query = User.objects.filter(id__in=users)
-        return query
+        user = User.objects.get(email=request.user)
+        access_owners = Access.objects.filter(Q(user_id=user) | Q(owner_id=user)).values('owner_id')
+        access_owners = [access_owner['owner_id'] for access_owner in access_owners] + [user.id]
+        # logging.info(access_owners)
+        chats = Chat.objects.filter(Q(owner_id__id__in=access_owners))
+        return chats
 
 
 class ChatSerializer(serializers.HyperlinkedModelSerializer):
-    # owner_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
 
     class Meta:
         model = Chat
         fields = [
             'id',
             'owner_id',
-            'user_id',
-            'date_send',
         ]
 
         extra_kwargs = {
             'id': {'read_only': True},
-            'user_id': {'read_only': True},
+            'owner_id': {'read_only': True},
         }
 
 
 class MessageSerializer(serializers.HyperlinkedModelSerializer):
+    chat_id = ChatUserFilteredPrimaryKeyRelatedField(many=False)
     class Meta:
         model = Message
         fields = [

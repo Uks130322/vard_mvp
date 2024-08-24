@@ -10,6 +10,7 @@ from rest_framework import viewsets
 from dj_rest_auth.app_settings import api_settings
 from dj_rest_auth.serializers import TokenSerializer
 
+from appchat.models import Chat
 from appuser.models import Access, User
 from appuser.serializers import UserSerializer, AccessSerializer
 
@@ -40,6 +41,7 @@ class RegisterView(RegisterView, viewsets.GenericViewSet):
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
+        Chat(owner_id=user).save()
         api_settings.TOKEN_CREATOR(self.token_model, user, serializer)
 
         complete_signup(

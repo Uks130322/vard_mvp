@@ -146,6 +146,7 @@ class ChartDashboardViewSet(viewsets.ModelViewSet):
 class ClientDBViewSet(viewsets.ModelViewSet):
     queryset = ClientDB.objects.all()
     serializer_class = ClientDBSerializer
+    filterset_fields = ['user_id__id']
 
     def get_permissions(self):
         if self.action == 'list':
@@ -159,12 +160,10 @@ class ClientDBViewSet(viewsets.ModelViewSet):
             return ClientDB.objects.all()
         else:
             user_ = User.objects.get(email=self.request.user)
-            query = ClientDB.objects.filter(user_id=user_)
+            query = get_custom_queryset(ClientDB, self.request.user, self.kwargs)
             return query
 
     def get_str_connect_sqlalchemy(self, data_base_type, user_name, password, url, host, port, data_base_name):
-        # password_new = password.replace('@', '%40')
-        # password_new = re.escape(password_new)
         str_connect = Work(
             data_base_type=data_base_type,
             url=url,
@@ -179,8 +178,6 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         return str_connect
 
     def get_query(self, data_base_type, user_name, password, url, host, port, data_base_name, str_query, user_id):
-        # password_new = password.replace('@', '%40')
-        # password_new = re.escape(password_new)
         str_connect = Work(
             data_base_type=data_base_type,
             url="",
@@ -198,7 +195,6 @@ class ClientDBViewSet(viewsets.ModelViewSet):
         return result
 
     def perform_create(self, serializer):
-        # serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         datas = serializer.validated_data
         url = self.get_str_connect_sqlalchemy(

@@ -26,7 +26,7 @@ class ChartClientdbFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedF
 
 
 class ChartSerializer(serializers.HyperlinkedModelSerializer):
-    clientdb_id = ChartClientdbFilteredPrimaryKeyRelatedField(many=False)
+    # clientdb_id = ChartClientdbFilteredPrimaryKeyRelatedField(many=False)
 
     class Meta:
         model = Chart
@@ -87,7 +87,7 @@ class ChartDashboardFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelated
 
 
 class DashboardSerializer(WritableNestedModelSerializer):
-    chart = ChartDashboardFilteredPrimaryKeyRelatedField(many=True)
+    # chart = ChartDashboardFilteredPrimaryKeyRelatedField(many=True)
 
     class Meta:
         model = Dashboard
