@@ -1,4 +1,4 @@
-#version: '3.8'
+version: '3.8'
 
 services:
   vardserver:
@@ -18,6 +18,21 @@ services:
     networks:
       - mynetwork
 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - djangoapp
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./static:/static
+      - ./media:/media
+    command: /bin/sh -c "mkdir -p /etc/nginx/certs && cd /etc/nginx/certs && openssl req -newkey rsa:2048 -nodes -keyout server.key -x509 -days 365 -out server.crt -subj '/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourUnit/CN=localhost/emailAddress=youremail@example.com' && nginx -g 'daemon off;'"
+    networks:
+      - mynetwork
+
   db:
     image: postgres:13
     environment:
@@ -32,19 +47,19 @@ services:
       - mynetwork
 
 ### test db ####
-#  testmariadb:
-#    container_name: testmariadb
-#    image: mariadb:latest
-#    ports:
-#      - 6000:3306
-#    environment:
-#      MARIADB_USER: mariauser
-#      MARIADB_PASSWORD: mariapass
-#      MARIADB_ROOT_PASSWORD: rootmaria
-#      MARIADB_DATABASE: bdmaria
-#    restart: always
-#    networks:
-#      - mynetwork
+  testmariadb:
+    container_name: testmariadb
+    image: mariadb:latest
+    ports:
+      - 6000:3306
+    environment:
+      MARIADB_USER: mariauser
+      MARIADB_PASSWORD: mariapass
+      MARIADB_ROOT_PASSWORD: rootmaria
+      MARIADB_DATABASE: bdmaria
+    restart: always
+    networks:
+      - mynetwork
 
   testmysql:
     container_name: testmysql
@@ -63,61 +78,61 @@ services:
     networks:
       - mynetwork
 
-#  testpostgres:
-#    container_name: testpostgres
-#    image: postgres:13
-#    ports:
-#      - 6002:5432
-#    shm_size: 128mb
-#    environment:
-#      - POSTGRES_DB=bdpostgres
-#      - POSTGRES_USER=postgresuser
-#      - POSTGRES_PASSWORD=postgrespass
-#      - PGDATA=/var/lib/postgresql/data/pgdata
-#    volumes:
-#      - testpgdata:/var/lib/postgresql/data/testpgdata
-#    restart: always
-#    networks:
-#      - mynetwork
+  testpostgres:
+    container_name: testpostgres
+    image: postgres:13
+    ports:
+      - 6002:5432
+    shm_size: 128mb
+    environment:
+      - POSTGRES_DB=bdpostgres
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=postgrespass
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - testpgdata:/var/lib/postgresql/data/testpgdata
+    restart: always
+    networks:
+      - mynetwork
 
 #sa у mssql должен быть сложный иначе пользователь не создастся
-#  testmssql:
-#    container_name: testmssql
-#    image: my/testmssq/image/name #mcr.microsoft.com/mssql/server:2017
-#
-##    environment:
-##      - ACCEPT_EULA=Y
-##      - MSSQL_SA_PASSWORD=QeTuo123
-##      - MSSQL_DATA_DIR=/var/opt/sqlserver/data
-##      - MSSQL_LOG_DIR=/var/opt/sqlserver/log
-##      - MSSQL_BACKUP_DIR=/var/opt/sqlserver/backup
-#
-#    ports:
-#      - 6003:1433
-#    volumes:
-#      - mssqldata:/var/opt/mssql
-##      - sqlsystem:/var/opt/mssql/
-##      - sqldata:/var/opt/sqlserver/data
-##      - sqllog:/var/opt/sqlserver/log
-##      - sqlbackup:/var/opt/sqlserver/backup
-#    #command: chattr -a entrypoint* && bash -c "chmod -R 777 /src/entrypoint.sh"
-#    #command: chattr -a /var/opt/ && bash -c "chmod -R 777 /var/opt/"
-#    build:
-#      context: .
-#      dockerfile: vard/mssqlconf/Dockerfile
+  testmssql:
+    container_name: testmssql
+    image: my/testmssq/image/name #mcr.microsoft.com/mssql/server:2017
+
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=QeTuo123
+      - MSSQL_DATA_DIR=/var/opt/sqlserver/data
+      - MSSQL_LOG_DIR=/var/opt/sqlserver/log
+      - MSSQL_BACKUP_DIR=/var/opt/sqlserver/backup
+
+    ports:
+      - 6003:1433
+    volumes:
+      - mssqldata:/var/opt/mssql
+      - sqlsystem:/var/opt/mssql/
+      - sqldata:/var/opt/sqlserver/data
+      - sqllog:/var/opt/sqlserver/log
+      - sqlbackup:/var/opt/sqlserver/backup
+    command: chattr -a entrypoint* && chmod -R 777 /src/entrypoint.sh && chattr -a /var/opt/ && chmod -R 777 /var/opt/
+
+    build:
+      context: .
+      dockerfile: vard/mssqlconf/Dockerfile
 
 ### test db ####
 
 volumes:
   pg_data:
     driver: local
-#  testpgdata:
-#    driver: local
-#  mssqldata:
-#  sqlsystem:
-#  sqldata:
-#  sqllog:
-#  sqlbackup:
+  testpgdata:
+    driver: local
+  mssqldata:
+  sqlsystem:
+  sqldata:
+  sqllog:
+  sqlbackup:
 
 networks:
   mynetwork:
