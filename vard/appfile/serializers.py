@@ -12,22 +12,36 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = File
-        fields = '__all__'
+        b64str = serializers.CharField(read_only=True, allow_blank=True, allow_null=True)
+        fields = [
+            'id',
+            'name',
+            'link',
+            'date_creation',
+            'date_change',
+            'date_delete',
+            'user_id',
+            'user_url',
+            'publish',
+            'type_id',
+            'b64str',
+        ]
         extra_kwargs = {
             'date_delete': {'read_only': True},
             'user_id': {'read_only': True},
             'type_id': {'read_only': True},
+            'b64str': {'read_only': True},
         }
 
     def load_by_url(self, validated_data):
         try:
             validated_data = load_json(self, validated_data)
             return validated_data
-        except BaseException as error:
+        except Exception as error:
             try:
                 validated_data = load_csv(self, validated_data)
                 return validated_data
-            except BaseException as error:
+            except Exception as error:
                 raise ValidationError(error)
 
     def create(self, validated_data):
@@ -42,15 +56,17 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
         file.type_id = File.FilesType[file_type].value
         file.save()
 
-        path_instance = f'{settings.BASE_DIR}{settings.MEDIA_URL}files/{file.link}'.replace('\\', '/')
-        hash_instance = get_hash_md5(path_instance)
-        files = File.objects.filter(user_id=validated_data['user_id']).exclude(id=file.id)
-
-        for file_ in files:
-            path_file = f'{settings.BASE_DIR}{settings.MEDIA_URL}files/{file_.link}'.replace('\\', '/')
-            hash_file = get_hash_md5(path_file)
-            if hash_instance == hash_file:
-                file.link.delete()
-                file.delete()
-                file = file_
+        # check the hash of the file and delete duplicate files, don't work correctly
+        #
+        # path_instance = f'{settings.BASE_DIR}{settings.MEDIA_URL}files/{file.link}'.replace('\\', '/')
+        # hash_instance = get_hash_md5(path_instance)
+        # files = File.objects.filter(user_id=validated_data['user_id']).exclude(id=file.id)
+        #
+        # for file_ in files:
+        #     path_file = f'{settings.BASE_DIR}{settings.MEDIA_URL}files/{file_.link}'.replace('\\', '/')
+        #     hash_file = get_hash_md5(path_file)
+        #     if hash_instance == hash_file:
+        #         file.link.delete()
+        #         file.delete()
+        #         file = file_
         return file
