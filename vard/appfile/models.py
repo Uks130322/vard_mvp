@@ -38,6 +38,7 @@ class File(models.Model):
     link = models.FileField(upload_to=user_directory_path, blank=True, verbose_name='link of file',
                             validators=[FileExtensionValidator(allowed_extensions=['pdf', 'csv', 'json'])])
     publish = models.IntegerField(choices=Publish.choices, default=0)
+    b64str = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.name}, id={self.user_id}'

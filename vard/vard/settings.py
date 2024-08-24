@@ -231,7 +231,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = '/usr/src/app/staticfiles'
 SITE_URL = 'http://127.0.0.1:8000'
 MEDIA_URL = 'media/'  # TODO clarify details
-MEDIA_ROOT = os.path.join('files')
+MEDIA_ROOT = os.path.join('media')
 MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 
 ### статика #######################################################################
